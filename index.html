@@ -238,6 +238,7 @@
         }
 
         editor.style.display = "flex";
+        editingIndex = null;
     };
 
     document.querySelectorAll(".cat").forEach(cat => {
@@ -279,24 +280,21 @@
 
         const notes = JSON.parse(localStorage.getItem("notes") || "[]");
 
-        let filtered = notes;
-        if (category !== "tutte") {
-            filtered = notes.filter(n => n.category === category);
-        }
-
         let html = `
             <button class="backBtn" onclick="goBack()">Indietro</button>
             <input id="searchBar" placeholder="🔎 Cerca..." oninput="filterNotes(this.value)">
             <div id="notesContainer">
         `;
 
-        filtered.forEach((n, i) => {
+        notes.forEach((n, originalIndex) => {
+            if (category !== "tutte" && n.category !== category) return;
+
             html += `
-                <div class="noteItem" data-index="${i}">
+                <div class="noteItem" data-index="${originalIndex}">
                     <b>${getIcon(n.category)}</b> ${n.text}
                     <div class="noteActions">
-                        <button class="actionBtn editBtn" onclick="editNote(${i})">✏️ Modifica</button>
-                        <button class="actionBtn deleteBtn" onclick="deleteNote(${i})">🗑️ Elimina</button>
+                        <button class="actionBtn editBtn" onclick="editNote(${originalIndex})">✏️ Modifica</button>
+                        <button class="actionBtn deleteBtn" onclick="deleteNote(${originalIndex})">🗑️ Elimina</button>
                     </div>
                 </div>
             `;
@@ -332,6 +330,7 @@
     function goBack() {
         notesList.style.display = "none";
         categories.style.display = "grid";
+        currentCategory = null;
     }
 
     function getIcon(cat) {
