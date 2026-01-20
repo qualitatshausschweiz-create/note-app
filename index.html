@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Note</title>
 
+<!-- ⭐ ICONA PER HOME SCREEN iPHONE ⭐ -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.png">
+
 <style>
     body {
         font-family: -apple-system, BlinkMacSystemFont, sans-serif;
@@ -37,6 +42,22 @@
         border-bottom: 1px solid #444;
     }
 
+    #themeToggle {
+        font-size: 22px;
+        background: none;
+        border: none;
+        margin-right: 10px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    #sunIcon {
+        height: 22px;
+        display: none;
+    }
+
     #addNoteBtn {
         font-size: 26px;
         padding: 6px 12px;
@@ -44,14 +65,6 @@
         background: #007aff;
         color: white;
         border: none;
-    }
-
-    #themeToggle {
-        font-size: 22px;
-        background: none;
-        border: none;
-        margin-right: 10px;
-        cursor: pointer;
     }
 
     .grid {
@@ -175,7 +188,9 @@
 <body>
 
 <header>
-    <button id="themeToggle">🌙</button>
+    <button id="themeToggle">
+        🌙 <img id="sunIcon" src="sun.png">
+    </button>
     Note
     <button id="addNoteBtn">+ Nota</button>
 </header>
@@ -212,8 +227,8 @@
     const editorTitle = document.getElementById("editorTitle");
     const notesList = document.getElementById("notesList");
     const categories = document.getElementById("categories");
+    const sunIcon = document.getElementById("sunIcon");
 
-    /* ⭐ FIX DEFINITIVO PER + NOTA ⭐ */
     document.getElementById("addNoteBtn").onclick = () => {
         editorTitle.textContent = "Nuova Nota";
         noteText.value = "";
@@ -225,7 +240,6 @@
         editor.style.display = "flex";
     };
 
-    /* ⭐ FIX CATEGORIE (Casa + Spesa ora funzionano) ⭐ */
     document.querySelectorAll(".cat").forEach(cat => {
         cat.addEventListener("click", () => {
             currentCategory = cat.dataset.cat;
@@ -331,13 +345,19 @@
         }[cat] || "📄";
     }
 
+    // ⭐ TEMA SCURO + SOLE ⭐
     document.getElementById("themeToggle").onclick = () => {
         document.body.classList.toggle("dark");
-        localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+
+        const isDark = document.body.classList.contains("dark");
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+
+        sunIcon.style.display = isDark ? "inline" : "none";
     };
 
     if (localStorage.getItem("theme") === "dark") {
         document.body.classList.add("dark");
+        sunIcon.style.display = "inline";
     }
 </script>
 
