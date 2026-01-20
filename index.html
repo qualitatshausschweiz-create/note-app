@@ -1,3 +1,212 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Note</title>
+
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    transition: 0.3s;
+  }
+
+  :root {
+    --bg: #f2f2f7;
+    --text: #000;
+    --card: #fff;
+  }
+
+  .dark {
+    --bg: #1c1c1e;
+    --text: #fff;
+    --card: #2c2c2e;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px;
+    background: var(--card);
+    font-size: 22px;
+    font-weight: 600;
+    border-bottom: 1px solid #444;
+  }
+
+  #themeToggle {
+    font-size: 22px;
+    background: none;
+    border: none;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+
+  #addNoteBtn, .backupBtn {
+    font-size: 16px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: #007aff;
+    color: white;
+    border: none;
+    margin-left: 6px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+    padding: 20px;
+  }
+
+  .cat {
+    background: var(--card);
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+  }
+
+  .circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+  }
+
+  .lavoro { background: #007aff; }
+  .spesa { background: #ffcc00; }
+  .casa { background: #ff9500; }
+  .idee { background: #34c759; }
+  .personale { background: #ffffff; border: 2px solid #ccc; }
+
+  #notesList {
+    display: none;
+    padding: 20px;
+  }
+
+  .noteItem {
+    background: var(--card);
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+
+  .noteActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .actionBtn {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .editBtn { background: #34c759; color: white; }
+  .deleteBtn { background: #ff3b30; color: white; }
+
+  .backBtn {
+    font-size: 18px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    background: #007aff;
+    color: white;
+    border: none;
+    margin-bottom: 20px;
+  }
+
+  #searchBar {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    border-radius: 12px;
+    border: 1px solid #aaa;
+    margin-bottom: 20px;
+  }
+
+  #noteEditor {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #editorBox {
+    background: var(--card);
+    width: 90%;
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  textarea {
+    width: 100%;
+    height: 150px;
+    font-size: 18px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .editorButtons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+  }
+
+  .saveBtn { background: #34c759; color: white; }
+  .cancelBtn { background: #ff3b30; color: white; }
+</style>
+</head>
+
+<body>
+
+<header>
+  <button id="themeToggle">🌙</button>
+  Note
+  <div>
+    <button class="backupBtn" onclick="backupJSON()">JSON</button>
+    <button class="backupBtn" onclick="backupTXT()">TXT</button>
+    <button id="addNoteBtn">+ Nota</button>
+  </div>
+</header>
+
+<div class="grid" id="categories">
+  <div class="cat" data-cat="tutte"><div class="circle personale"></div>📁 Tutte</div>
+  <div class="cat" data-cat="lavoro"><div class="circle lavoro"></div>💼 Lavoro</div>
+  <div class="cat" data-cat="spesa"><div class="circle spesa"></div>🛒 Spesa</div>
+  <div class="cat" data-cat="casa"><div class="circle casa"></div>🏠 Casa</div>
+  <div class="cat" data-cat="idee"><div class="circle idee"></div>💡 Idee</div>
+  <div class="cat" data-cat="personale"><div class="circle personale"></div>⭐ Personale</div>
+</div>
+
+<div id="notesList"></div>
+
+<div id="noteEditor">
+  <div id="editorBox">
+    <h3 id="editorTitle">Nuova Nota</h3>
+    <textarea id="noteText"></textarea>
+    <div class="editorButtons">
+      <button class="cancelBtn" onclick="closeEditor()">Annulla</button>
+      <button class="saveBtn" onclick="saveNote()">Salva</button>
+    </div>
+  </div>
+</div>
+
 <script>
 let editingIndex = null;
 let currentCategory = null;
@@ -7,139 +216,160 @@ const noteText = document.getElementById("noteText");
 const editorTitle = document.getElementById("editorTitle");
 const notesList = document.getElementById("notesList");
 const categories = document.getElementById("categories");
-const sunIcon = document.getElementById("sunIcon");
 
 document.getElementById("addNoteBtn").onclick = () => {
-    editorTitle.textContent = "Nuova Nota";
-    noteText.value = "";
-
-    if (!currentCategory || currentCategory === "tutte") {
-        currentCategory = "generale";
-    }
-
-    editor.style.display = "flex";
-    editingIndex = null;
+  editorTitle.textContent = "Nuova Nota";
+  noteText.value = "";
+  if (!currentCategory || currentCategory === "tutte") {
+    currentCategory = "generale";
+  }
+  editor.style.display = "flex";
+  editingIndex = null;
 };
 
 document.querySelectorAll(".cat").forEach(cat => {
-    cat.addEventListener("click", () => {
-        currentCategory = cat.dataset.cat;
-        showNotes(currentCategory);
-    });
+  cat.addEventListener("click", () => {
+    currentCategory = cat.dataset.cat;
+    showNotes(currentCategory);
+  });
 });
 
 function closeEditor() {
-    editor.style.display = "none";
+  editor.style.display = "none";
 }
 
 function saveNote() {
-    const text = noteText.value.trim();
-    if (!text) return;
+  const text = noteText.value.trim();
+  if (!text) return;
 
-    const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
 
-    if (editingIndex !== null) {
-        notes[editingIndex].text = text;
-    } else {
-        notes.push({
-            text,
-            category: currentCategory,
-            date: Date.now()
-        });
-    }
+  if (editingIndex !== null) {
+    notes[editingIndex].text = text;
+  } else {
+    notes.push({ text, category: currentCategory, date: Date.now() });
+  }
 
-    localStorage.setItem("notes", JSON.stringify(notes));
-    editor.style.display = "none";
-    showNotes(currentCategory);
+  localStorage.setItem("notes", JSON.stringify(notes));
+  editor.style.display = "none";
+  showNotes(currentCategory);
 }
 
 function showNotes(category) {
-    currentCategory = category;
-    categories.style.display = "none";
-    notesList.style.display = "block";
+  currentCategory = category;
+  categories.style.display = "none";
+  notesList.style.display = "block";
 
-    const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
 
-    let filtered = notes;
-    if (category !== "tutte") {
-        filtered = notes.filter(n => n.category === category);
-    }
+  let filtered = notes;
+  if (category !== "tutte") {
+    filtered = notes.filter(n => n.category === category);
+  }
 
-    let html = `
-        <button class="backBtn" onclick="goBack()">Indietro</button>
-        <input id="searchBar" placeholder="🔎 Cerca..." oninput="filterNotes(this.value)">
-        <div id="notesContainer">
+  let html = `
+    <button class="backBtn" onclick="goBack()">Indietro</button>
+    <input id="searchBar" placeholder="🔎 Cerca..." oninput="filterNotes(this.value)">
+    <div id="notesContainer">
+  `;
+
+  filtered.forEach((n, i) => {
+    html += `
+      <div class="noteItem" data-index="${i}">
+        <b>${getIcon(n.category)}</b> ${n.text}
+        <div class="noteActions">
+          <button class="actionBtn editBtn" onclick="editNote(${i})">✏️ Modifica</button>
+          <button class="actionBtn deleteBtn" onclick="deleteNote(${i})">🗑️ Elimina</button>
+        </div>
+      </div>
     `;
+  });
 
-    filtered.forEach((n, i) => {
-        const originalIndex = notes.indexOf(n);
-        html += `
-            <div class="noteItem" data-index="${originalIndex}">
-                <b>${getIcon(n.category)}</b> ${n.text}
-                <div class="noteActions">
-                    <button class="actionBtn editBtn" onclick="editNote(${originalIndex})">✏️ Modifica</button>
-                    <button class="actionBtn deleteBtn" onclick="deleteNote(${originalIndex})">🗑️ Elimina</button>
-                </div>
-            </div>
-        `;
-    });
-
-    html += "</div>";
-    notesList.innerHTML = html;
+  html += "</div>";
+  notesList.innerHTML = html;
 }
 
 function filterNotes(query) {
-    const items = document.querySelectorAll(".noteItem");
-    items.forEach(item => {
-        const text = item.textContent.toLowerCase();
-        item.style.display = text.includes(query.toLowerCase()) ? "block" : "none";
-    });
+  const items = document.querySelectorAll(".noteItem");
+  items.forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(query.toLowerCase()) ? "block" : "none";
+  });
 }
 
 function editNote(index) {
-    const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-    editingIndex = index;
-    noteText.value = notes[index].text;
-    editorTitle.textContent = "Modifica Nota";
-    editor.style.display = "flex";
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+  editingIndex = index;
+  noteText.value = notes[index].text;
+  editorTitle.textContent = "Modifica Nota";
+  editor.style.display = "flex";
 }
 
 function deleteNote(index) {
-    const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-    notes.splice(index, 1);
-    localStorage.setItem("notes", JSON.stringify(notes));
-    showNotes(currentCategory);
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+  notes.splice(index, 1);
+  localStorage.setItem("notes", JSON.stringify(notes));
+  showNotes(currentCategory);
 }
 
 function goBack() {
-    notesList.style.display = "none";
-    categories.style.display = "grid";
-    currentCategory = null;
+  notesList.style.display = "none";
+  categories.style.display = "grid";
+  currentCategory = null;
 }
 
 function getIcon(cat) {
-    return {
-        lavoro: "💼",
-        spesa: "🛒",
-        casa: "🏠",
-        idee: "💡",
-        personale: "⭐",
-        generale: "📝"
-    }[cat] || "📄";
+  return {
+    lavoro: "💼",
+    spesa: "🛒",
+    casa: "🏠",
+    idee: "💡",
+    personale: "⭐",
+    generale: "📝"
+  }[cat] || "📄";
 }
 
-// ⭐ TEMA SCURO + SOLE ⭐
 document.getElementById("themeToggle").onclick = () => {
-    document.body.classList.toggle("dark");
-
-    const isDark = document.body.classList.contains("dark");
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-
-    sunIcon.style.display = isDark ? "inline" : "none";
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme",
+    document.body.classList.contains("dark") ? "dark" : "light"
+  );
 };
 
 if (localStorage.getItem("theme") === "dark") {
-    document.body.classList.add("dark");
-    sunIcon.style.display = "inline";
+  document.body.classList.add("dark");
+}
+
+/* ⭐ BACKUP JSON ⭐ */
+function backupJSON() {
+  const notes = localStorage.getItem("notes") || "[]";
+  const blob = new Blob([notes], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "backup_note.json";
+  a.click();
+}
+
+/* ⭐ BACKUP TXT ⭐ */
+function backupTXT() {
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+
+  let txt = "BACKUP NOTE\n\n";
+  notes.forEach(n => {
+    txt += `${getIcon(n.category)} ${n.text}\n\n`;
+  });
+
+  const blob = new Blob([txt], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "backup_note.txt";
+  a.click();
 }
 </script>
+
+</body>
+</html>
