@@ -268,13 +268,14 @@ function showNotes(category) {
     <div id="notesContainer">
   `;
 
-  filtered.forEach((n, i) => {
+  filtered.forEach(n => {
+    const originalIndex = notes.indexOf(n);
     html += `
-      <div class="noteItem" data-index="${i}">
+      <div class="noteItem" data-index="${originalIndex}">
         <b>${getIcon(n.category)}</b> ${n.text}
         <div class="noteActions">
-          <button class="actionBtn editBtn" onclick="editNote(${i})">✏️ Modifica</button>
-          <button class="actionBtn deleteBtn" onclick="deleteNote(${i})">🗑️ Elimina</button>
+          <button class="actionBtn editBtn" onclick="editNote(${originalIndex})">✏️ Modifica</button>
+          <button class="actionBtn deleteBtn" onclick="deleteNote(${originalIndex})">🗑️ Elimina</button>
         </div>
       </div>
     `;
