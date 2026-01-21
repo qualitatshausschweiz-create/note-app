@@ -256,3 +256,64 @@ function showNotes(category) {
           <button class="actionBtn deleteBtn" onclick="deleteNote(${originalIndex})">🗑️ Elimina</button>
         </div>
       </div>
+    `;
+  });
+
+  html += "</div>";
+  notesList.innerHTML = html;
+}
+
+function filterNotes(query) {
+  const items = document.querySelectorAll(".noteItem");
+  items.forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(query.toLowerCase()) ? "block" : "none";
+  });
+}
+
+function editNote(index) {
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+  editingIndex = index;
+  noteText.value = notes[index].text;
+  editorTitle.textContent = "Modifica Nota";
+  editor.style.display = "flex";
+}
+
+function deleteNote(index) {
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+  notes.splice(index, 1);
+  localStorage.setItem("notes", JSON.stringify(notes));
+  showNotes(currentCategory);
+}
+
+function goBack() {
+  notesList.style.display = "none";
+  categories.style.display = "grid";
+  currentCategory = null;
+}
+
+function getIcon(cat) {
+  return {
+    lavoro: "💼",
+    spesa: "🛒",
+    casa: "🏠",
+    idee: "💡",
+    personale: "⭐",
+    generale: "📝"
+  }[cat] || "📄";
+}
+
+document.getElementById("themeToggle").onclick = () => {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme",
+    document.body.classList.contains("dark") ? "dark" : "light"
+  );
+};
+
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+}
+</script>
+
+</body>
+</html>
