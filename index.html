@@ -1,165 +1,197 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Note</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      transition: 0.3s;
-    }
-    :root {
-      --bg: #f2f2f7;
-      --text: #000;
-      --card: #fff;
-    }
-    .dark {
-      --bg: #1c1c1e;
-      --text: #fff;
-      --card: #2c2c2e;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 18px;
-      background: var(--card);
-      font-size: 22px;
-      font-weight: 600;
-      border-bottom: 1px solid #444;
-    }
-    #themeToggle {
-      font-size: 22px;
-      background: none;
-      border: none;
-      margin-right: 10px;
-      cursor: pointer;
-    }
-    #addNoteBtn {
-      font-size: 26px;
-      padding: 6px 12px;
-      border-radius: 12px;
-      background: #007aff;
-      color: white;
-      border: none;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 22px;
-      padding: 20px;
-    }
-    .cat {
-      background: var(--card);
-      padding: 20px;
-      border-radius: 20px;
-      text-align: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      cursor: pointer;
-    }
-    .circle {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      margin: 0 auto 10px;
-    }
-    .lavoro { background: #007aff; }
-    .spesa { background: #ffcc00; }
-    .casa { background: #ff9500; }
-    .idee { background: #34c759; }
-    .personale { background: #ffffff; border: 2px solid #ccc; }
-    #notesList {
-      display: none;
-      padding: 20px;
-    }
-    .noteItem {
-      background: var(--card);
-      padding: 15px;
-      margin-bottom: 12px;
-      border-radius: 14px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .noteActions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-      margin-top: 10px;
-    }
-    .actionBtn {
-      padding: 6px 10px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .editBtn { background: #34c759; color: white; }
-    .deleteBtn { background: #ff3b30; color: white; }
-    .backBtn {
-      font-size: 18px;
-      padding: 6px 12px;
-      border-radius: 10px;
-      background: #007aff;
-      color: white;
-      border: none;
-      margin-bottom: 20px;
-    }
-    #searchBar {
-      width: 100%;
-      padding: 12px;
-      font-size: 18px;
-      border-radius: 12px;
-      border: 1px solid #aaa;
-      margin-bottom: 20px;
-    }
-    #noteEditor {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.4);
-      display: none;
-      justify-content: center;
-      align-items: center;
-    }
-    #editorBox {
-      background: var(--card);
-      width: 90%;
-      padding: 20px;
-      border-radius: 16px;
-    }
-    textarea {
-      width: 100%;
-      height: 150px;
-      font-size: 18px;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      background: var(--bg);
-      color: var(--text);
-    }
-    .editorButtons {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 15px;
-    }
-    .saveBtn { background: #34c759; color: white; }
-    .cancelBtn { background: #ff3b30; color: white; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Note</title>
 
-    /* Pulsante Backup */
-    #backupBtn {
-      margin: 20px;
-      width: calc(100% - 40px);
-      padding: 15px;
-      font-size: 18px;
-      border-radius: 12px;
-      border: none;
-      background: #5856d6;
-      color: white;
-    }
-  </style>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    transition: 0.3s;
+  }
+
+  :root {
+    --bg: #f2f2f7;
+    --text: #000;
+    --card: #fff;
+  }
+
+  .dark {
+    --bg: #1c1c1e;
+    --text: #fff;
+    --card: #2c2c2e;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px;
+    background: var(--card);
+    font-size: 22px;
+    font-weight: 600;
+    border-bottom: 1px solid #444;
+  }
+
+  #themeToggle {
+    font-size: 22px;
+    background: none;
+    border: none;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+
+  #addNoteBtn {
+    font-size: 26px;
+    padding: 6px 12px;
+    border-radius: 12px;
+    background: #007aff;
+    color: white;
+    border: none;
+  }
+
+  /* 🔵 MODULO LINGUA — CSS */
+  #language-switcher {
+    display: flex;
+    gap: 6px;
+    margin-left: 10px;
+  }
+
+  #language-switcher button {
+    padding: 4px 8px;
+    border-radius: 8px;
+    border: none;
+    background: #4A90E2;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  #language-switcher button:hover {
+    background: #357ABD;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+    padding: 20px;
+  }
+
+  .cat {
+    background: var(--card);
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+  }
+
+  .circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+  }
+
+  .lavoro { background: #007aff; }
+  .spesa { background: #ffcc00; }
+  .casa { background: #ff9500; }
+  .idee { background: #34c759; }
+  .personale { background: #ffffff; border: 2px solid #ccc; }
+
+  #notesList {
+    display: none;
+    padding: 20px;
+  }
+
+  .noteItem {
+    background: var(--card);
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+
+  .noteActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .actionBtn {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .editBtn { background: #34c759; color: white; }
+  .deleteBtn { background: #ff3b30; color: white; }
+
+  .backBtn {
+    font-size: 18px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    background: #007aff;
+    color: white;
+    border: none;
+    margin-bottom: 20px;
+  }
+
+  #searchBar {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    border-radius: 12px;
+    border: 1px solid #aaa;
+    margin-bottom: 20px;
+  }
+
+  #noteEditor {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #editorBox {
+    background: var(--card);
+    width: 90%;
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  textarea {
+    width: 100%;
+    height: 150px;
+    font-size: 18px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .editorButtons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+  }
+
+  .saveBtn { background: #34c759; color: white; }
+  .cancelBtn { background: #ff3b30; color: white; }
+</style>
 </head>
 
 <body>
@@ -167,19 +199,26 @@
 <header>
   <button id="themeToggle">🌙</button>
   Note
+
+  <!-- 🔵 MODULO LINGUA — PULSANTI -->
+  <div id="language-switcher">
+    <button onclick="switchLanguage('it')">🇮🇹</button>
+    <button onclick="switchLanguage('de')">🇩🇪</button>
+    <button onclick="switchLanguage('en')">🇬🇧</button>
+    <button onclick="switchLanguage('es')">🇪🇸</button>
+  </div>
+
   <button id="addNoteBtn">+ Nota</button>
 </header>
 
 <div class="grid" id="categories">
-  <div class="cat" data-cat="tutte"><div class="circle personale"></div>📁 Tutte</div>
-  <div class="cat" data-cat="lavoro"><div class="circle lavoro"></div>💼 Lavoro</div>
-  <div class="cat" data-cat="spesa"><div class="circle spesa"></div>🛒 Spesa</div>
-  <div class="cat" data-cat="casa"><div class="circle casa"></div>🏠 Casa</div>
-  <div class="cat" data-cat="idee"><div class="circle idee"></div>💡 Idee</div>
-  <div class="cat" data-cat="personale"><div class="circle personale"></div>⭐ Personale</div>
+  <div class="cat" data-cat="tutte"><div class="circle personale"></div>📁 <span id="cat-tutte">Tutte</span></div>
+  <div class="cat" data-cat="lavoro"><div class="circle lavoro"></div>💼 <span id="cat-lavoro">Lavoro</span></div>
+  <div class="cat" data-cat="spesa"><div class="circle spesa"></div>🛒 <span id="cat-spesa">Spesa</span></div>
+  <div class="cat" data-cat="casa"><div class="circle casa"></div>🏠 <span id="cat-casa">Casa</span></div>
+  <div class="cat" data-cat="idee"><div class="circle idee"></div>💡 <span id="cat-idee">Idee</span></div>
+  <div class="cat" data-cat="personale"><div class="circle personale"></div>⭐ <span id="cat-personale">Personale</span></div>
 </div>
-
-<button id="backupBtn">📦 Backup</button>
 
 <div id="notesList"></div>
 
@@ -188,50 +227,111 @@
     <h3 id="editorTitle">Nuova Nota</h3>
     <textarea id="noteText"></textarea>
     <div class="editorButtons">
-      <button class="cancelBtn" onclick="closeEditor()">Annulla</button>
-      <button class="saveBtn" onclick="saveNote()">Salva</button>
+      <button class="cancelBtn" onclick="closeEditor()" id="cancelBtn">Annulla</button>
+      <button class="saveBtn" onclick="saveNote()" id="saveBtn">Salva</button>
     </div>
   </div>
 </div>
 
-<!-- MENU BACKUP -->
-<div id="backupMenu" style="
-  display:none;
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background:rgba(0,0,0,0.4);
-  justify-content:center;
-  align-items:center;
-">
-  <div style="
-    background:var(--card);
-    padding:20px;
-    border-radius:16px;
-    width:80%;
-  ">
-    <h3>Backup Note</h3>
-
-    <button onclick="exportBackup()" style="
-      width:100%; padding:12px; margin-bottom:10px;
-      background:#34c759; color:white; border:none; border-radius:10px;
-    ">⬇️ Esporta backup</button>
-
-    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)">
-
-    <button onclick="document.getElementById('importFile').click()" style="
-      width:100%; padding:12px; margin-bottom:10px;
-      background:#ff9500; color:white; border:none; border-radius:10px;
-    ">⬆️ Importa backup</button>
-
-    <button onclick="closeBackupMenu()" style="
-      width:100%; padding:12px;
-      background:#ff3b30; color:white; border:none; border-radius:10px;
-    ">Chiudi</button>
-  </div>
-</div>
-
 <script>
+/* 🌍 MODULO LINGUA — TRADUZIONI */
+const translations = {
+  it: {
+    addNote: "+ Nota",
+    editorTitle: "Nuova Nota",
+    editNote: "Modifica Nota",
+    save: "Salva",
+    cancel: "Annulla",
+    edit: "Modifica",
+    delete: "Elimina",
+    back: "Indietro",
+    search: "🔎 Cerca...",
+    tutte: "Tutte",
+    lavoro: "Lavoro",
+    spesa: "Spesa",
+    casa: "Casa",
+    idee: "Idee",
+    personale: "Personale"
+  },
+
+  de: {
+    addNote: "+ Notiz",
+    editorTitle: "Neue Notiz",
+    editNote: "Notiz bearbeiten",
+    save: "Speichern",
+    cancel: "Abbrechen",
+    edit: "Bearbeiten",
+    delete: "Löschen",
+    back: "Zurück",
+    search: "🔎 Suchen...",
+    tutte: "Alle",
+    lavoro: "Arbeit",
+    spesa: "Einkauf",
+    casa: "Zuhause",
+    idee: "Ideen",
+    personale: "Persönlich"
+  },
+
+  en: {
+    addNote: "+ Note",
+    editorTitle: "New Note",
+    editNote: "Edit Note",
+    save: "Save",
+    cancel: "Cancel",
+    edit: "Edit",
+    delete: "Delete",
+    back: "Back",
+    search: "🔎 Search...",
+    tutte: "All",
+    lavoro: "Work",
+    spesa: "Shopping",
+    casa: "Home",
+    idee: "Ideas",
+    personale: "Personal"
+  },
+
+  es: {
+    addNote: "+ Nota",
+    editorTitle: "Nueva Nota",
+    editNote: "Editar Nota",
+    save: "Guardar",
+    cancel: "Cancelar",
+    edit: "Editar",
+    delete: "Eliminar",
+    back: "Atrás",
+    search: "🔎 Buscar...",
+    tutte: "Todas",
+    lavoro: "Trabajo",
+    spesa: "Compras",
+    casa: "Casa",
+    idee: "Ideas",
+    personale: "Personal"
+  }
+};
+
+let currentLang = localStorage.getItem("lang") || "it";
+
+function switchLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem("lang", lang);
+
+  document.getElementById("addNoteBtn").textContent = translations[lang].addNote;
+  document.getElementById("editorTitle").textContent = translations[lang].editorTitle;
+  document.getElementById("saveBtn").textContent = translations[lang].save;
+  document.getElementById("cancelBtn").textContent = translations[lang].cancel;
+
+  document.getElementById("cat-tutte").textContent = translations[lang].tutte;
+  document.getElementById("cat-lavoro").textContent = translations[lang].lavoro;
+  document.getElementById("cat-spesa").textContent = translations[lang].spesa;
+  document.getElementById("cat-casa").textContent = translations[lang].casa;
+  document.getElementById("cat-idee").textContent = translations[lang].idee;
+  document.getElementById("cat-personale").textContent = translations[lang].personale;
+}
+
+/* 🔄 Applica lingua salvata */
+switchLanguage(currentLang);
+
+/* 🔧 LOGICA NOTE */
 let editingIndex = null;
 let currentCategory = null;
 
@@ -242,7 +342,7 @@ const notesList = document.getElementById("notesList");
 const categories = document.getElementById("categories");
 
 document.getElementById("addNoteBtn").onclick = () => {
-  editorTitle.textContent = "Nuova Nota";
+  editorTitle.textContent = translations[currentLang].editorTitle;
   noteText.value = "";
   if (!currentCategory || currentCategory === "tutte") {
     currentCategory = "generale";
@@ -292,8 +392,8 @@ function showNotes(category) {
   }
 
   let html = `
-    <button class="backBtn" onclick="goBack()">Indietro</button>
-    <input id="searchBar" placeholder="🔎 Cerca..." oninput="filterNotes(this.value)">
+    <button class="backBtn" onclick="goBack()" id="backBtn">${translations[currentLang].back}</button>
+    <input id="searchBar" placeholder="${translations[currentLang].search}" oninput="filterNotes(this.value)">
     <div id="notesContainer">
   `;
 
@@ -303,8 +403,8 @@ function showNotes(category) {
       <div class="noteItem" data-index="${originalIndex}">
         <b>${getIcon(n.category)}</b> ${n.text}
         <div class="noteActions">
-          <button class="actionBtn editBtn" onclick="editNote(${originalIndex})">✏️ Modifica</button>
-          <button class="actionBtn deleteBtn" onclick="deleteNote(${originalIndex})">🗑️ Elimina</button>
+          <button class="actionBtn editBtn" onclick="editNote(${originalIndex})">✏️ ${translations[currentLang].edit}</button>
+          <button class="actionBtn deleteBtn" onclick="deleteNote(${originalIndex})">🗑️ ${translations[currentLang].delete}</button>
         </div>
       </div>
     `;
@@ -326,7 +426,7 @@ function editNote(index) {
   const notes = JSON.parse(localStorage.getItem("notes") || "[]");
   editingIndex = index;
   noteText.value = notes[index].text;
-  editorTitle.textContent = "Modifica Nota";
+  editorTitle.textContent = translations[currentLang].editNote;
   editor.style.display = "flex";
 }
 
@@ -354,6 +454,7 @@ function getIcon(cat) {
   }[cat] || "📄";
 }
 
+/* 🌙 TEMA SCURO */
 document.getElementById("themeToggle").onclick = () => {
   document.body.classList.toggle("dark");
   localStorage.setItem("theme",
@@ -363,46 +464,6 @@ document.getElementById("themeToggle").onclick = () => {
 
 if (localStorage.getItem("theme") === "dark") {
   document.body.classList.add("dark");
-}
-
-/* BACKUP */
-document.getElementById("backupBtn").onclick = () => {
-  document.getElementById("backupMenu").style.display = "flex";
-};
-
-function closeBackupMenu() {
-  document.getElementById("backupMenu").style.display = "none";
-}
-
-function exportBackup() {
-  const notes = localStorage.getItem("notes") || "[]";
-  const blob = new Blob([notes], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "backup_note.json";
-  a.click();
-
-  URL.revokeObjectURL(url);
-}
-
-function importBackup(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      localStorage.setItem("notes", JSON.stringify(data));
-      alert("Backup importato con successo!");
-      location.reload();
-    } catch {
-      alert("Errore: file non valido");
-    }
-  };
-  reader.readAsText(file);
 }
 </script>
 
