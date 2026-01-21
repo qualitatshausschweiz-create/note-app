@@ -147,6 +147,18 @@
     }
     .saveBtn { background: #34c759; color: white; }
     .cancelBtn { background: #ff3b30; color: white; }
+
+    /* Pulsante Backup */
+    #backupBtn {
+      margin: 20px;
+      width: calc(100% - 40px);
+      padding: 15px;
+      font-size: 18px;
+      border-radius: 12px;
+      border: none;
+      background: #5856d6;
+      color: white;
+    }
   </style>
 </head>
 
@@ -167,6 +179,8 @@
   <div class="cat" data-cat="personale"><div class="circle personale"></div>⭐ Personale</div>
 </div>
 
+<button id="backupBtn">📦 Backup</button>
+
 <div id="notesList"></div>
 
 <div id="noteEditor">
@@ -177,6 +191,43 @@
       <button class="cancelBtn" onclick="closeEditor()">Annulla</button>
       <button class="saveBtn" onclick="saveNote()">Salva</button>
     </div>
+  </div>
+</div>
+
+<!-- MENU BACKUP -->
+<div id="backupMenu" style="
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.4);
+  justify-content:center;
+  align-items:center;
+">
+  <div style="
+    background:var(--card);
+    padding:20px;
+    border-radius:16px;
+    width:80%;
+  ">
+    <h3>Backup Note</h3>
+
+    <button onclick="exportBackup()" style="
+      width:100%; padding:12px; margin-bottom:10px;
+      background:#34c759; color:white; border:none; border-radius:10px;
+    ">⬇️ Esporta backup</button>
+
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)">
+
+    <button onclick="document.getElementById('importFile').click()" style="
+      width:100%; padding:12px; margin-bottom:10px;
+      background:#ff9500; color:white; border:none; border-radius:10px;
+    ">⬆️ Importa backup</button>
+
+    <button onclick="closeBackupMenu()" style="
+      width:100%; padding:12px;
+      background:#ff3b30; color:white; border:none; border-radius:10px;
+    ">Chiudi</button>
   </div>
 </div>
 
@@ -312,6 +363,46 @@ document.getElementById("themeToggle").onclick = () => {
 
 if (localStorage.getItem("theme") === "dark") {
   document.body.classList.add("dark");
+}
+
+/* BACKUP */
+document.getElementById("backupBtn").onclick = () => {
+  document.getElementById("backupMenu").style.display = "flex";
+};
+
+function closeBackupMenu() {
+  document.getElementById("backupMenu").style.display = "none";
+}
+
+function exportBackup() {
+  const notes = localStorage.getItem("notes") || "[]";
+  const blob = new Blob([notes], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "backup_note.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+function importBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      localStorage.setItem("notes", JSON.stringify(data));
+      alert("Backup importato con successo!");
+      location.reload();
+    } catch {
+      alert("Errore: file non valido");
+    }
+  };
+  reader.readAsText(file);
 }
 </script>
 
