@@ -1,1 +1,22 @@
 manifest.json
+{
+  "name": "Note",
+  "short_name": "Note",
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "background_color": "#4A90E2",
+  "theme_color": "#4A90E2",
+  "description": "App Note personale offline",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
