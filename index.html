@@ -35,7 +35,6 @@
     font-size: 22px;
     font-weight: 600;
     border-bottom: 1px solid #444;
-    flex-wrap: wrap;
   }
 
   #themeToggle {
@@ -46,35 +45,14 @@
     cursor: pointer;
   }
 
-  #addNoteBtn {
-    font-size: 26px;
+  #addNoteBtn, #backupBtn {
+    font-size: 20px;
     padding: 6px 12px;
     border-radius: 12px;
     background: #007aff;
     color: white;
     border: none;
-  }
-
-  /* 🔵 MODULO LINGUA */
-  #language-switcher {
-    display: flex;
-    gap: 6px;
     margin-left: 10px;
-  }
-
-  #language-switcher button {
-    padding: 4px 8px;
-    border-radius: 8px;
-    border: none;
-    background: #4A90E2;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 14px;
-  }
-
-  #language-switcher button:hover {
-    background: #357ABD;
   }
 
   .grid {
@@ -156,7 +134,7 @@
     margin-bottom: 20px;
   }
 
-  #noteEditor {
+  #noteEditor, #backupPopup {
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
@@ -166,7 +144,7 @@
     align-items: center;
   }
 
-  #editorBox {
+  #editorBox, #backupBox {
     background: var(--card);
     width: 90%;
     padding: 20px;
@@ -200,138 +178,58 @@
 <header>
   <button id="themeToggle">🌙</button>
   Note
-
-  <!-- 🔵 PULSANTI LINGUA -->
-  <div id="language-switcher">
-    <button onclick="switchLanguage('it')">🇮🇹</button>
-    <button onclick="switchLanguage('de')">🇩🇪</button>
-    <button onclick="switchLanguage('en')">🇬🇧</button>
-    <button onclick="switchLanguage('es')">🇪🇸</button>
+  <div>
+    <button id="addNoteBtn">+ Nota</button>
+    <button id="backupBtn">🗂️ Backup</button>
   </div>
-
-  <button id="addNoteBtn">+ Nota</button>
 </header>
 
 <div class="grid" id="categories">
-  <div class="cat" data-cat="tutte"><div class="circle personale"></div>📁 <span id="cat-tutte">Tutte</span></div>
-  <div class="cat" data-cat="lavoro"><div class="circle lavoro"></div>💼 <span id="cat-lavoro">Lavoro</span></div>
-  <div class="cat" data-cat="spesa"><div class="circle spesa"></div>🛒 <span id="cat-spesa">Spesa</span></div>
-  <div class="cat" data-cat="casa"><div class="circle casa"></div>🏠 <span id="cat-casa">Casa</span></div>
-  <div class="cat" data-cat="idee"><div class="circle idee"></div>💡 <span id="cat-idee">Idee</span></div>
-  <div class="cat" data-cat="personale"><div class="circle personale"></div>⭐ <span id="cat-personale">Personale</span></div>
+  <div class="cat" data-cat="tutte"><div class="circle personale"></div>📁 Tutte</div>
+  <div class="cat" data-cat="lavoro"><div class="circle lavoro"></div>💼 Lavoro</div>
+  <div class="cat" data-cat="spesa"><div class="circle spesa"></div>🛒 Spesa</div>
+  <div class="cat" data-cat="casa"><div class="circle casa"></div>🏠 Casa</div>
+  <div class="cat" data-cat="idee"><div class="circle idee"></div>💡 Idee</div>
+  <div class="cat" data-cat="personale"><div class="circle personale"></div>⭐ Personale</div>
 </div>
 
 <div id="notesList"></div>
 
+<!-- POPUP BACKUP -->
+<div id="backupPopup">
+  <div id="backupBox">
+    <h3>Backup</h3>
+
+    <button class="actionBtn" style="background:#34c759; color:white;" onclick="exportBackup()">
+      Esporta Backup
+    </button>
+
+    <br><br>
+
+    <input type="file" id="backupFile" style="display:none;" onchange="importBackupFile(event)">
+    <button class="actionBtn" style="background:#007aff; color:white;" onclick="document.getElementById('backupFile').click()">
+      Importa Backup
+    </button>
+
+    <br><br>
+
+    <button class="backBtn" onclick="closeBackup()">Chiudi</button>
+  </div>
+</div>
+
+<!-- POPUP EDITOR -->
 <div id="noteEditor">
   <div id="editorBox">
     <h3 id="editorTitle">Nuova Nota</h3>
     <textarea id="noteText"></textarea>
     <div class="editorButtons">
-      <button class="cancelBtn" onclick="closeEditor()" id="cancelBtn">Annulla</button>
-      <button class="saveBtn" onclick="saveNote()" id="saveBtn">Salva</button>
+      <button class="cancelBtn" onclick="closeEditor()">Annulla</button>
+      <button class="saveBtn" onclick="saveNote()">Salva</button>
     </div>
   </div>
 </div>
 
 <script>
-/* 🌍 TRADUZIONI */
-const translations = {
-  it: {
-    addNote: "+ Nota",
-    editorTitle: "Nuova Nota",
-    editNote: "Modifica Nota",
-    save: "Salva",
-    cancel: "Annulla",
-    edit: "Modifica",
-    delete: "Elimina",
-    back: "Indietro",
-    search: "🔎 Cerca...",
-    tutte: "Tutte",
-    lavoro: "Lavoro",
-    spesa: "Spesa",
-    casa: "Casa",
-    idee: "Idee",
-    personale: "Personale"
-  },
-
-  de: {
-    addNote: "+ Notiz",
-    editorTitle: "Neue Notiz",
-    editNote: "Notiz bearbeiten",
-    save: "Speichern",
-    cancel: "Abbrechen",
-    edit: "Bearbeiten",
-    delete: "Löschen",
-    back: "Zurück",
-    search: "🔎 Suchen...",
-    tutte: "Alle",
-    lavoro: "Arbeit",
-    spesa: "Einkauf",
-    casa: "Zuhause",
-    idee: "Ideen",
-    personale: "Persönlich"
-  },
-
-  en: {
-    addNote: "+ Note",
-    editorTitle: "New Note",
-    editNote: "Edit Note",
-    save: "Save",
-    cancel: "Cancel",
-    edit: "Edit",
-    delete: "Delete",
-    back: "Back",
-    search: "🔎 Search...",
-    tutte: "All",
-    lavoro: "Work",
-    spesa: "Shopping",
-    casa: "Home",
-    idee: "Ideas",
-    personale: "Personal"
-  },
-
-  es: {
-    addNote: "+ Nota",
-    editorTitle: "Nueva Nota",
-    editNote: "Editar Nota",
-    save: "Guardar",
-    cancel: "Cancelar",
-    edit: "Editar",
-    delete: "Eliminar",
-    back: "Atrás",
-    search: "🔎 Buscar...",
-    tutte: "Todas",
-    lavoro: "Trabajo",
-    spesa: "Compras",
-    casa: "Casa",
-    idee: "Ideas",
-    personale: "Personal"
-  }
-};
-
-let currentLang = localStorage.getItem("lang") || "it";
-
-function switchLanguage(lang) {
-  currentLang = lang;
-  localStorage.setItem("lang", lang);
-
-  document.getElementById("addNoteBtn").textContent = translations[lang].addNote;
-  document.getElementById("editorTitle").textContent = translations[lang].editorTitle;
-  document.getElementById("saveBtn").textContent = translations[lang].save;
-  document.getElementById("cancelBtn").textContent = translations[lang].cancel;
-
-  document.getElementById("cat-tutte").textContent = translations[lang].tutte;
-  document.getElementById("cat-lavoro").textContent = translations[lang].lavoro;
-  document.getElementById("cat-spesa").textContent = translations[lang].spesa;
-  document.getElementById("cat-casa").textContent = translations[lang].casa;
-  document.getElementById("cat-idee").textContent = translations[lang].idee;
-  document.getElementById("cat-personale").textContent = translations[lang].personale;
-}
-
-switchLanguage(currentLang);
-
-/* 🔧 LOGICA NOTE */
 let editingIndex = null;
 let currentCategory = null;
 
@@ -342,7 +240,7 @@ const notesList = document.getElementById("notesList");
 const categories = document.getElementById("categories");
 
 document.getElementById("addNoteBtn").onclick = () => {
-  editorTitle.textContent = translations[currentLang].editorTitle;
+  editorTitle.textContent = "Nuova Nota";
   noteText.value = "";
   if (!currentCategory || currentCategory === "tutte") {
     currentCategory = "generale";
@@ -350,6 +248,14 @@ document.getElementById("addNoteBtn").onclick = () => {
   editingIndex = null;
   editor.style.display = "flex";
 };
+
+document.getElementById("backupBtn").onclick = () => {
+  document.getElementById("backupPopup").style.display = "flex";
+};
+
+function closeBackup() {
+  document.getElementById("backupPopup").style.display = "none";
+}
 
 document.querySelectorAll(".cat").forEach(cat => {
   cat.addEventListener("click", () => {
@@ -392,8 +298,8 @@ function showNotes(category) {
   }
 
   let html = `
-    <button class="backBtn" onclick="goBack()" id="backBtn">${translations[currentLang].back}</button>
-    <input id="searchBar" placeholder="${translations[currentLang].search}" oninput="filterNotes(this.value)">
+    <button class="backBtn" onclick="goBack()">Indietro</button>
+    <input id="searchBar" placeholder="🔎 Cerca..." oninput="filterNotes(this.value)">
     <div id="notesContainer">
   `;
 
@@ -403,8 +309,8 @@ function showNotes(category) {
       <div class="noteItem" data-index="${originalIndex}">
         <b>${getIcon(n.category)}</b> ${n.text}
         <div class="noteActions">
-          <button class="actionBtn editBtn" onclick="editNote(${originalIndex})">✏️ ${translations[currentLang].edit}</button>
-          <button class="actionBtn deleteBtn" onclick="deleteNote(${originalIndex})">🗑️ ${translations[currentLang].delete}</button>
+          <button class="actionBtn editBtn" onclick="editNote(${originalIndex})">✏️ Modifica</button>
+          <button class="actionBtn deleteBtn" onclick="deleteNote(${originalIndex})">🗑️ Elimina</button>
         </div>
       </div>
     `;
@@ -426,7 +332,7 @@ function editNote(index) {
   const notes = JSON.parse(localStorage.getItem("notes") || "[]");
   editingIndex = index;
   noteText.value = notes[index].text;
-  editorTitle.textContent = translations[currentLang].editNote;
+  editorTitle.textContent = "Modifica Nota";
   editor.style.display = "flex";
 }
 
@@ -454,7 +360,6 @@ function getIcon(cat) {
   }[cat] || "📄";
 }
 
-/* 🌙 TEMA SCURO */
 document.getElementById("themeToggle").onclick = () => {
   document.body.classList.toggle("dark");
   localStorage.setItem("theme",
@@ -465,6 +370,34 @@ document.getElementById("themeToggle").onclick = () => {
 if (localStorage.getItem("theme") === "dark") {
   document.body.classList.add("dark");
 }
+
+/* ---------------- BACKUP FUNZIONI ---------------- */
+
+function exportBackup() {
+  const notes = localStorage.getItem("notes") || "[]";
+  const blob = new Blob([notes], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "backup-notes.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+function importBackupFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    localStorage.setItem("notes", e.target.result);
+    alert("Backup importato con successo!");
+  };
+  reader.readAsText(file);
+}
+
 </script>
 
 </body>
