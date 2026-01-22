@@ -457,11 +457,17 @@ function closeLangPopup() {
   document.getElementById("langPopup").style.display = "none";
 }
 
+/* ⭐ CORREZIONE: aggiorna lingua e torna alle categorie */
 function setLang(lang) {
   currentLang = lang;
   localStorage.setItem("lang", lang);
+
   applyTranslations();
-  if (currentCategory) showNotes(currentCategory);
+
+  categories.style.display = "grid";
+  notesList.style.display = "none";
+  currentCategory = null;
+
   closeLangPopup();
 }
 
@@ -510,187 +516,3 @@ function getTimestamp() {
     pad(d.getHours()) + ":" +
     pad(d.getMinutes()) + ":" +
     pad(d.getSeconds())
-  );
-}
-
-/* Backup automatico */
-function saveAutoBackup() {
-  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-  const data = {
-    timestamp: getTimestamp(),
-    notes
-  };
-  localStorage.setItem("autoBackup", JSON.stringify(data));
-  updateAutoBackupLabel();
-}
-
-function updateAutoBackupLabel() {
-  const info = document.getElementById("autoBackupInfo");
-  const auto = localStorage.getItem("autoBackup");
-  const t = tr[currentLang];
-
-  if (!auto) {
-    info.textContent = t.autoBackupLabel + " –";
-    return;
-  }
-
-  const parsed = JSON.parse(auto);
-  info.textContent = t.autoBackupLabel + " " + parsed.timestamp;
-}
-
-/* Restore automatico */
-function restoreAutoBackup() {
-  const auto = localStorage.getItem("autoBackup");
-  const t = tr[currentLang];
-
-  if (!auto) {
-    alert(t.backupAutoMissing);
-    return;
-  }
-
-  const parsed = JSON.parse(auto);
-  localStorage.setItem("notes", JSON.stringify(parsed.notes));
-  alert(t.backupAutoRestored);
-  if (currentCategory) showNotes(currentCategory);
-}
-
-/* Note — logica base */
-document.getElementById("addNoteBtn").onclick = () => {
-  const t = tr[currentLang];
-  editorTitle.textContent = t.newNote;
-  noteText.value = "";
-  if (!currentCategory || currentCategory === "alle") {
-    currentCategory = "allgemein";
-  }
-  editingIndex = null;
-  editor.style.display = "flex";
-};
-
-document.querySelectorAll(".cat").forEach(cat => {
-  cat.addEventListener("click", () => {
-    currentCategory = cat.dataset.cat;
-    showNotes(currentCategory);
-  });
-});
-
-function closeEditor() {
-  editor.style.display = "none";
-}
-
-function saveNote() {
-  const text = noteText.value.trim();
-  if (!text) return;
-
-  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-
-  if (editingIndex !== null) {
-    notes[editingIndex].text = text;
-  } else {
-    notes.push({ text, category: currentCategory, date: Date.now() });
-  }
-
-  localStorage.setItem("notes", JSON.stringify(notes));
-  saveAutoBackup();
-  editor.style.display = "none";
-  showNotes(currentCategory);
-}
-
-function showNotes(category) {
-  currentCategory = category;
-  categories.style.display = "none";
-  notesList.style.display = "block";
-
-  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-  const t = tr[currentLang];
-
-  let filtered = notes;
-  if (category !== "alle") {
-    filtered = notes.filter(n => n.category === category);
-  }
-
-  let html = `
-    <button class="backBtn" onclick="goBack()">${t.back}</button>
-    <input id="searchBar" placeholder="${t.search}" oninput="filterNotes(this.value)">
-    <div id="notesContainer">
-  `;
-
-  filtered.forEach(n => {
-    const originalIndex = notes.indexOf(n);
-    html += `
-      <div class="noteItem" data-index="${originalIndex}">
-        <b>${getIcon(n.category)}</b> ${n.text}
-        <div class="noteActions">
-          <button class="actionBtn editBtn" onclick="editNote(${originalIndex})">${t.editBtn}</button>
-          <button class="actionBtn deleteBtn" onclick="deleteNote(${originalIndex})">${t.deleteBtn}</button>
-        </div>
-      </div>
-    `;
-  });
-
-  html += "</div>";
-  notesList.innerHTML = html;
-}
-
-function filterNotes(query) {
-  const items = document.querySelectorAll(".noteItem");
-  items.forEach(item => {
-    const text = item.textContent.toLowerCase();
-    item.style.display = text.includes(query.toLowerCase()) ? "block" : "none";
-  });
-}
-
-function editNote(index) {
-  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-  const t = tr[currentLang];
-  editingIndex = index;
-  noteText.value = notes[index].text;
-  editorTitle.textContent = t.editNote;
-  editor.style.display = "flex";
-}
-
-function deleteNote(index) {
-  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-  notes.splice(index, 1);
-  localStorage.setItem("notes", JSON.stringify(notes));
-  saveAutoBackup();
-  showNotes(currentCategory);
-}
-
-function goBack() {
-  notesList.style.display = "none";
-  categories.style.display = "grid";
-  currentCategory = null;
-}
-
-/* Icone per categorie DE */
-function getIcon(cat) {
-  return {
-    arbeit: "💼",
-    einkauf: "🛒",
-    zuhause: "🏠",
-    ideen: "💡",
-    personlich: "⭐",
-    allgemein: "📝",
-    alle: "📁"
-  }[cat] || "📄";
-}
-
-/* Tema chiaro/scuro */
-document.getElementById("themeToggle").onclick = () => {
-  document.body.classList.toggle("dark");
-  const isDark = document.body.classList.contains("dark");
-  localStorage.setItem("theme", isDark ? "dark" : "light");
-  document.getElementById("themeToggle").textContent = isDark ? "☀️" : "🌙";
-};
-
-if (localStorage.getItem("theme") === "dark") {
-  document.body.classList.add("dark");
-  document.getElementById("themeToggle").textContent = "☀️";
-}
-
-/* Init */
-applyTranslations();
-</script>
-
-</body>
-</html>
