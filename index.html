@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="de">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Note</title>
+<title>Notizen</title>
 
 <style>
   body {
@@ -27,31 +27,45 @@
   }
 
   header {
+    padding: 12px 18px 16px 18px;
+    background: var(--card);
+    border-bottom: 1px solid #444;
+  }
+
+  #headerTitleRow {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  #headerControlsRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px;
-    background: var(--card);
-    font-size: 22px;
-    font-weight: 600;
-    border-bottom: 1px solid #444;
   }
 
   #themeToggle {
     font-size: 22px;
     background: none;
     border: none;
-    margin-right: 10px;
     cursor: pointer;
   }
 
   #addNoteBtn {
-    font-size: 26px;
+    font-size: 20px;
     padding: 6px 12px;
     border-radius: 12px;
     background: #007aff;
     color: white;
     border: none;
+  }
+
+  #langBtn {
+    font-size: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
   }
 
   .grid {
@@ -77,11 +91,11 @@
     margin: 0 auto 10px;
   }
 
-  .lavoro { background: #007aff; }
-  .spesa { background: #ffcc00; }
-  .casa { background: #ff9500; }
-  .idee { background: #34c759; }
-  .personale { background: #ffffff; border: 2px solid #ccc; }
+  .arbeit { background: #007aff; }
+  .einkauf { background: #ffcc00; }
+  .zuhause { background: #ff9500; }
+  .ideen { background: #34c759; }
+  .personlich { background: #ffffff; border: 2px solid #ccc; }
 
   #notesList {
     display: none;
@@ -141,6 +155,7 @@
     display: none;
     justify-content: center;
     align-items: center;
+    z-index: 900;
   }
 
   #editorBox {
@@ -170,7 +185,7 @@
   .saveBtn { background: #34c759; color: white; }
   .cancelBtn { background: #ff3b30; color: white; }
 
-  /* ⭐ Pulsante Sicherung flottante */
+  /* 🛟 Pulsante Sicherung flottante */
   #backupBtn {
     position: fixed;
     bottom: 22px;
@@ -184,10 +199,10 @@
     border: none;
     box-shadow: 0 4px 14px rgba(0,0,0,0.25);
     cursor: pointer;
-    z-index: 999;
+    z-index: 950;
   }
 
-  /* ⭐ Popup Sicherung */
+  /* Popup Sicherung */
   #backupPopup {
     position: fixed;
     top: 0; left: 0;
@@ -221,62 +236,112 @@
   .blue { background: #007aff; color: white; }
   .orange { background: #ff9500; color: white; }
   .gray { background: #ccc; }
+
+  /* Popup lingua elegante */
+  #langPopup {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  #langBox {
+    background: var(--card);
+    width: 80%;
+    max-width: 360px;
+    padding: 20px;
+    border-radius: 18px;
+    text-align: center;
+  }
+
+  .langChoice {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 12px;
+    border: none;
+    font-size: 17px;
+    cursor: pointer;
+    background: #e5e5ea;
+  }
 </style>
 </head>
 <body>
 
 <header>
-  <button id="themeToggle">🌙</button>
-  Note
-  <button id="addNoteBtn">+ Nota</button>
+  <div id="headerTitleRow">
+    <span id="appTitle">Notizen</span>
+  </div>
+  <div id="headerControlsRow">
+    <button id="themeToggle">🌙</button>
+    <button id="addNoteBtn">+ Notiz</button>
+    <button id="langBtn">🌐</button>
+  </div>
 </header>
 
-<!-- ⭐ Pulsante Sicherung flottante -->
+<!-- 🛟 Pulsante Sicherung flottante -->
 <button id="backupBtn" onclick="openBackupPopup()">🛟</button>
 
-<!-- ⭐ Popup Sicherung -->
+<!-- Popup Sicherung -->
 <div id="backupPopup">
   <div id="backupBox">
     <h2 id="backupTitle">Sicherung</h2>
 
-    <button class="backupBtn green" onclick="exportBackup()">Esporta</button>
-    <button class="backupBtn blue" onclick="document.getElementById('backupFile').click()">Importa</button>
-    <button class="backupBtn orange" onclick="restoreAutoBackup()">Ripristina backup automatico</button>
+    <button id="backupExportBtn" class="backupBtn green" onclick="exportBackup()">Exportieren</button>
+    <button id="backupImportBtn" class="backupBtn blue" onclick="document.getElementById('backupFile').click()">Importieren</button>
+    <button id="backupAutoRestoreBtn" class="backupBtn orange" onclick="restoreAutoBackup()">Automatische Sicherung wiederherstellen</button>
 
     <p id="autoBackupInfo" style="margin-top:15px; font-size:14px; color:#555;">
-      Ultimo backup automatico: –
+      Letzte automatische Sicherung: –
     </p>
 
-    <button class="backupBtn gray" onclick="closeBackupPopup()">Chiudi</button>
+    <button id="backupCloseBtn" class="backupBtn gray" onclick="closeBackupPopup()">Schließen</button>
 
     <input type="file" id="backupFile" accept="application/json" style="display:none" onchange="importBackup(event)">
   </div>
 </div>
 
+<!-- Popup lingua -->
+<div id="langPopup">
+  <div id="langBox">
+    <h2>Sprache / Language / Lingua / Idioma</h2>
+    <button class="langChoice" onclick="setLang('de')">🇩🇪 Deutsch</button>
+    <button class="langChoice" onclick="setLang('it')">🇮🇹 Italiano</button>
+    <button class="langChoice" onclick="setLang('en')">🇬🇧 English</button>
+    <button class="langChoice" onclick="setLang('es')">🇪🇸 Español</button>
+    <button class="langChoice" onclick="closeLangPopup()">✖</button>
+  </div>
+</div>
+
 <div class="grid" id="categories">
-  <div class="cat" data-cat="tutte"><div class="circle personale"></div>📁 Tutte</div>
-  <div class="cat" data-cat="lavoro"><div class="circle lavoro"></div>💼 Lavoro</div>
-  <div class="cat" data-cat="spesa"><div class="circle spesa"></div>🛒 Spesa</div>
-  <div class="cat" data-cat="casa"><div class="circle casa"></div>🏠 Casa</div>
-  <div class="cat" data-cat="idee"><div class="circle idee"></div>💡 Idee</div>
-  <div class="cat" data-cat="personale"><div class="circle personale"></div>⭐ Personale</div>
+  <div class="cat" data-cat="alle"><div class="circle personlich"></div>📁 Alle</div>
+  <div class="cat" data-cat="arbeit"><div class="circle arbeit"></div>💼 Arbeit</div>
+  <div class="cat" data-cat="einkauf"><div class="circle einkauf"></div>🛒 Einkauf</div>
+  <div class="cat" data-cat="zuhause"><div class="circle zuhause"></div>🏠 Zuhause</div>
+  <div class="cat" data-cat="ideen"><div class="circle ideen"></div>💡 Ideen</div>
+  <div class="cat" data-cat="personlich"><div class="circle personlich"></div>⭐ Persönlich</div>
 </div>
 
 <div id="notesList"></div>
 
 <div id="noteEditor">
   <div id="editorBox">
-    <h3 id="editorTitle">Nuova Nota</h3>
+    <h3 id="editorTitle">Neue Notiz</h3>
     <textarea id="noteText"></textarea>
     <div class="editorButtons">
-      <button class="cancelBtn" onclick="closeEditor()">Annulla</button>
-      <button class="saveBtn" onclick="saveNote()">Salva</button>
+      <button class="cancelBtn" id="cancelBtn" onclick="closeEditor()">Abbrechen</button>
+      <button class="saveBtn" id="saveBtn" onclick="saveNote()">Speichern</button>
     </div>
   </div>
 </div>
 <script>
 let editingIndex = null;
 let currentCategory = null;
+let currentLang = localStorage.getItem("lang") || "de";
 
 const editor = document.getElementById("noteEditor");
 const noteText = document.getElementById("noteText");
@@ -284,20 +349,123 @@ const editorTitle = document.getElementById("editorTitle");
 const notesList = document.getElementById("notesList");
 const categories = document.getElementById("categories");
 
-/* ⭐ Traduzioni */
-const t = {
+/* 🌐 Traduzioni */
+const tr = {
+  de: {
+    appTitle: "Notizen",
+    addNote: "+ Notiz",
+    newNote: "Neue Notiz",
+    editNote: "Notiz bearbeiten",
+    cancel: "Abbrechen",
+    save: "Speichern",
+    back: "Zurück",
+    search: "🔎 Suchen...",
+    editBtn: "✏️ Bearbeiten",
+    deleteBtn: "🗑️ Löschen",
+    backupTitle: "Sicherung",
+    backupExport: "Exportieren",
+    backupImport: "Importieren",
+    backupAutoRestore: "Automatische Sicherung wiederherstellen",
+    backupAutoRestored: "Automatische Sicherung wiederhergestellt!",
+    backupAutoMissing: "Keine automatische Sicherung gefunden!",
+    autoBackupLabel: "Letzte automatische Sicherung:",
+    backupClose: "Schließen"
+  },
   it: {
-    title: "Backup",
-    export: "Esporta",
-    import: "Importa",
-    autoRestore: "Ripristina backup automatico",
-    autoRestored: "Backup automatico ripristinato!",
-    autoMissing: "Nessun backup automatico trovato!",
-    autoLabel: "Ultimo backup automatico:"
+    appTitle: "Note",
+    addNote: "+ Nota",
+    newNote: "Nuova Nota",
+    editNote: "Modifica Nota",
+    cancel: "Annulla",
+    save: "Salva",
+    back: "Indietro",
+    search: "🔎 Cerca...",
+    editBtn: "✏️ Modifica",
+    deleteBtn: "🗑️ Elimina",
+    backupTitle: "Backup",
+    backupExport: "Esporta",
+    backupImport: "Importa",
+    backupAutoRestore: "Ripristina backup automatico",
+    backupAutoRestored: "Backup automatico ripristinato!",
+    backupAutoMissing: "Nessun backup automatico trovato!",
+    autoBackupLabel: "Ultimo backup automatico:",
+    backupClose: "Chiudi"
+  },
+  en: {
+    appTitle: "Notes",
+    addNote: "+ Note",
+    newNote: "New Note",
+    editNote: "Edit Note",
+    cancel: "Cancel",
+    save: "Save",
+    back: "Back",
+    search: "🔎 Search...",
+    editBtn: "✏️ Edit",
+    deleteBtn: "🗑️ Delete",
+    backupTitle: "Backup",
+    backupExport: "Export",
+    backupImport: "Import",
+    backupAutoRestore: "Restore automatic backup",
+    backupAutoRestored: "Automatic backup restored!",
+    backupAutoMissing: "No automatic backup found!",
+    autoBackupLabel: "Last automatic backup:",
+    backupClose: "Close"
+  },
+  es: {
+    appTitle: "Notas",
+    addNote: "+ Nota",
+    newNote: "Nueva nota",
+    editNote: "Editar nota",
+    cancel: "Cancelar",
+    save: "Guardar",
+    back: "Atrás",
+    search: "🔎 Buscar...",
+    editBtn: "✏️ Editar",
+    deleteBtn: "🗑️ Eliminar",
+    backupTitle: "Bécap",
+    backupExport: "Exportar",
+    backupImport: "Importar",
+    backupAutoRestore: "Restaurar bécap automático",
+    backupAutoRestored: "Bécap automático restaurado",
+    backupAutoMissing: "Ningún bécap automático encontrado",
+    autoBackupLabel: "Último bécap automático:",
+    backupClose: "Cerrar"
   }
 };
 
-/* ⭐ Popup Sicherung */
+/* Applica traduzioni */
+function applyTranslations() {
+  const t = tr[currentLang];
+  document.getElementById("appTitle").textContent = t.appTitle;
+  document.getElementById("addNoteBtn").textContent = t.addNote;
+  document.getElementById("backupTitle").textContent = t.backupTitle;
+  document.getElementById("backupExportBtn").textContent = t.backupExport;
+  document.getElementById("backupImportBtn").textContent = t.backupImport;
+  document.getElementById("backupAutoRestoreBtn").textContent = t.backupAutoRestore;
+  document.getElementById("backupCloseBtn").textContent = t.backupClose;
+  document.getElementById("cancelBtn").textContent = t.cancel;
+  document.getElementById("saveBtn").textContent = t.save;
+  updateAutoBackupLabel();
+}
+
+/* Popup lingua */
+document.getElementById("langBtn").onclick = () => {
+  document.getElementById("langPopup").style.display = "flex";
+};
+
+function closeLangPopup() {
+  document.getElementById("langPopup").style.display = "none";
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem("lang", lang);
+  applyTranslations();
+  if (currentCategory) showNotes(currentCategory);
+  closeLangPopup();
+}
+
+/* Popup Sicherung */
 function openBackupPopup() {
   document.getElementById("backupPopup").style.display = "flex";
   updateAutoBackupLabel();
@@ -307,7 +475,7 @@ function closeBackupPopup() {
   document.getElementById("backupPopup").style.display = "none";
 }
 
-/* ⭐ Esporta */
+/* Esporta */
 function exportBackup() {
   const notes = localStorage.getItem("notes") || "[]";
   const blob = new Blob([notes], { type: "application/json" });
@@ -318,7 +486,7 @@ function exportBackup() {
   a.click();
 }
 
-/* ⭐ Importa */
+/* Importa */
 function importBackup(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -326,12 +494,12 @@ function importBackup(event) {
   const reader = new FileReader();
   reader.onload = e => {
     localStorage.setItem("notes", e.target.result);
-    showNotes(currentCategory);
+    if (currentCategory) showNotes(currentCategory);
   };
   reader.readAsText(file);
 }
 
-/* ⭐ Timestamp */
+/* Timestamp */
 function getTimestamp() {
   const d = new Date();
   const pad = n => (n < 10 ? "0" + n : n);
@@ -345,7 +513,7 @@ function getTimestamp() {
   );
 }
 
-/* ⭐ Backup automatico */
+/* Backup automatico */
 function saveAutoBackup() {
   const notes = JSON.parse(localStorage.getItem("notes") || "[]");
   const data = {
@@ -359,36 +527,40 @@ function saveAutoBackup() {
 function updateAutoBackupLabel() {
   const info = document.getElementById("autoBackupInfo");
   const auto = localStorage.getItem("autoBackup");
+  const t = tr[currentLang];
 
   if (!auto) {
-    info.textContent = t.it.autoLabel + " –";
+    info.textContent = t.autoBackupLabel + " –";
     return;
   }
 
   const parsed = JSON.parse(auto);
-  info.textContent = t.it.autoLabel + " " + parsed.timestamp;
+  info.textContent = t.autoBackupLabel + " " + parsed.timestamp;
 }
 
-/* ⭐ Restore automatico */
+/* Restore automatico */
 function restoreAutoBackup() {
   const auto = localStorage.getItem("autoBackup");
+  const t = tr[currentLang];
+
   if (!auto) {
-    alert(t.it.autoMissing);
+    alert(t.backupAutoMissing);
     return;
   }
 
   const parsed = JSON.parse(auto);
   localStorage.setItem("notes", JSON.stringify(parsed.notes));
-  alert(t.it.autoRestored);
-  showNotes(currentCategory);
+  alert(t.backupAutoRestored);
+  if (currentCategory) showNotes(currentCategory);
 }
 
-/* ⭐ Tuo codice originale (intatto) */
+/* Note — logica base */
 document.getElementById("addNoteBtn").onclick = () => {
-  editorTitle.textContent = "Nuova Nota";
+  const t = tr[currentLang];
+  editorTitle.textContent = t.newNote;
   noteText.value = "";
-  if (!currentCategory || currentCategory === "tutte") {
-    currentCategory = "generale";
+  if (!currentCategory || currentCategory === "alle") {
+    currentCategory = "allgemein";
   }
   editingIndex = null;
   editor.style.display = "flex";
@@ -429,15 +601,16 @@ function showNotes(category) {
   notesList.style.display = "block";
 
   const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+  const t = tr[currentLang];
 
   let filtered = notes;
-  if (category !== "tutte") {
+  if (category !== "alle") {
     filtered = notes.filter(n => n.category === category);
   }
 
   let html = `
-    <button class="backBtn" onclick="goBack()">Indietro</button>
-    <input id="searchBar" placeholder="🔎 Cerca..." oninput="filterNotes(this.value)">
+    <button class="backBtn" onclick="goBack()">${t.back}</button>
+    <input id="searchBar" placeholder="${t.search}" oninput="filterNotes(this.value)">
     <div id="notesContainer">
   `;
 
@@ -447,8 +620,8 @@ function showNotes(category) {
       <div class="noteItem" data-index="${originalIndex}">
         <b>${getIcon(n.category)}</b> ${n.text}
         <div class="noteActions">
-          <button class="actionBtn editBtn" onclick="editNote(${originalIndex})">✏️ Modifica</button>
-          <button class="actionBtn deleteBtn" onclick="deleteNote(${originalIndex})">🗑️ Elimina</button>
+          <button class="actionBtn editBtn" onclick="editNote(${originalIndex})">${t.editBtn}</button>
+          <button class="actionBtn deleteBtn" onclick="deleteNote(${originalIndex})">${t.deleteBtn}</button>
         </div>
       </div>
     `;
@@ -468,9 +641,10 @@ function filterNotes(query) {
 
 function editNote(index) {
   const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+  const t = tr[currentLang];
   editingIndex = index;
   noteText.value = notes[index].text;
-  editorTitle.textContent = "Modifica Nota";
+  editorTitle.textContent = t.editNote;
   editor.style.display = "flex";
 }
 
@@ -488,27 +662,34 @@ function goBack() {
   currentCategory = null;
 }
 
+/* Icone per categorie DE */
 function getIcon(cat) {
   return {
-    lavoro: "💼",
-    spesa: "🛒",
-    casa: "🏠",
-    idee: "💡",
-    personale: "⭐",
-    generale: "📝"
+    arbeit: "💼",
+    einkauf: "🛒",
+    zuhause: "🏠",
+    ideen: "💡",
+    personlich: "⭐",
+    allgemein: "📝",
+    alle: "📁"
   }[cat] || "📄";
 }
 
+/* Tema chiaro/scuro */
 document.getElementById("themeToggle").onclick = () => {
   document.body.classList.toggle("dark");
-  localStorage.setItem("theme",
-    document.body.classList.contains("dark") ? "dark" : "light"
-  );
+  const isDark = document.body.classList.contains("dark");
+  localStorage.setItem("theme", isDark ? "dark" : "light");
+  document.getElementById("themeToggle").textContent = isDark ? "☀️" : "🌙";
 };
 
 if (localStorage.getItem("theme") === "dark") {
   document.body.classList.add("dark");
+  document.getElementById("themeToggle").textContent = "☀️";
 }
+
+/* Init */
+applyTranslations();
 </script>
 
 </body>
