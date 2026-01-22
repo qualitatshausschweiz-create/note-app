@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="de">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -37,22 +37,36 @@
     border-bottom: 1px solid #444;
   }
 
+  #leftHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
   #themeToggle {
     font-size: 22px;
     background: none;
     border: none;
-    margin-right: 10px;
+    margin-right: 4px;
     cursor: pointer;
   }
 
+  #langButtons button {
+    font-size: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 4px;
+  }
+
   #addNoteBtn, #backupBtn {
-    font-size: 20px;
-    padding: 6px 12px;
+    font-size: 18px;
+    padding: 6px 10px;
     border-radius: 12px;
     background: #007aff;
     color: white;
     border: none;
-    margin-left: 10px;
+    margin-left: 8px;
   }
 
   .grid {
@@ -78,11 +92,11 @@
     margin: 0 auto 10px;
   }
 
-  .lavoro { background: #007aff; }
-  .spesa { background: #ffcc00; }
-  .casa { background: #ff9500; }
-  .idee { background: #34c759; }
-  .personale { background: #ffffff; border: 2px solid #ccc; }
+  .arbeit { background: #007aff; }
+  .einkauf { background: #ffcc00; }
+  .zuhause { background: #ff9500; }
+  .ideen { background: #34c759; }
+  .persoenlich { background: #ffffff; border: 2px solid #ccc; }
 
   #notesList {
     display: none;
@@ -176,21 +190,51 @@
 <body>
 
 <header>
-  <button id="themeToggle">🌙</button>
-  Note
-  <div>
-    <button id="addNoteBtn">+ Nota</button>
-    <button id="backupBtn">🗂️ Backup</button>
+  <div id="leftHeader">
+    <button id="themeToggle">🌙</button>
+    <span id="appTitle">Notizen</span>
+  </div>
+  <div id="rightHeader">
+    <div id="langButtons">
+      <button onclick="switchLanguage('it')">🇮🇹</button>
+      <button onclick="switchLanguage('de')">🇩🇪</button>
+      <button onclick="switchLanguage('en')">🇬🇧</button>
+      <button onclick="switchLanguage('es')">🇪🇸</button>
+    </div>
+    <button id="addNoteBtn">+ Notiz</button>
+    <button id="backupBtn">Sicherung</button>
   </div>
 </header>
 
 <div class="grid" id="categories">
-  <div class="cat" data-cat="tutte"><div class="circle personale"></div>📁 Tutte</div>
-  <div class="cat" data-cat="lavoro"><div class="circle lavoro"></div>💼 Lavoro</div>
-  <div class="cat" data-cat="spesa"><div class="circle spesa"></div>🛒 Spesa</div>
-  <div class="cat" data-cat="casa"><div class="circle casa"></div>🏠 Casa</div>
-  <div class="cat" data-cat="idee"><div class="circle idee"></div>💡 Idee</div>
-  <div class="cat" data-cat="personale"><div class="circle personale"></div>⭐ Personale</div>
+  <div class="cat" data-cat="alle">
+    <div class="circle persoenlich"></div>
+    <span class="catLabel" data-key="alle">Alle</span>
+  </div>
+  <div class="cat" data-cat="arbeit">
+    <div class="circle arbeit"></div>
+    <span class="catLabel" data-key="arbeit">Arbeit</span>
+  </div>
+  <div class="cat" data-cat="einkauf">
+    <div class="circle einkauf"></div>
+    <span class="catLabel" data-key="einkauf">Einkauf</span>
+  </div>
+  <div class="cat" data-cat="zuhause">
+    <div class="circle zuhause"></div>
+    <span class="catLabel" data-key="zuhause">Zuhause</span>
+  </div>
+  <div class="cat" data-cat="ideen">
+    <div class="circle ideen"></div>
+    <span class="catLabel" data-key="ideen">Ideen</span>
+  </div>
+  <div class="cat" data-cat="persönlich">
+    <div class="circle persoenlich"></div>
+    <span class="catLabel" data-key="persönlich">Persönlich</span>
+  </div>
+  <div class="cat" data-cat="allgemein">
+    <div class="circle persoenlich"></div>
+    <span class="catLabel" data-key="allgemein">Allgemein</span>
+  </div>
 </div>
 
 <div id="notesList"></div>
@@ -198,33 +242,33 @@
 <!-- POPUP BACKUP -->
 <div id="backupPopup">
   <div id="backupBox">
-    <h3>Backup</h3>
+    <h3 id="backupTitle">Sicherung</h3>
 
-    <button class="actionBtn" style="background:#34c759; color:white;" onclick="exportBackup()">
-      Esporta Backup
+    <button id="backupExportBtn" class="actionBtn" style="background:#34c759; color:white;" onclick="exportBackup()">
+      Exportieren
     </button>
 
     <br><br>
 
     <input type="file" id="backupFile" style="display:none;" onchange="importBackupFile(event)">
-    <button class="actionBtn" style="background:#007aff; color:white;" onclick="document.getElementById('backupFile').click()">
-      Importa Backup
+    <button id="backupImportBtn" class="actionBtn" style="background:#007aff; color:white;" onclick="document.getElementById('backupFile').click()">
+      Importieren
     </button>
 
     <br><br>
 
-    <button class="backBtn" onclick="closeBackup()">Chiudi</button>
+    <button id="backupCloseBtn" class="backBtn" onclick="closeBackup()">Schließen</button>
   </div>
 </div>
 
 <!-- POPUP EDITOR -->
 <div id="noteEditor">
   <div id="editorBox">
-    <h3 id="editorTitle">Nuova Nota</h3>
+    <h3 id="editorTitle">Neue Notiz</h3>
     <textarea id="noteText"></textarea>
     <div class="editorButtons">
-      <button class="cancelBtn" onclick="closeEditor()">Annulla</button>
-      <button class="saveBtn" onclick="saveNote()">Salva</button>
+      <button id="cancelBtn" class="cancelBtn" onclick="closeEditor()">Abbrechen</button>
+      <button id="saveBtn" class="saveBtn" onclick="saveNote()">Speichern</button>
     </div>
   </div>
 </div>
@@ -232,6 +276,7 @@
 <script>
 let editingIndex = null;
 let currentCategory = null;
+let currentLang = localStorage.getItem("lang") || "de";
 
 const editor = document.getElementById("noteEditor");
 const noteText = document.getElementById("noteText");
@@ -239,11 +284,122 @@ const editorTitle = document.getElementById("editorTitle");
 const notesList = document.getElementById("notesList");
 const categories = document.getElementById("categories");
 
+const translations = {
+  it: {
+    appTitle: "Note",
+    addNote: "+ Nota",
+    backup: "Backup",
+    back: "Indietro",
+    searchPlaceholder: "🔎 Cerca...",
+    newNote: "Nuova Nota",
+    editNoteTitle: "Modifica Nota",
+    save: "Salva",
+    cancel: "Annulla",
+    edit: "✏️ Modifica",
+    delete: "🗑️ Elimina",
+    categories: {
+      alle: "Tutte",
+      arbeit: "Lavoro",
+      einkauf: "Spesa",
+      zuhause: "Casa",
+      ideen: "Idee",
+      persönlich: "Personale",
+      allgemein: "Generale"
+    },
+    backupTitle: "Backup",
+    backupExport: "Esporta",
+    backupImport: "Importa",
+    backupClose: "Chiudi",
+    backupImported: "Backup importato con successo!"
+  },
+  de: {
+    appTitle: "Notizen",
+    addNote: "+ Notiz",
+    backup: "Sicherung",
+    back: "Zurück",
+    searchPlaceholder: "🔎 Suchen...",
+    newNote: "Neue Notiz",
+    editNoteTitle: "Notiz bearbeiten",
+    save: "Speichern",
+    cancel: "Abbrechen",
+    edit: "✏️ Bearbeiten",
+    delete: "🗑️ Löschen",
+    categories: {
+      alle: "Alle",
+      arbeit: "Arbeit",
+      einkauf: "Einkauf",
+      zuhause: "Zuhause",
+      ideen: "Ideen",
+      persönlich: "Persönlich",
+      allgemein: "Allgemein"
+    },
+    backupTitle: "Sicherung",
+    backupExport: "Exportieren",
+    backupImport: "Importieren",
+    backupClose: "Schließen",
+    backupImported: "Sicherung erfolgreich importiert!"
+  },
+  en: {
+    appTitle: "Notes",
+    addNote: "+ Note",
+    backup: "Backup",
+    back: "Back",
+    searchPlaceholder: "🔎 Search...",
+    newNote: "New Note",
+    editNoteTitle: "Edit Note",
+    save: "Save",
+    cancel: "Cancel",
+    edit: "✏️ Edit",
+    delete: "🗑️ Delete",
+    categories: {
+      alle: "All",
+      arbeit: "Work",
+      einkauf: "Shopping",
+      zuhause: "Home",
+      ideen: "Ideas",
+      persönlich: "Personal",
+      allgemein: "General"
+    },
+    backupTitle: "Backup",
+    backupExport: "Export",
+    backupImport: "Import",
+    backupClose: "Close",
+    backupImported: "Backup imported successfully!"
+  },
+  es: {
+    appTitle: "Notas",
+    addNote: "+ Nota",
+    backup: "Bécap",
+    back: "Atrás",
+    searchPlaceholder: "🔎 Buscar...",
+    newNote: "Nueva nota",
+    editNoteTitle: "Editar nota",
+    save: "Guardar",
+    cancel: "Cancelar",
+    edit: "✏️ Editar",
+    delete: "🗑️ Eliminar",
+    categories: {
+      alle: "Todas",
+      arbeit: "Trabajo",
+      einkauf: "Compras",
+      zuhause: "Casa",
+      ideen: "Ideas",
+      persönlich: "Personal",
+      allgemein: "General"
+    },
+    backupTitle: "Bécap",
+    backupExport: "Exportar",
+    backupImport: "Importar",
+    backupClose: "Cerrar",
+    backupImported: "¡Bécap importado correctamente!"
+  }
+};
+
 document.getElementById("addNoteBtn").onclick = () => {
-  editorTitle.textContent = "Nuova Nota";
+  editorTitle.textContent = translations[currentLang].newNote;
   noteText.value = "";
-  if (!currentCategory || currentCategory === "tutte") {
-    currentCategory = "generale";
+  if (!currentCategory || currentCategory === "alle") {
+    currentCategory = "allgemein";
   }
   editingIndex = null;
   editor.style.display = "flex";
@@ -293,13 +449,13 @@ function showNotes(category) {
   const notes = JSON.parse(localStorage.getItem("notes") || "[]");
 
   let filtered = notes;
-  if (category !== "tutte") {
+  if (category !== "alle") {
     filtered = notes.filter(n => n.category === category);
   }
 
   let html = `
-    <button class="backBtn" onclick="goBack()">Indietro</button>
-    <input id="searchBar" placeholder="🔎 Cerca..." oninput="filterNotes(this.value)">
+    <button class="backBtn" onclick="goBack()">${translations[currentLang].back}</button>
+    <input id="searchBar" placeholder="${translations[currentLang].searchPlaceholder}" oninput="filterNotes(this.value)">
     <div id="notesContainer">
   `;
 
@@ -309,8 +465,8 @@ function showNotes(category) {
       <div class="noteItem" data-index="${originalIndex}">
         <b>${getIcon(n.category)}</b> ${n.text}
         <div class="noteActions">
-          <button class="actionBtn editBtn" onclick="editNote(${originalIndex})">✏️ Modifica</button>
-          <button class="actionBtn deleteBtn" onclick="deleteNote(${originalIndex})">🗑️ Elimina</button>
+          <button class="actionBtn editBtn" onclick="editNote(${originalIndex})">${translations[currentLang].edit}</button>
+          <button class="actionBtn deleteBtn" onclick="deleteNote(${originalIndex})">${translations[currentLang].delete}</button>
         </div>
       </div>
     `;
@@ -332,7 +488,7 @@ function editNote(index) {
   const notes = JSON.parse(localStorage.getItem("notes") || "[]");
   editingIndex = index;
   noteText.value = notes[index].text;
-  editorTitle.textContent = "Modifica Nota";
+  editorTitle.textContent = translations[currentLang].editNoteTitle;
   editor.style.display = "flex";
 }
 
@@ -351,12 +507,12 @@ function goBack() {
 
 function getIcon(cat) {
   return {
-    lavoro: "💼",
-    spesa: "🛒",
-    casa: "🏠",
-    idee: "💡",
-    personale: "⭐",
-    generale: "📝"
+    arbeit: "💼",
+    einkauf: "🛒",
+    zuhause: "🏠",
+    ideen: "💡",
+    persönlich: "⭐",
+    allgemein: "📝"
   }[cat] || "📄";
 }
 
@@ -393,11 +549,49 @@ function importBackupFile(event) {
   const reader = new FileReader();
   reader.onload = function(e) {
     localStorage.setItem("notes", e.target.result);
-    alert("Backup importato con successo!");
+    alert(translations[currentLang].backupImported);
   };
   reader.readAsText(file);
 }
 
+/* ---------------- MULTILINGUA ---------------- */
+
+function applyTranslations() {
+  const t = translations[currentLang];
+
+  document.getElementById("appTitle").textContent = t.appTitle;
+  document.getElementById("addNoteBtn").textContent = t.addNote;
+  document.getElementById("backupBtn").textContent = t.backup;
+
+  document.getElementById("backupTitle").textContent = t.backupTitle;
+  document.getElementById("backupExportBtn").textContent = t.backupExport;
+  document.getElementById("backupImportBtn").textContent = t.backupImport;
+  document.getElementById("backupCloseBtn").textContent = t.backupClose;
+
+  document.getElementById("saveBtn").textContent = t.save;
+  document.getElementById("cancelBtn").textContent = t.cancel;
+
+  document.querySelectorAll(".catLabel").forEach(span => {
+    const key = span.getAttribute("data-key");
+    if (t.categories[key]) {
+      span.textContent = t.categories[key];
+    }
+  });
+
+  // se siamo nella lista note, ri-renderizza per aggiornare testi pulsanti e placeholder
+  if (notesList.style.display === "block" && currentCategory) {
+    showNotes(currentCategory);
+  }
+}
+
+function switchLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem("lang", lang);
+  applyTranslations();
+}
+
+// inizializzazione
+applyTranslations();
 </script>
 
 </body>
