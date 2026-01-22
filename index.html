@@ -1,180 +1,313 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notizen</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Note</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #f2f2f7;
-  color: #000;
-}
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px;
-  background: #fff;
-  border-bottom: 1px solid #ccc;
-}
-#categoryBar {
-  display: flex;
-  overflow-x: auto;
-  padding: 10px;
-  background: #fff;
-  border-bottom: 1px solid #ccc;
-}
-.categoryBtn {
-  padding: 8px 14px;
-  margin-right: 8px;
-  border-radius: 12px;
-  border: none;
-  background: #e5e5ea;
-  cursor: pointer;
-}
-.categoryBtn.active {
-  background: #007aff;
-  color: white;
-}
-#notesList {
-  padding: 15px;
-}
-.noteItem {
-  background: white;
-  padding: 14px;
-  border-radius: 12px;
-  margin-bottom: 12px;
-  border: 1px solid #ddd;
-}
-#editorPopup, #backupPopup {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.45);
-  display: none;
-  justify-content: center;
-  align-items: center;
-}
-.popupContent {
-  background: white;
-  padding: 20px;
-  width: 90%;
-  max-width: 420px;
-  border-radius: 16px;
-}
-.actionBtn {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-}
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    transition: 0.3s;
+  }
+
+  :root {
+    --bg: #f2f2f7;
+    --text: #000;
+    --card: #fff;
+  }
+
+  .dark {
+    --bg: #1c1c1e;
+    --text: #fff;
+    --card: #2c2c2e;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px;
+    background: var(--card);
+    font-size: 22px;
+    font-weight: 600;
+    border-bottom: 1px solid #444;
+  }
+
+  #themeToggle {
+    font-size: 22px;
+    background: none;
+    border: none;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+
+  #addNoteBtn {
+    font-size: 26px;
+    padding: 6px 12px;
+    border-radius: 12px;
+    background: #007aff;
+    color: white;
+    border: none;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+    padding: 20px;
+  }
+
+  .cat {
+    background: var(--card);
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+  }
+
+  .circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+  }
+
+  .lavoro { background: #007aff; }
+  .spesa { background: #ffcc00; }
+  .casa { background: #ff9500; }
+  .idee { background: #34c759; }
+  .personale { background: #ffffff; border: 2px solid #ccc; }
+
+  #notesList {
+    display: none;
+    padding: 20px;
+  }
+
+  .noteItem {
+    background: var(--card);
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+
+  .noteActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .actionBtn {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .editBtn { background: #34c759; color: white; }
+  .deleteBtn { background: #ff3b30; color: white; }
+
+  .backBtn {
+    font-size: 18px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    background: #007aff;
+    color: white;
+    border: none;
+    margin-bottom: 20px;
+  }
+
+  #searchBar {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    border-radius: 12px;
+    border: 1px solid #aaa;
+    margin-bottom: 20px;
+  }
+
+  #noteEditor {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #editorBox {
+    background: var(--card);
+    width: 90%;
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  textarea {
+    width: 100%;
+    height: 150px;
+    font-size: 18px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .editorButtons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+  }
+
+  .saveBtn { background: #34c759; color: white; }
+  .cancelBtn { background: #ff3b30; color: white; }
+
+  /* ⭐ Pulsante Sicherung flottante */
+  #backupBtn {
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background: white;
+    color: black;
+    font-size: 32px;
+    border: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    cursor: pointer;
+    z-index: 999;
+  }
+
+  /* ⭐ Popup Sicherung */
+  #backupPopup {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  #backupBox {
+    background: var(--card);
+    width: 90%;
+    max-width: 420px;
+    padding: 22px;
+    border-radius: 18px;
+  }
+
+  .backupBtn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    margin-top: 12px;
+    font-size: 17px;
+    cursor: pointer;
+  }
+
+  .green { background: #34c759; color: white; }
+  .blue { background: #007aff; color: white; }
+  .orange { background: #ff9500; color: white; }
+  .gray { background: #ccc; }
 </style>
 </head>
-
 <body>
 
 <header>
-  <div id="title">Notizen</div>
-  <button onclick="openBackupPopup()">Sicherung</button>
+  <button id="themeToggle">🌙</button>
+  Note
+  <button id="addNoteBtn">+ Nota</button>
 </header>
 
-<div id="categoryBar"></div>
-<div id="notesList"></div>
+<!-- ⭐ Pulsante Sicherung flottante -->
+<button id="backupBtn" onclick="openBackupPopup()">🛟</button>
 
-<!-- BACKUP POPUP -->
+<!-- ⭐ Popup Sicherung -->
 <div id="backupPopup">
-  <div class="popupContent">
+  <div id="backupBox">
     <h2 id="backupTitle">Sicherung</h2>
 
-    <button id="backupExportBtn" class="actionBtn" style="background:#34c759; color:white;" onclick="exportBackup()">
-      Exportieren
-    </button>
-
-    <button id="backupImportBtn" class="actionBtn" style="background:#007aff; color:white;" onclick="document.getElementById('backupFile').click()">
-      Importieren
-    </button>
-
-    <button id="backupAutoRestoreBtn" class="actionBtn" style="background:#ff9500; color:white;" onclick="restoreAutoBackup()">
-      Automatische Sicherung wiederherstellen
-    </button>
+    <button class="backupBtn green" onclick="exportBackup()">Esporta</button>
+    <button class="backupBtn blue" onclick="document.getElementById('backupFile').click()">Importa</button>
+    <button class="backupBtn orange" onclick="restoreAutoBackup()">Ripristina backup automatico</button>
 
     <p id="autoBackupInfo" style="margin-top:15px; font-size:14px; color:#555;">
-      Letzte automatische Sicherung: –
+      Ultimo backup automatico: –
     </p>
 
-    <button class="actionBtn" style="background:#ccc;" onclick="closeBackupPopup()">Schließen</button>
+    <button class="backupBtn gray" onclick="closeBackupPopup()">Chiudi</button>
 
     <input type="file" id="backupFile" accept="application/json" style="display:none" onchange="importBackup(event)">
   </div>
 </div>
-<script>
-let currentLang = "de";
-let currentCategory = "alle";
 
-const translations = {
-  de: {
-    backupTitle: "Sicherung",
-    backupExport: "Exportieren",
-    backupImport: "Importieren",
-    backupAutoRestore: "Automatische Sicherung wiederherstellen",
-    backupAutoRestored: "Automatische Sicherung erfolgreich wiederhergestellt!",
-    backupAutoMissing: "Keine automatische Sicherung gefunden!",
-    autoBackupLabel: "Letzte automatische Sicherung:"
-  },
+<div class="grid" id="categories">
+  <div class="cat" data-cat="tutte"><div class="circle personale"></div>📁 Tutte</div>
+  <div class="cat" data-cat="lavoro"><div class="circle lavoro"></div>💼 Lavoro</div>
+  <div class="cat" data-cat="spesa"><div class="circle spesa"></div>🛒 Spesa</div>
+  <div class="cat" data-cat="casa"><div class="circle casa"></div>🏠 Casa</div>
+  <div class="cat" data-cat="idee"><div class="circle idee"></div>💡 Idee</div>
+  <div class="cat" data-cat="personale"><div class="circle personale"></div>⭐ Personale</div>
+</div>
+
+<div id="notesList"></div>
+
+<div id="noteEditor">
+  <div id="editorBox">
+    <h3 id="editorTitle">Nuova Nota</h3>
+    <textarea id="noteText"></textarea>
+    <div class="editorButtons">
+      <button class="cancelBtn" onclick="closeEditor()">Annulla</button>
+      <button class="saveBtn" onclick="saveNote()">Salva</button>
+    </div>
+  </div>
+</div>
+<script>
+let editingIndex = null;
+let currentCategory = null;
+
+const editor = document.getElementById("noteEditor");
+const noteText = document.getElementById("noteText");
+const editorTitle = document.getElementById("editorTitle");
+const notesList = document.getElementById("notesList");
+const categories = document.getElementById("categories");
+
+/* ⭐ Traduzioni */
+const t = {
   it: {
-    backupTitle: "Backup",
-    backupExport: "Esporta",
-    backupImport: "Importa",
-    backupAutoRestore: "Ripristina backup automatico",
-    backupAutoRestored: "Backup automatico ripristinato con successo!",
-    backupAutoMissing: "Nessun backup automatico trovato!",
-    autoBackupLabel: "Ultimo backup automatico:"
-  },
-  en: {
-    backupTitle: "Backup",
-    backupExport: "Export",
-    backupImport: "Import",
-    backupAutoRestore: "Restore automatic backup",
-    backupAutoRestored: "Automatic backup restored successfully!",
-    backupAutoMissing: "No automatic backup found!",
-    autoBackupLabel: "Last automatic backup:"
-  },
-  es: {
-    backupTitle: "Bécap",
-    backupExport: "Exportar",
-    backupImport: "Importar",
-    backupAutoRestore: "Restaurar bécap automático",
-    backupAutoRestored: "¡Bécap automático restaurado correctamente!",
-    backupAutoMissing: "¡No se encontró ningún bécap automático!",
-    autoBackupLabel: "Último bécap automático:"
+    title: "Backup",
+    export: "Esporta",
+    import: "Importa",
+    autoRestore: "Ripristina backup automatico",
+    autoRestored: "Backup automatico ripristinato!",
+    autoMissing: "Nessun backup automatico trovato!",
+    autoLabel: "Ultimo backup automatico:"
   }
 };
 
-function applyTranslations() {
-  const t = translations[currentLang];
-  document.getElementById("backupTitle").textContent = t.backupTitle;
-  document.getElementById("backupExportBtn").textContent = t.backupExport;
-  document.getElementById("backupImportBtn").textContent = t.backupImport;
-  document.getElementById("backupAutoRestoreBtn").textContent = t.backupAutoRestore;
-
-  updateAutoBackupLabel();
-}
-
+/* ⭐ Popup Sicherung */
 function openBackupPopup() {
-  applyTranslations();
   document.getElementById("backupPopup").style.display = "flex";
+  updateAutoBackupLabel();
 }
 
 function closeBackupPopup() {
   document.getElementById("backupPopup").style.display = "none";
 }
 
+/* ⭐ Esporta */
 function exportBackup() {
   const notes = localStorage.getItem("notes") || "[]";
   const blob = new Blob([notes], { type: "application/json" });
@@ -185,18 +318,20 @@ function exportBackup() {
   a.click();
 }
 
+/* ⭐ Importa */
 function importBackup(event) {
   const file = event.target.files[0];
   if (!file) return;
 
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = e => {
     localStorage.setItem("notes", e.target.result);
     showNotes(currentCategory);
   };
   reader.readAsText(file);
 }
-// TIMESTAMP FORMATO: 2026-01-22 18:05:33
+
+/* ⭐ Timestamp */
 function getTimestamp() {
   const d = new Date();
   const pad = n => (n < 10 ? "0" + n : n);
@@ -210,68 +345,133 @@ function getTimestamp() {
   );
 }
 
+/* ⭐ Backup automatico */
 function saveAutoBackup() {
-  const notes = localStorage.getItem("notes") || "[]";
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
   const data = {
     timestamp: getTimestamp(),
-    notes: JSON.parse(notes)
+    notes
   };
   localStorage.setItem("autoBackup", JSON.stringify(data));
   updateAutoBackupLabel();
 }
 
 function updateAutoBackupLabel() {
-  const t = translations[currentLang];
   const info = document.getElementById("autoBackupInfo");
   const auto = localStorage.getItem("autoBackup");
 
   if (!auto) {
-    info.textContent = t.autoBackupLabel + " –";
+    info.textContent = t.it.autoLabel + " –";
     return;
   }
 
   const parsed = JSON.parse(auto);
-  info.textContent = t.autoBackupLabel + " " + parsed.timestamp;
+  info.textContent = t.it.autoLabel + " " + parsed.timestamp;
 }
 
+/* ⭐ Restore automatico */
 function restoreAutoBackup() {
   const auto = localStorage.getItem("autoBackup");
   if (!auto) {
-    alert(translations[currentLang].backupAutoMissing);
+    alert(t.it.autoMissing);
     return;
   }
 
   const parsed = JSON.parse(auto);
   localStorage.setItem("notes", JSON.stringify(parsed.notes));
-
-  alert(translations[currentLang].backupAutoRestored);
+  alert(t.it.autoRestored);
   showNotes(currentCategory);
 }
 
-// NOTE + CATEGORIE (versione abbreviata, identica alla tua)
-function showNotes(category) {
-  currentCategory = category;
-  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-  const list = document.getElementById("notesList");
-  list.innerHTML = "";
+/* ⭐ Tuo codice originale (intatto) */
+document.getElementById("addNoteBtn").onclick = () => {
+  editorTitle.textContent = "Nuova Nota";
+  noteText.value = "";
+  if (!currentCategory || currentCategory === "tutte") {
+    currentCategory = "generale";
+  }
+  editingIndex = null;
+  editor.style.display = "flex";
+};
 
-  notes
-    .filter(n => category === "alle" || n.category === category)
-    .forEach(n => {
-      const div = document.createElement("div");
-      div.className = "noteItem";
-      div.textContent = n.text;
-      list.appendChild(div);
-    });
+document.querySelectorAll(".cat").forEach(cat => {
+  cat.addEventListener("click", () => {
+    currentCategory = cat.dataset.cat;
+    showNotes(currentCategory);
+  });
+});
+
+function closeEditor() {
+  editor.style.display = "none";
 }
 
-// SALVATAGGIO AUTOMATICO AD OGNI MODIFICA
-function saveNote(text, category) {
+function saveNote() {
+  const text = noteText.value.trim();
+  if (!text) return;
+
   const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-  notes.push({ text, category });
+
+  if (editingIndex !== null) {
+    notes[editingIndex].text = text;
+  } else {
+    notes.push({ text, category: currentCategory, date: Date.now() });
+  }
+
   localStorage.setItem("notes", JSON.stringify(notes));
   saveAutoBackup();
-  showNotes(category);
+  editor.style.display = "none";
+  showNotes(currentCategory);
+}
+
+function showNotes(category) {
+  currentCategory = category;
+  categories.style.display = "none";
+  notesList.style.display = "block";
+
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+
+  let filtered = notes;
+  if (category !== "tutte") {
+    filtered = notes.filter(n => n.category === category);
+  }
+
+  let html = `
+    <button class="backBtn" onclick="goBack()">Indietro</button>
+    <input id="searchBar" placeholder="🔎 Cerca..." oninput="filterNotes(this.value)">
+    <div id="notesContainer">
+  `;
+
+  filtered.forEach(n => {
+    const originalIndex = notes.indexOf(n);
+    html += `
+      <div class="noteItem" data-index="${originalIndex}">
+        <b>${getIcon(n.category)}</b> ${n.text}
+        <div class="noteActions">
+          <button class="actionBtn editBtn" onclick="editNote(${originalIndex})">✏️ Modifica</button>
+          <button class="actionBtn deleteBtn" onclick="deleteNote(${originalIndex})">🗑️ Elimina</button>
+        </div>
+      </div>
+    `;
+  });
+
+  html += "</div>";
+  notesList.innerHTML = html;
+}
+
+function filterNotes(query) {
+  const items = document.querySelectorAll(".noteItem");
+  items.forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(query.toLowerCase()) ? "block" : "none";
+  });
+}
+
+function editNote(index) {
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+  editingIndex = index;
+  noteText.value = notes[index].text;
+  editorTitle.textContent = "Modifica Nota";
+  editor.style.display = "flex";
 }
 
 function deleteNote(index) {
@@ -282,8 +482,33 @@ function deleteNote(index) {
   showNotes(currentCategory);
 }
 
-showNotes("alle");
-applyTranslations();
+function goBack() {
+  notesList.style.display = "none";
+  categories.style.display = "grid";
+  currentCategory = null;
+}
+
+function getIcon(cat) {
+  return {
+    lavoro: "💼",
+    spesa: "🛒",
+    casa: "🏠",
+    idee: "💡",
+    personale: "⭐",
+    generale: "📝"
+  }[cat] || "📄";
+}
+
+document.getElementById("themeToggle").onclick = () => {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme",
+    document.body.classList.contains("dark") ? "dark" : "light"
+  );
+};
+
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+}
 </script>
 
 </body>
