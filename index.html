@@ -26,23 +26,6 @@
         <option value="personale">Personale</option>
     </select>
 </header>
-
-<main>
-    <ul id="notesList"></ul>
-</main>
-
-<button id="addNoteBtn" class="floating-btn">+</button>
-
-<!-- Backup / Import / Export -->
-<div class="backup-bar">
-    <button id="exportBtn">Esporta</button>
-    <button id="importBtn">Importa</button>
-    <input type="file" id="importFile" accept=".json" style="display:none;">
-</div>
-
-<script src="script.js"></script>
-</body>
-</html>
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
@@ -85,6 +68,24 @@ main {
     margin-bottom: 12px;
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* PIN */
+.note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pin-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.note.pinned {
+    border-left: 5px solid #ffcc00;
 }
 
 .floating-btn {
@@ -148,6 +149,22 @@ main {
     border-radius: 12px;
     font-size: 16px;
 }
+
+<main>
+    <ul id="notesList"></ul>
+</main>
+
+<button id="addNoteBtn" class="floating-btn">+</button>
+
+<div class="backup-bar">
+    <button id="exportBtn">Esporta</button>
+    <button id="importBtn">Importa</button>
+    <input type="file" id="importFile" accept=".json" style="display:none;">
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
 // =========================
 // FACE ID LOCALE
 // =========================
@@ -189,15 +206,35 @@ function renderNotes() {
 
     list.innerHTML = "";
 
-    notes
+    // Ordina: prima pinned, poi normali
+    const sortedNotes = [...notes].sort((a, b) => {
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+        return 0;
+    });
+
+    sortedNotes
         .filter(n => filter === "all" || n.category === filter)
         .forEach((note, index) => {
             const li = document.createElement("li");
             li.className = "note";
+            if (note.pinned) li.classList.add("pinned");
+
             li.innerHTML = `
-                <strong>${note.category.toUpperCase()}</strong><br>
-                ${note.text}
+                <div class="note-header">
+                    <strong>${note.category.toUpperCase()}</strong>
+                    <button class="pin-btn">${note.pinned ? "📌" : "📍"}</button>
+                </div>
+                <div class="note-text">${note.text}</div>
             `;
+
+            // Gestione pin
+            li.querySelector(".pin-btn").addEventListener("click", () => {
+                note.pinned = !note.pinned;
+                saveNotes();
+                renderNotes();
+            });
+
             list.appendChild(li);
         });
 }
@@ -210,7 +247,7 @@ document.getElementById("addNoteBtn").addEventListener("click", () => {
         ? "personale"
         : document.getElementById("categoryFilter").value;
 
-    notes.push({ text, category });
+    notes.push({ text, category, pinned: false });
     saveNotes();
     renderNotes();
 });
