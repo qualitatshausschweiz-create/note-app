@@ -49,7 +49,6 @@
       border: none;
     }
 
-    /* Categorie */
     .grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -76,7 +75,6 @@
     .ideen { background: #34c759; }
     .personlich { background: #ffffff; border: 2px solid #ccc; }
 
-    /* Lista note */
     #notesList {
       display: none;
       padding: 20px;
@@ -88,7 +86,6 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
-    /* Editor */
     #noteEditor {
       position: fixed;
       top: 0; left: 0;
@@ -116,7 +113,6 @@
       color: var(--text);
     }
 
-    /* Palette colori */
     #colorPicker {
       display: flex;
       gap: 12px;
@@ -136,7 +132,6 @@
       transform: scale(1.15);
     }
 
-    /* Pulsante Sicherung */
     #backupBtn {
       position: fixed;
       bottom: 22px;
@@ -153,7 +148,6 @@
       z-index: 950;
     }
 
-    /* Popup Sicherung */
     #backupPopup {
       position: fixed;
       top: 0; left: 0;
@@ -185,7 +179,11 @@
     .orangeBtn { background: #ff9500; color: white; }
     .grayBtn { background: #ccc; color: black; }
 
-    /* Popup Lingua verticale */
+    #backupFile {
+      margin-top: 12px;
+      width: 100%;
+    }
+
     #langPopup {
       position: fixed;
       top: 0; left: 0;
@@ -222,6 +220,7 @@
     }
   </style>
 </head>
+
 <body>
 
 <header>
@@ -333,13 +332,13 @@
 
   </div>
 </div>
+
 <script>
 let editingIndex = null;
 let currentCategory = null;
 let currentLang = localStorage.getItem("lang") || "de";
 let selectedColor = "#ffffff";
 
-/* Traduzioni categorie */
 const catNames = {
   de:{alle:"Alle",arbeit:"Arbeit",einkauf:"Einkauf",zuhause:"Zuhause",ideen:"Ideen",personlich:"Persönlich"},
   it:{alle:"Tutte",arbeit:"Lavoro",einkauf:"Spesa",zuhause:"Casa",ideen:"Idee",personlich:"Personale"},
@@ -347,7 +346,6 @@ const catNames = {
   es:{alle:"Todas",arbeit:"Trabajo",einkauf:"Compra",zuhause:"Casa",ideen:"Ideas",personlich:"Personal"}
 };
 
-/* Traduzioni UI */
 const tr = {
   de:{appTitle:"Notizen",addNoteBtn:"+ Notiz",newNote:"Neue Notiz",cancelBtn:"Abbrechen",saveBtn:"Speichern",back:"Zurück",search:"🔍 Suchen..."},
   it:{appTitle:"Note",addNoteBtn:"+ Nota",newNote:"Nuova Nota",cancelBtn:"Annulla",saveBtn:"Salva",back:"Indietro",search:"🔍 Cerca..."},
@@ -355,7 +353,6 @@ const tr = {
   es:{appTitle:"Notas",addNoteBtn:"+ Nota",newNote:"Nueva nota",cancelBtn:"Cancelar",saveBtn:"Guardar",back:"Atrás",search:"🔍 Buscar..."}
 };
 
-/* Applica traduzioni */
 function applyTranslations() {
   const t = tr[currentLang];
 
@@ -372,7 +369,6 @@ function applyTranslations() {
   if (currentCategory) showNotes(currentCategory);
 }
 
-/* Popup lingua */
 langBtn.onclick = () => langPopup.style.display = "flex";
 function closeLangPopup() { langPopup.style.display = "none"; }
 function setLang(lang) {
@@ -382,11 +378,9 @@ function setLang(lang) {
   closeLangPopup();
 }
 
-/* Sicherung */
 backupBtn.onclick = () => backupPopup.style.display = "flex";
 backupCloseBtn.onclick = () => backupPopup.style.display = "none";
 
-/* Apri editor */
 addNoteBtn.onclick = () => {
   editorTitle.textContent = tr[currentLang].newNote;
   noteText.value = "";
@@ -396,12 +390,10 @@ addNoteBtn.onclick = () => {
   noteEditor.style.display = "flex";
 };
 
-/* Abbrechen */
 cancelBtn.onclick = () => {
   noteEditor.style.display = "none";
 };
 
-/* Speichern */
 saveBtn.onclick = () => {
   const text = noteText.value.trim();
   if (!text) return;
@@ -421,10 +413,9 @@ saveBtn.onclick = () => {
 
   localStorage.setItem("notes", JSON.stringify(notes));
   noteEditor.style.display = "none";
-  showNotes(currentCategory);
+  if (currentCategory) showNotes(currentCategory);
 };
 
-/* Selettore colori */
 document.querySelectorAll(".colorDot").forEach(dot => {
   dot.addEventListener("click", () => {
     document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
@@ -433,7 +424,6 @@ document.querySelectorAll(".colorDot").forEach(dot => {
   });
 });
 
-/* Categorie */
 document.querySelectorAll(".cat").forEach(cat => {
   cat.addEventListener("click", () => {
     currentCategory = cat.dataset.cat;
@@ -441,7 +431,6 @@ document.querySelectorAll(".cat").forEach(cat => {
   });
 });
 
-/* Mostra note */
 function showNotes(category) {
   currentCategory = category;
   categories.style.display = "none";
@@ -486,9 +475,31 @@ function showNotes(category) {
   notesList.innerHTML = html;
 }
 
-/* Filtro */
 function filterNotes(query) {
   const items = document.querySelectorAll(".noteItem");
   items.forEach(item => {
     const text = item.textContent.toLowerCase();
-    item.style.display = text.includes(query
+    item.style.display = text.includes(query.toLowerCase()) ? "" : "none";
+  });
+}
+
+function goBack() {
+  notesList.style.display = "none";
+  categories.style.display = "grid";
+  currentCategory = null;
+}
+
+themeToggle.onclick = () => {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+};
+
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+}
+
+applyTranslations();
+</script>
+
+</body>
+</html>
