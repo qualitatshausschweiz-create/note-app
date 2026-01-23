@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Notizen</title>
+
   <style>
     :root {
       --bg: #f2f2f7;
@@ -198,7 +199,7 @@
   </div>
 </header>
 
-<!-- 🌐 Popup Lingua -->
+<!-- Popup Lingua -->
 <div id="langPopup" style="display:none;">
   <div id="langBox">
     <h2>Sprache / Language / Lingua / Idioma</h2>
@@ -210,7 +211,7 @@
   </div>
 </div>
 
-<!-- 🗂️ Categorie -->
+<!-- Categorie -->
 <div class="grid" id="categories">
 
   <div class="cat" data-cat="alle">
@@ -245,17 +246,16 @@
 
 </div>
 
-<!-- 📄 Lista Note -->
+<!-- Lista Note -->
 <div id="notesList"></div>
 
-<!-- ✏️ Editor Nota -->
+<!-- Editor -->
 <div id="noteEditor" style="display:none;">
   <div id="editorBox">
     <h3 id="editorTitle">Neue Notiz</h3>
 
     <textarea id="noteText"></textarea>
 
-    <!-- 🎨 Palette Colori Personalizzati -->
     <div id="colorPicker">
       <span class="colorDot" data-color="#ffffff" style="background:#ffffff;"></span>
       <span class="colorDot" data-color="#ffeb3b" style="background:#ffeb3b;"></span>
@@ -272,10 +272,10 @@
   </div>
 </div>
 
-<!-- 🛟 Pulsante Sicherung -->
+<!-- Pulsante Sicherung -->
 <button id="backupBtn" onclick="openBackupPopup()">🛟</button>
 
-<!-- 🛟 Popup Sicherung -->
+<!-- Popup Sicherung -->
 <div id="backupPopup" style="display:none;">
   <div id="backupBox">
 
@@ -302,127 +302,23 @@ let currentCategory = null;
 let currentLang = localStorage.getItem("lang") || "de";
 let selectedColor = "#ffffff";
 
-/* 🌐 Traduzioni categorie */
+/* Traduzioni categorie */
 const catNames = {
-  de: {
-    alle: "Alle",
-    arbeit: "Arbeit",
-    einkauf: "Einkauf",
-    zuhause: "Zuhause",
-    ideen: "Ideen",
-    personlich: "Persönlich"
-  },
-  it: {
-    alle: "Tutte",
-    arbeit: "Lavoro",
-    einkauf: "Spesa",
-    zuhause: "Casa",
-    ideen: "Idee",
-    personlich: "Personale"
-  },
-  en: {
-    alle: "All",
-    arbeit: "Work",
-    einkauf: "Shopping",
-    zuhause: "Home",
-    ideen: "Ideas",
-    personlich: "Personal"
-  },
-  es: {
-    alle: "Todas",
-    arbeit: "Trabajo",
-    einkauf: "Compra",
-    zuhause: "Casa",
-    ideen: "Ideas",
-    personlich: "Personal"
-  }
+  de: { alle:"Alle", arbeit:"Arbeit", einkauf:"Einkauf", zuhause:"Zuhause", ideen:"Ideen", personlich:"Persönlich" },
+  it: { alle:"Tutte", arbeit:"Lavoro", einkauf:"Spesa", zuhause:"Casa", ideen:"Idee", personlich:"Personale" },
+  en: { alle:"All", arbeit:"Work", einkauf:"Shopping", zuhause:"Home", ideen:"Ideas", personlich:"Personal" },
+  es: { alle:"Todas", arbeit:"Trabajo", einkauf:"Compra", zuhause:"Casa", ideen:"Ideas", personlich:"Personal" }
 };
 
-/* 🌐 Traduzioni UI */
+/* Traduzioni UI */
 const tr = {
-  de: {
-    appTitle: "Notizen",
-    addNoteBtn: "+ Notiz",
-    newNote: "Neue Notiz",
-    editNote: "Notiz bearbeiten",
-    cancelBtn: "Abbrechen",
-    saveBtn: "Speichern",
-    back: "Zurück",
-    search: "🔍 Suchen...",
-    edit: "✏️ Bearbeiten",
-    delete: "🗑️ Löschen",
-    backupTitle: "Sicherung",
-    backupExportBtn: "Exportieren",
-    backupImportBtn: "Importieren",
-    backupAutoRestoreBtn: "Automatische Sicherung wiederherstellen",
-    backupManualBtn: "📦 Backup manuell speichern",
-    backupManualRestoreBtn: "📧 Manuellen Backup wiederherstellen",
-    autoBackupLabel: "Letzte automatische Sicherung:",
-    backupCloseBtn: "Schliessen"
-  },
-  it: {
-    appTitle: "Note",
-    addNoteBtn: "+ Nota",
-    newNote: "Nuova Nota",
-    editNote: "Modifica Nota",
-    cancelBtn: "Annulla",
-    saveBtn: "Salva",
-    back: "Indietro",
-    search: "🔍 Cerca...",
-    edit: "✏️ Modifica",
-    delete: "🗑️ Elimina",
-    backupTitle: "Backup",
-    backupExportBtn: "Esporta",
-    backupImportBtn: "Importa",
-    backupAutoRestoreBtn: "Ripristina backup automatico",
-    backupManualBtn: "📦 Salva backup manuale",
-    backupManualRestoreBtn: "📧 Ripristina backup manuale",
-    autoBackupLabel: "Ultimo backup automatico:",
-    backupCloseBtn: "Chiudi"
-  },
-  en: {
-    appTitle: "Notes",
-    addNoteBtn: "+ Note",
-    newNote: "New Note",
-    editNote: "Edit Note",
-    cancelBtn: "Cancel",
-    saveBtn: "Save",
-    back: "Back",
-    search: "🔍 Search...",
-    edit: "✏️ Edit",
-    delete: "🗑️ Delete",
-    backupTitle: "Backup",
-    backupExportBtn: "Export",
-    backupImportBtn: "Import",
-    backupAutoRestoreBtn: "Restore automatic backup",
-    backupManualBtn: "📦 Save manual backup",
-    backupManualRestoreBtn: "📧 Restore manual backup",
-    autoBackupLabel: "Last automatic backup:",
-    backupCloseBtn: "Close"
-  },
-  es: {
-    appTitle: "Notas",
-    addNoteBtn: "+ Nota",
-    newNote: "Nueva nota",
-    editNote: "Editar nota",
-    cancelBtn: "Cancelar",
-    saveBtn: "Guardar",
-    back: "Atrás",
-    search: "🔍 Buscar...",
-    edit: "✏️ Modificar",
-    delete: "🗑️ Eliminar",
-    backupTitle: "Bécap",
-    backupExportBtn: "Exportar",
-    backupImportBtn: "Importar",
-    backupAutoRestoreBtn: "Restaurar bécap automático",
-    backupManualBtn: "📦 Guardar bécap manual",
-    backupManualRestoreBtn: "📧 Restaurar bécap manual",
-    autoBackupLabel: "Último bécap automático:",
-    backupCloseBtn: "Cerrar"
-  }
+  de:{appTitle:"Notizen",addNoteBtn:"+ Notiz",newNote:"Neue Notiz",editNote:"Notiz bearbeiten",cancelBtn:"Abbrechen",saveBtn:"Speichern",back:"Zurück",search:"🔍 Suchen...",edit:"✏️ Bearbeiten",delete:"🗑️ Löschen",backupTitle:"Sicherung",backupExportBtn:"Exportieren",backupImportBtn:"Importieren",backupAutoRestoreBtn:"Automatische Sicherung wiederherstellen",backupManualBtn:"📦 Backup manuell speichern",backupManualRestoreBtn:"📧 Manuellen Backup wiederherstellen",autoBackupLabel:"Letzte automatische Sicherung:",backupCloseBtn:"Schliessen"},
+  it:{appTitle:"Note",addNoteBtn:"+ Nota",newNote:"Nuova Nota",editNote:"Modifica Nota",cancelBtn:"Annulla",saveBtn:"Salva",back:"Indietro",search:"🔍 Cerca...",edit:"✏️ Modifica",delete:"🗑️ Elimina",backupTitle:"Backup",backupExportBtn:"Esporta",backupImportBtn:"Importa",backupAutoRestoreBtn:"Ripristina backup automatico",backupManualBtn:"📦 Salva backup manuale",backupManualRestoreBtn:"📧 Ripristina backup manuale",autoBackupLabel:"Ultimo backup automatico:",backupCloseBtn:"Chiudi"},
+  en:{appTitle:"Notes",addNoteBtn:"+ Note",newNote:"New Note",editNote:"Edit Note",cancelBtn:"Cancel",saveBtn:"Save",back:"Back",search:"🔍 Search...",edit:"✏️ Edit",delete:"🗑️ Delete",backupTitle:"Backup",backupExportBtn:"Export",backupImportBtn:"Import",backupAutoRestoreBtn:"Restore automatic backup",backupManualBtn:"📦 Save manual backup",backupManualRestoreBtn:"📧 Restore manual backup",autoBackupLabel:"Last automatic backup:",backupCloseBtn:"Close"},
+  es:{appTitle:"Notas",addNoteBtn:"+ Nota",newNote:"Nueva nota",editNote:"Editar nota",cancelBtn:"Cancelar",saveBtn:"Guardar",back:"Atrás",search:"🔍 Buscar...",edit:"✏️ Modificar",delete:"🗑️ Eliminar",backupTitle:"Bécap",backupExportBtn:"Exportar",backupImportBtn:"Importar",backupAutoRestoreBtn:"Restaurar bécap automático",backupManualBtn:"📦 Guardar bécap manual",backupManualRestoreBtn:"📧 Restaurar bécap manual",autoBackupLabel:"Último bécap automático:",backupCloseBtn:"Cerrar"}
 };
 
-/* 🔄 Applica traduzioni UI + categorie */
+/* Applica traduzioni */
 function applyTranslations() {
   const t = tr[currentLang];
 
@@ -441,20 +337,17 @@ function applyTranslations() {
 
   updateAutoBackupLabel();
 
-  /* Traduci etichette categorie */
   document.querySelectorAll(".catLabel").forEach(label => {
     const key = label.dataset.key;
     label.textContent = catNames[currentLang][key];
   });
 
-  /* Traduci lista note se aperta */
   if (currentCategory) showNotes(currentCategory);
 }
 
-/* 🌐 Cambio lingua */
+/* Cambio lingua */
 langBtn.onclick = () => langPopup.style.display = "block";
 function closeLangPopup() { langPopup.style.display = "none"; }
-
 function setLang(lang) {
   currentLang = lang;
   localStorage.setItem("lang", lang);
@@ -462,11 +355,11 @@ function setLang(lang) {
   closeLangPopup();
 }
 
-/* 🛟 Popup Sicherung */
+/* Popup Sicherung */
 function openBackupPopup() { backupPopup.style.display = "flex"; }
 function closeBackupPopup() { backupPopup.style.display = "none"; }
 
-/* 📁 Esporta */
+/* Esporta */
 backupExportBtn.onclick = () => {
   const notes = localStorage.getItem("notes") || "[]";
   const blob = new Blob([notes], { type: "application/json" });
@@ -477,7 +370,7 @@ backupExportBtn.onclick = () => {
   a.click();
 };
 
-/* 📥 Importa */
+/* Importa */
 backupFile.addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
@@ -489,14 +382,14 @@ backupFile.addEventListener("change", e => {
   reader.readAsText(file);
 });
 
-/* 🕒 Timestamp */
+/* Timestamp */
 function getTimestamp() {
   const d = new Date();
   const pad = n => (n < 10 ? "0" + n : n);
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
 
-/* 💾 Backup automatico */
+/* Backup automatico */
 function saveAutoBackup() {
   const notes = JSON.parse(localStorage.getItem("notes"));
   const data = { timestamp: getTimestamp(), notes };
@@ -515,124 +408,5 @@ function updateAutoBackupLabel() {
   autoBackupLabel.textContent = t.autoBackupLabel + " " + parsed.timestamp;
 }
 
-/* 🔄 Restore automatico */
-backupAutoRestoreBtn.onclick = () => {
-  const auto = localStorage.getItem("autoBackup");
-  const t = tr[currentLang];
-  if (!auto) return alert(t.backupAutoMissing);
-  const parsed = JSON.parse(auto);
-  localStorage.setItem("notes", JSON.stringify(parsed.notes));
-  alert(t.backupAutoRestored);
-  if (currentCategory) showNotes(currentCategory);
-};
-
-/* 💾 Backup manuale */
-backupManualBtn.onclick = () => {
-  const notes = JSON.parse(localStorage.getItem("notes"));
-  const data = { timestamp: getTimestamp(), notes };
-  localStorage.setItem("manualBackup", JSON.stringify(data));
-  alert("✔ OK");
-};
-
-/* 🔄 Restore manuale */
-backupManualRestoreBtn.onclick = () => {
-  const manual = localStorage.getItem("manualBackup");
-  const t = tr[currentLang];
-  if (!manual) return alert(t.backupManualMissing);
-  const parsed = JSON.parse(manual);
-  localStorage.setItem("notes", JSON.stringify(parsed.notes));
-  alert(t.backupManualRestored);
-  if (currentCategory) showNotes(currentCategory);
-};
-
-/* ➕ Nuova nota */
-addNoteBtn.onclick = () => {
-  editorTitle.textContent = tr[currentLang].newNote;
-  noteText.value = "";
-  selectedColor = "#ffffff";
-  document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
-  editingIndex = null;
-  noteEditor.style.display = "flex";
-};
-
-/* 🎨 Selettore colori */
-document.querySelectorAll(".colorDot").forEach(dot => {
-  dot.addEventListener("click", () => {
-    document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
-    dot.classList.add("selected");
-    selectedColor = dot.dataset.color;
-  });
-});
-
-/* 📂 Categorie */
-document.querySelectorAll(".cat").forEach(cat => {
-  cat.addEventListener("click", () => {
-    currentCategory = cat.dataset.cat;
-    showNotes(currentCategory);
-  });
-});
-
-/* 📄 Mostra note */
-function showNotes(category) {
-  currentCategory = category;
-  categories.style.display = "none";
-  notesList.style.display = "block";
-
-  const notes = JSON.parse(localStorage.getItem("notes")) || [];
-  const t = tr[currentLang];
-
-  let filtered = notes;
-  if (category !== "alle") {
-    filtered = notes.filter(n => n.category === category);
-  }
-
-  let html = `
-    <button class="backBtn" onclick="goBack()">${t.back}</button>
-    <input id="searchBar" placeholder="${t.search}" oninput="filterNotes(this.value)">
-    <div id="notesContainer">
-  `;
-
-  filtered.forEach(n => {
-    const translatedCat = catNames[currentLang][n.category];
-    html += `
-      <div class="noteItem" style="background:${n.color || 'var(--card)'};">
-        <b>${translatedCat}</b><br>${n.text}
-      </div>
-    `;
-  });
-
-  html += "</div>";
-  notesList.innerHTML = html;
-}
-
-/* 🔍 Filtro */
-function filterNotes(query) {
-  const items = document.querySelectorAll(".noteItem");
-  items.forEach(item => {
-    const text = item.textContent.toLowerCase();
-    item.style.display = text.includes(query.toLowerCase()) ? "" : "none";
-  });
-}
-
-/* 🔙 Torna alle categorie */
-function goBack() {
-  notesList.style.display = "none";
-  categories.style.display = "grid";
-  currentCategory = null;
-}
-
-/* 🌓 Tema */
-themeToggle.onclick = () => {
-  document.body.classList.toggle("dark");
-  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-};
-
-if (localStorage.getItem("theme") === "dark") {
-  document.body.classList.add("dark");
-}
-
-/* 🚀 Avvio */
-applyTranslations();
-</script>
-</body>
-</html>
+/* Restore automatico */
+backupAutoRestore
