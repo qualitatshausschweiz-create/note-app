@@ -49,6 +49,7 @@
       border: none;
     }
 
+    /* Categorie */
     .grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -75,6 +76,7 @@
     .ideen { background: #34c759; }
     .personlich { background: #ffffff; border: 2px solid #ccc; }
 
+    /* Lista note */
     #notesList {
       display: none;
       padding: 20px;
@@ -86,6 +88,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
+    /* Editor */
     #noteEditor {
       position: fixed;
       top: 0; left: 0;
@@ -113,6 +116,7 @@
       color: var(--text);
     }
 
+    /* Palette colori */
     #colorPicker {
       display: flex;
       gap: 12px;
@@ -132,6 +136,7 @@
       transform: scale(1.15);
     }
 
+    /* Pulsante Sicherung */
     #backupBtn {
       position: fixed;
       bottom: 22px;
@@ -148,6 +153,7 @@
       z-index: 950;
     }
 
+    /* Popup Sicherung */
     #backupPopup {
       position: fixed;
       top: 0; left: 0;
@@ -179,9 +185,40 @@
     .orangeBtn { background: #ff9500; color: white; }
     .grayBtn { background: #ccc; color: black; }
 
-    #backupFile {
-      margin-top: 12px;
+    /* Popup Lingua verticale */
+    #langPopup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #langBox {
+      background: var(--card);
+      width: 90%;
+      max-width: 360px;
+      padding: 22px;
+      border-radius: 18px;
+      text-align: center;
+    }
+    .langChoice {
+      display: block;
       width: 100%;
+      margin: 8px 0;
+      padding: 12px;
+      font-size: 17px;
+      border: none;
+      border-radius: 12px;
+      background: #007aff;
+      color: white;
+      cursor: pointer;
+    }
+    .langChoice:last-child {
+      background: #ccc;
+      color: black;
     }
   </style>
 </head>
@@ -200,14 +237,14 @@
 </header>
 
 <!-- Popup Lingua -->
-<div id="langPopup" style="display:none;">
+<div id="langPopup">
   <div id="langBox">
     <h2>Sprache / Language / Lingua / Idioma</h2>
-    <button onclick="setLang('de')">Deutsch</button>
-    <button onclick="setLang('it')">Italiano</button>
-    <button onclick="setLang('en')">English</button>
-    <button onclick="setLang('es')">Español</button>
-    <button onclick="closeLangPopup()">❌</button>
+    <button class="langChoice" onclick="setLang('de')">Deutsch</button>
+    <button class="langChoice" onclick="setLang('it')">Italiano</button>
+    <button class="langChoice" onclick="setLang('en')">English</button>
+    <button class="langChoice" onclick="setLang('es')">Español</button>
+    <button class="langChoice" onclick="closeLangPopup()">❌</button>
   </div>
 </div>
 
@@ -250,7 +287,7 @@
 <div id="notesList"></div>
 
 <!-- Editor -->
-<div id="noteEditor" style="display:none;">
+<div id="noteEditor">
   <div id="editorBox">
     <h3 id="editorTitle">Neue Notiz</h3>
 
@@ -273,10 +310,10 @@
 </div>
 
 <!-- Pulsante Sicherung -->
-<button id="backupBtn" onclick="openBackupPopup()">🛟</button>
+<button id="backupBtn">🛟</button>
 
 <!-- Popup Sicherung -->
-<div id="backupPopup" style="display:none;">
+<div id="backupPopup">
   <div id="backupBox">
 
     <h2 id="backupTitle">Sicherung</h2>
@@ -290,7 +327,7 @@
 
     <p id="autoBackupLabel">Letzte automatische Sicherung: –</p>
 
-    <button id="backupCloseBtn" class="backupBtn grayBtn" onclick="closeBackupPopup()">Schliessen</button>
+    <button id="backupCloseBtn" class="backupBtn grayBtn">Schliessen</button>
 
     <input type="file" id="backupFile" accept="application/json">
 
@@ -312,10 +349,10 @@ const catNames = {
 
 /* Traduzioni UI */
 const tr = {
-  de:{appTitle:"Notizen",addNoteBtn:"+ Notiz",newNote:"Neue Notiz",cancelBtn:"Abbrechen",saveBtn:"Speichern"},
-  it:{appTitle:"Note",addNoteBtn:"+ Nota",newNote:"Nuova Nota",cancelBtn:"Annulla",saveBtn:"Salva"},
-  en:{appTitle:"Notes",addNoteBtn:"+ Note",newNote:"New Note",cancelBtn:"Cancel",saveBtn:"Save"},
-  es:{appTitle:"Notas",addNoteBtn:"+ Nota",newNote:"Nueva nota",cancelBtn:"Cancelar",saveBtn:"Guardar"}
+  de:{appTitle:"Notizen",addNoteBtn:"+ Notiz",newNote:"Neue Notiz",cancelBtn:"Abbrechen",saveBtn:"Speichern",back:"Zurück",search:"🔍 Suchen..."},
+  it:{appTitle:"Note",addNoteBtn:"+ Nota",newNote:"Nuova Nota",cancelBtn:"Annulla",saveBtn:"Salva",back:"Indietro",search:"🔍 Cerca..."},
+  en:{appTitle:"Notes",addNoteBtn:"+ Note",newNote:"New Note",cancelBtn:"Cancel",saveBtn:"Save",back:"Back",search:"🔍 Search..."},
+  es:{appTitle:"Notas",addNoteBtn:"+ Nota",newNote:"Nueva nota",cancelBtn:"Cancelar",saveBtn:"Guardar",back:"Atrás",search:"🔍 Buscar..."}
 };
 
 /* Applica traduzioni */
@@ -335,8 +372,8 @@ function applyTranslations() {
   if (currentCategory) showNotes(currentCategory);
 }
 
-/* Cambio lingua */
-langBtn.onclick = () => langPopup.style.display = "block";
+/* Popup lingua */
+langBtn.onclick = () => langPopup.style.display = "flex";
 function closeLangPopup() { langPopup.style.display = "none"; }
 function setLang(lang) {
   currentLang = lang;
@@ -345,6 +382,10 @@ function setLang(lang) {
   closeLangPopup();
 }
 
+/* Sicherung */
+backupBtn.onclick = () => backupPopup.style.display = "flex";
+backupCloseBtn.onclick = () => backupPopup.style.display = "none";
+
 /* Apri editor */
 addNoteBtn.onclick = () => {
   editorTitle.textContent = tr[currentLang].newNote;
@@ -352,15 +393,15 @@ addNoteBtn.onclick = () => {
   selectedColor = "#ffffff";
   document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
   editingIndex = null;
-  noteEditor.style.display = "flex";  // CORRETTO PER SAFARI
+  noteEditor.style.display = "flex";
 };
 
-/* Pulsante Abbrechen */
+/* Abbrechen */
 cancelBtn.onclick = () => {
   noteEditor.style.display = "none";
 };
 
-/* Pulsante Speichern */
+/* Speichern */
 saveBtn.onclick = () => {
   const text = noteText.value.trim();
   if (!text) return;
@@ -407,13 +448,30 @@ function showNotes(category) {
   notesList.style.display = "block";
 
   const notes = JSON.parse(localStorage.getItem("notes")) || [];
+  const t = tr[currentLang];
 
   let filtered = notes;
   if (category !== "alle") {
     filtered = notes.filter(n => n.category === category);
   }
 
-  let html = `<button onclick="goBack()">←</button>`;
+  let html = `
+    <div style="display:flex; align-items:center; margin-bottom:12px;">
+      <button onclick="goBack()" style="
+        background:none;
+        border:none;
+        font-size:26px;
+        padding:6px 12px;
+        cursor:pointer;
+      ">←</button>
+      <span style="font-size:18px; font-weight:600; margin-left:6px;">
+        ${catNames[currentLang][category]}
+      </span>
+    </div>
+
+    <input id="searchBar" placeholder="${t.search}" oninput="filterNotes(this.value)">
+    <div id="notesContainer">
+  `;
 
   filtered.forEach(n => {
     const translatedCat = catNames[currentLang][n.category];
@@ -424,28 +482,13 @@ function showNotes(category) {
     `;
   });
 
+  html += "</div>";
   notesList.innerHTML = html;
 }
 
-/* Torna indietro */
-function goBack() {
-  notesList.style.display = "none";
-  categories.style.display = "grid";
-  currentCategory = null;
-}
-
-/* Tema */
-themeToggle.onclick = () => {
-  document.body.classList.toggle("dark");
-  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-};
-
-if (localStorage.getItem("theme") === "dark") {
-  document.body.classList.add("dark");
-}
-
-/* Avvio */
-applyTranslations();
-</script>
-</body>
-</html>
+/* Filtro */
+function filterNotes(query) {
+  const items = document.querySelectorAll(".noteItem");
+  items.forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(query
