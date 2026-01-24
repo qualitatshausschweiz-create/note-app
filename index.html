@@ -247,7 +247,7 @@
 <!-- Categorie -->
 <div class="grid" id="categories">
 
-  <!-- ⭐ Preferiti in cima -->
+  <!-- Preferiti -->
   <div class="cat" data-cat="favorite">
     <div class="circle favorite"></div>
     <span class="catLabel" data-key="favorite">Favoriten</span>
@@ -322,7 +322,6 @@
 
     <button id="backupExportBtn" class="backupBtn greenBtn">Exportieren</button>
 
-    <!-- Importieren come LABEL per iPhone -->
     <label for="backupFile" id="backupImportBtn" class="backupBtn blueBtn">Importieren</label>
 
     <button id="backupAutoRestoreBtn" class="backupBtn orangeBtn">Automatische Sicherung wiederherstellen</button>
@@ -334,7 +333,6 @@
 
     <button id="backupCloseBtn" class="backupBtn grayBtn">Schliessen</button>
 
-    <!-- input file invisibile ma cliccabile -->
     <input type="file" id="backupFile" accept="application/json"
            style="opacity:0; position:absolute; width:1px; height:1px;">
 
@@ -357,7 +355,6 @@ const noteText = document.getElementById("noteText");
 const cancelBtn = document.getElementById("cancelBtn");
 const saveBtn = document.getElementById("saveBtn");
 const notesList = document.getElementById("notesList");
-const categoriesDiv = document.getElementById("categories");
 
 const backupBtn = document.getElementById("backupBtn");
 const backupPopup = document.getElementById("backupPopup");
@@ -610,7 +607,7 @@ document.querySelectorAll(".cat").forEach(cat => {
   });
 });
 
-/* Mostra note */
+/* ⭐ Mostra note (con Preferiti funzionanti) */
 function showNotes(cat) {
   const notes = loadNotes();
 
@@ -669,7 +666,7 @@ function showNotes(cat) {
   });
 }
 
-/* Pulsanti backup */
+/* Backup */
 backupBtn.onclick = () => backupPopup.style.display = "flex";
 backupCloseBtn.onclick = () => backupPopup.style.display = "none";
 
