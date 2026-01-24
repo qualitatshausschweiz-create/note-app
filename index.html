@@ -109,7 +109,7 @@
       white-space: pre-wrap;
     }
 
-    /* EDITOR */
+    /* EDITOR NOTE */
     #noteEditor {
       position: fixed;
       top: 0; left: 0;
@@ -231,6 +231,7 @@
     }
   </style>
 </head>
+
 <body>
 
 <header>
@@ -347,7 +348,6 @@
       ⚪ <span>Schliessen</span>
     </button>
 
-    <!-- FILE INPUT NASCOSTO -->
     <input type="file" id="backupFile" accept="application/json"
            style="opacity:0; position:absolute; width:1px; height:1px;">
   </div>
@@ -539,13 +539,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* -------------------------
-     CATEGORIE (FIX iPHONE)
+     CATEGORIE — FIX iPHONE
+     (touchstart + click)
   ------------------------- */
   document.querySelectorAll(".cat").forEach(catEl => {
+
+    // iPhone: evento immediato
+    catEl.addEventListener("touchstart", () => {
+      currentCategory = catEl.dataset.cat;
+      showNotes(currentCategory);
+    }, { passive: true });
+
+    // Desktop / Android
     catEl.addEventListener("click", () => {
       currentCategory = catEl.dataset.cat;
       showNotes(currentCategory);
     });
+
   });
 
 
