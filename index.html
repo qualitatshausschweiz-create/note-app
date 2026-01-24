@@ -353,10 +353,10 @@ const tr = {
 function applyTranslations() {
   const t = tr[currentLang];
 
-  appTitle.textContent = t.appTitle;
-  addNoteBtn.textContent = t.addNoteBtn;
-  cancelBtn.textContent = t.cancelBtn;
-  saveBtn.textContent = t.saveBtn;
+  document.getElementById("appTitle").textContent = t.appTitle;
+  document.getElementById("addNoteBtn").textContent = t.addNoteBtn;
+  document.getElementById("cancelBtn").textContent = t.cancelBtn;
+  document.getElementById("saveBtn").textContent = t.saveBtn;
 
   document.querySelectorAll(".catLabel").forEach(label => {
     const key = label.dataset.key;
@@ -369,8 +369,12 @@ function applyTranslations() {
 }
 
 /* Popup lingua */
-langBtn.onclick = () => langPopup.style.display = "flex";
-function closeLangPopup() { langPopup.style.display = "none"; }
+document.getElementById("langBtn").onclick = () => {
+  document.getElementById("langPopup").style.display = "flex";
+};
+function closeLangPopup() {
+  document.getElementById("langPopup").style.display = "none";
+}
 function setLang(lang) {
   currentLang = lang;
   localStorage.setItem("lang", lang);
@@ -378,12 +382,16 @@ function setLang(lang) {
   closeLangPopup();
 }
 
-/* Sicherung */
-backupBtn.onclick = () => backupPopup.style.display = "flex";
-backupCloseBtn.onclick = () => backupPopup.style.display = "none";
+/* Sicherung: apri/chiudi */
+document.getElementById("backupBtn").onclick = () => {
+  document.getElementById("backupPopup").style.display = "flex";
+};
+document.getElementById("backupCloseBtn").onclick = () => {
+  document.getElementById("backupPopup").style.display = "none";
+};
 
 /* Backup: esporta */
-backupExportBtn.onclick = () => {
+document.getElementById("backupExportBtn").onclick = () => {
   const notes = localStorage.getItem("notes") || "[]";
   const blob = new Blob([notes], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -394,7 +402,7 @@ backupExportBtn.onclick = () => {
 };
 
 /* Backup: importa */
-backupFile.addEventListener("change", e => {
+document.getElementById("backupFile").addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
@@ -414,7 +422,7 @@ function getTimestamp() {
 
 /* Backup automatico */
 function saveAutoBackup() {
-  const notes = JSON.parse(localStorage.getItem("notes"));
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
   const data = { timestamp: getTimestamp(), notes };
   localStorage.setItem("autoBackup", JSON.stringify(data));
   updateAutoBackupLabel();
@@ -423,18 +431,20 @@ function saveAutoBackup() {
 function updateAutoBackupLabel() {
   const t = tr[currentLang];
   const auto = localStorage.getItem("autoBackup");
+  const label = document.getElementById("autoBackupLabel");
+  if (!label) return;
   if (!auto) {
-    autoBackupLabel.textContent = t.autoBackupLabel + " –";
+    label.textContent = t.autoBackupLabel + " –";
     return;
   }
   const parsed = JSON.parse(auto);
-  autoBackupLabel.textContent = t.autoBackupLabel + " " + parsed.timestamp;
+  label.textContent = t.autoBackupLabel + " " + parsed.timestamp;
 }
 
 /* Ripristina automatico */
-backupAutoRestoreBtn.onclick = () => {
+document.getElementById("backupAutoRestoreBtn").onclick = () => {
   const auto = localStorage.getItem("autoBackup");
-  if (!auto) return alert("Kein automatisches Backup gefunden.");
+  if (!auto) { alert("Kein automatisches Backup gefunden."); return; }
   const parsed = JSON.parse(auto);
   localStorage.setItem("notes", JSON.stringify(parsed.notes));
   alert("✔ Automatisches Backup wiederhergestellt.");
@@ -442,25 +452,168 @@ backupAutoRestoreBtn.onclick = () => {
 };
 
 /* Backup manuale */
-backupManualBtn.onclick = () => {
-  const notes = JSON.parse(localStorage.getItem("notes"));
+document.getElementById("backupManualBtn").onclick = () => {
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
   const data = { timestamp: getTimestamp(), notes };
   localStorage.setItem("manualBackup", JSON.stringify(data));
   alert("✔ Manuelles Backup gespeichert.");
 };
 
 /* Ripristina manuale */
-backupManualRestoreBtn.onclick = () => {
+document.getElementById("backupManualRestoreBtn").onclick = () => {
   const manual = localStorage.getItem("manualBackup");
-  if (!manual) return alert("Kein manuelles Backup gefunden.");
+  if (!manual) { alert("Kein manuelles Backup gefunden."); return; }
   const parsed = JSON.parse(manual);
   localStorage.setItem("notes", JSON.stringify(parsed.notes));
   alert("✔ Manuelles Backup wiederhergestellt.");
   if (currentCategory) showNotes(currentCategory);
 };
 
-/* Apri editor */
-addNoteBtn.onclick = () => {
-  editorTitle.textContent = tr[currentLang].newNote;
-  noteText.value = "";
+/* Apri editor nuova nota */
+document.getElementById("addNoteBtn").onclick = () => {
+  const t = tr[currentLang];
+  document.getElementById("editorTitle").textContent = t.newNote;
+  document.getElementById("noteText").value = "";
   selectedColor = "#ffffff";
+  document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
+  editingIndex = null;
+  document.getElementById("noteEditor").style.display = "flex";
+};
+
+/* Abbrechen */
+document.getElementById("cancelBtn").onclick = () => {
+  document.getElementById("noteEditor").style.display = "none";
+};
+
+/* Speichern */
+document.getElementById("saveBtn").onclick = () => {
+  const text = document.getElementById("noteText").value.trim();
+  if (!text) return;
+
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+
+  if (editingIndex !== null) {
+    notes[editingIndex].text = text;
+    notes[editingIndex].color = selectedColor;
+  } else {
+    notes.push({
+      text,
+      category: currentCategory,
+      color: selectedColor
+    });
+  }
+
+  localStorage.setItem("notes", JSON.stringify(notes));
+  document.getElementById("noteEditor").style.display = "none";
+  if (currentCategory) showNotes(currentCategory);
+};
+
+/* Selettore colori */
+document.querySelectorAll(".colorDot").forEach(dot => {
+  dot.addEventListener("click", () => {
+    document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
+    dot.classList.add("selected");
+    selectedColor = dot.dataset.color;
+  });
+});
+
+/* Categorie */
+document.querySelectorAll(".cat").forEach(cat => {
+  cat.addEventListener("click", () => {
+    currentCategory = cat.dataset.cat;
+    showNotes(currentCategory);
+  });
+});
+
+/* Mostra note + modifica al click */
+function showNotes(category) {
+  currentCategory = category;
+  document.getElementById("categories").style.display = "none";
+  const notesList = document.getElementById("notesList");
+  notesList.style.display = "block";
+
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+  const t = tr[currentLang];
+
+  let filtered = notes;
+  if (category !== "alle") {
+    filtered = notes.filter(n => n.category === category);
+  }
+
+  let html = `
+    <div style="display:flex; align-items:center; margin-bottom:12px;">
+      <button onclick="goBack()" style="
+        background:none;
+        border:none;
+        font-size:26px;
+        padding:6px 12px;
+        cursor:pointer;
+      ">←</button>
+      <span style="font-size:18px; font-weight:600; margin-left:6px;">
+        ${catNames[currentLang][category]}
+      </span>
+    </div>
+
+    <input id="searchBar" placeholder="${t.search}" oninput="filterNotes(this.value)">
+    <div id="notesContainer">
+  `;
+
+  filtered.forEach((n, i) => {
+    const translatedCat = catNames[currentLang][n.category];
+    html += `
+      <div class="noteItem" style="background:${n.color}" onclick="editNote(${i})">
+        <b>${translatedCat}</b><br>${n.text}
+      </div>
+    `;
+  });
+
+  html += "</div>";
+  notesList.innerHTML = html;
+}
+
+/* Modifica nota */
+function editNote(index) {
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+  const note = notes[index];
+  editingIndex = index;
+  document.getElementById("noteText").value = note.text;
+  selectedColor = note.color || "#ffffff";
+
+  document.querySelectorAll(".colorDot").forEach(dot => {
+    dot.classList.toggle("selected", dot.dataset.color === selectedColor);
+  });
+
+  document.getElementById("editorTitle").textContent = tr[currentLang].editNote;
+  document.getElementById("noteEditor").style.display = "flex";
+}
+
+/* Filtro note */
+function filterNotes(query) {
+  const items = document.querySelectorAll(".noteItem");
+  const q = query.toLowerCase();
+  items.forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(q) ? "" : "none";
+  });
+}
+
+/* Torna alle categorie */
+function goBack() {
+  document.getElementById("notesList").style.display = "none";
+  document.getElementById("categories").style.display = "grid";
+  currentCategory = null;
+}
+
+/* Tema */
+document.getElementById("themeToggle").onclick = () => {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+};
+
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+}
+
+/* Avvio */
+applyTranslations();
+</script>
