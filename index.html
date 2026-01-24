@@ -2,55 +2,82 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Notizen</title>
+
+  <!--
+    VIEWPORT iPhone
+    Garantisce che l’app si adatti perfettamente allo schermo,
+    incluso il notch e la barra inferiore.
+  -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <title>Notizen</title>
+
   <style>
+    /* ---------------------------------------------------------
+       PALETTE BASE (chiaro/scuro)
+       --------------------------------------------------------- */
     :root {
       --bg: #f2f2f7;
       --card: #ffffff;
       --text: #000000;
     }
+
+    body.dark {
+      --bg: #000000;
+      --card: #1c1c1e;
+      --text: #ffffff;
+    }
+
+    /* ---------------------------------------------------------
+       STRUTTURA BASE
+       --------------------------------------------------------- */
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
       background: var(--bg);
       color: var(--text);
     }
-    body.dark {
-      --bg: #000000;
-      --card: #1c1c1e;
-      --text: #ffffff;
-      background: var(--bg);
-      color: var(--text);
-    }
+
     #app {
       max-width: 600px;
       margin: 0 auto;
       padding: 16px;
     }
+
+    /* ---------------------------------------------------------
+       HEADER
+       --------------------------------------------------------- */
     header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 12px;
     }
+
     #appTitle {
       font-size: 24px;
       font-weight: 700;
     }
+
     .iconBtn {
       border: none;
       background: none;
       font-size: 22px;
       cursor: pointer;
       margin-left: 8px;
+      color: var(--text);
     }
+
+    /* ---------------------------------------------------------
+       CATEGORIE (griglia orizzontale)
+       --------------------------------------------------------- */
     #categories {
       display: flex;
       gap: 8px;
       overflow-x: auto;
       margin-bottom: 12px;
     }
+
     .cat {
       flex: 0 0 auto;
       padding: 8px 12px;
@@ -61,13 +88,18 @@
       align-items: center;
       cursor: pointer;
     }
+
     .catLabel {
       font-size: 14px;
     }
+
+    /* ---------------------------------------------------------
+       LISTA NOTE
+       --------------------------------------------------------- */
     #notesList {
-      display: none;
       display: block;
     }
+
     .noteItem {
       background: var(--card);
       border-radius: 14px;
@@ -76,6 +108,10 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
       cursor: pointer;
     }
+
+    /* ---------------------------------------------------------
+       BOTTONE + (nuova nota)
+       --------------------------------------------------------- */
     #addNoteBtn {
       position: fixed;
       right: 20px;
@@ -94,7 +130,10 @@
       cursor: pointer;
       z-index: 1100;
     }
-    /* Editor */
+
+    /* ---------------------------------------------------------
+       EDITOR NOTE (popup centrale)
+       --------------------------------------------------------- */
     #noteEditor {
       position: fixed;
       top: 0; left: 0;
@@ -105,6 +144,7 @@
       justify-content: center;
       z-index: 1400;
     }
+
     #noteEditorBox {
       width: 90%;
       max-width: 500px;
@@ -116,6 +156,7 @@
       flex-direction: column;
       gap: 10px;
     }
+
     #noteText {
       width: 100%;
       min-height: 120px;
@@ -127,11 +168,13 @@
       background: transparent;
       color: inherit;
     }
+
     #editorButtons {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
     }
+
     #editorButtons button {
       border-radius: 12px;
       border: none;
@@ -139,20 +182,26 @@
       font-size: 15px;
       cursor: pointer;
     }
+
     #cancelBtn {
       background: #ccc;
       color: #000;
     }
+
     #saveBtn {
       background: #007aff;
       color: #fff;
     }
-    /* Colori */
+
+    /* ---------------------------------------------------------
+       COLORI NOTE
+       --------------------------------------------------------- */
     #colorRow {
       display: flex;
       gap: 8px;
       margin-top: 4px;
     }
+
     .colorDot {
       width: 22px;
       height: 22px;
@@ -160,10 +209,14 @@
       border: 2px solid transparent;
       cursor: pointer;
     }
+
     .colorDot.selected {
       border-color: #000;
     }
-    /* Popup lingua */
+
+    /* ---------------------------------------------------------
+       POPUP LINGUA + BACKUP
+       --------------------------------------------------------- */
     #langPopup,
     #backupPopup {
       position: fixed;
@@ -175,6 +228,7 @@
       justify-content: center;
       z-index: 1500;
     }
+
     #langBox,
     #backupBox {
       width: 80%;
@@ -184,6 +238,7 @@
       padding: 16px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.3);
     }
+
     .langChoice {
       width: 100%;
       padding: 10px;
@@ -195,13 +250,17 @@
       font-size: 16px;
       cursor: pointer;
     }
-    /* Backup buttons */
+
+    /* ---------------------------------------------------------
+       BACKUP BUTTONS
+       --------------------------------------------------------- */
     .backupBtnRow {
       display: flex;
       flex-direction: column;
       gap: 8px;
       margin-top: 8px;
     }
+
     .backupAction {
       display: flex;
       align-items: center;
@@ -213,15 +272,22 @@
       color: inherit;
       cursor: pointer;
     }
+
     .backupAction span {
       flex: 1;
     }
+
   </style>
 </head>
 <body>
   <div id="app">
+
+    <!-- ---------------------------------------------------------
+         HEADER (titolo + lingua + backup + tema)
+         --------------------------------------------------------- -->
     <header>
       <div id="appTitle">Notizen</div>
+
       <div>
         <button id="langBtn" class="iconBtn">🌐</button>
         <button id="backupBtn" class="iconBtn">💾</button>
@@ -229,19 +295,82 @@
       </div>
     </header>
 
-    <!-- Popup lingua -->
+    <!-- ---------------------------------------------------------
+         CATEGORIE (barra orizzontale)
+         --------------------------------------------------------- -->
+    <div id="categories">
+      <div class="cat" data-cat="alle"><span class="catLabel">Alle</span></div>
+      <div class="cat" data-cat="favorite"><span class="catLabel">Favoriten</span></div>
+      <div class="cat" data-cat="arbeit"><span class="catLabel">Arbeit</span></div>
+      <div class="cat" data-cat="einkauf"><span class="catLabel">Einkauf</span></div>
+      <div class="cat" data-cat="zuhause"><span class="catLabel">Zuhause</span></div>
+      <div class="cat" data-cat="ideen"><span class="catLabel">Ideen</span></div>
+      <div class="cat" data-cat="personlich"><span class="catLabel">Persönlich</span></div>
+    </div>
+
+    <!-- ---------------------------------------------------------
+         LISTA NOTE
+         --------------------------------------------------------- -->
+    <div id="notesList"></div>
+
+    <!-- ---------------------------------------------------------
+         EDITOR NOTE (popup centrale)
+         --------------------------------------------------------- -->
+    <div id="noteEditor">
+      <div id="noteEditorBox">
+
+        <h2 id="editorTitle">Neue Notiz</h2>
+
+        <textarea id="noteText" placeholder=""></textarea>
+
+        <!-- Colori -->
+        <div id="colorRow">
+          <div class="colorDot selected" data-color="#ffffff" style="background:#ffffff;"></div>
+          <div class="colorDot" data-color="#ffcc00" style="background:#ffcc00;"></div>
+          <div class="colorDot" data-color="#ff9500" style="background:#ff9500;"></div>
+          <div class="colorDot" data-color="#34c759" style="background:#34c759;"></div>
+          <div class="colorDot" data-color="#007aff" style="background:#007aff;"></div>
+        </div>
+
+        <!-- Pulsanti -->
+        <div id="editorButtons">
+          <button id="cancelBtn">Abbrechen</button>
+          <button id="saveBtn">Speichern</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ---------------------------------------------------------
+       BOTTONE + (nuova nota)
+       --------------------------------------------------------- -->
+  <button id="addNoteBtn">+</button>
+    <!-- ---------------------------------------------------------
+         POPUP LINGUA
+         --------------------------------------------------------- -->
     <div id="langPopup">
       <div id="langBox">
         <h2>Sprache</h2>
+
+        <!-- Scelta lingua -->
         <button class="langChoice" data-lang="de">Deutsch</button>
         <button class="langChoice" data-lang="it">Italiano</button>
         <button class="langChoice" data-lang="en">English</button>
         <button class="langChoice" data-lang="es">Español</button>
+
+        <!-- Chiudi -->
         <button id="langCloseBtn" class="langChoice">OK</button>
       </div>
     </div>
 
-    <!-- FOGLIO iOS PER SCELTA CATEGORIA (80%) -->
+
+    <!-- ---------------------------------------------------------
+         FOGLIO iOS PER SCELTA CATEGORIA (80% larghezza)
+         --------------------------------------------------------- -->
+
+    <!-- Overlay scuro dietro al foglio -->
     <div id="categorySheetOverlay" style="
       position: fixed;
       top: 0; left: 0;
@@ -251,9 +380,10 @@
       z-index: 1200;
     "></div>
 
+    <!-- Foglio vero e proprio -->
     <div id="categorySheet" style="
       position: fixed;
-      bottom: -420px;
+      bottom: -420px; /* nascosto */
       left: 50%;
       transform: translateX(-50%);
       width: 80%;
@@ -266,6 +396,7 @@
       z-index: 1300;
       transition: bottom 0.28s ease;
     ">
+
       <h2 id="categorySheetTitle" style="
         text-align:center;
         margin-top:0;
@@ -274,11 +405,13 @@
         font-weight:600;
       ">Kategorie wählen</h2>
 
+      <!-- Pulsanti categorie -->
       <div id="categorySheetButtons" style="
         display:flex;
         flex-direction:column;
         gap:12px;
       ">
+
         <button class="sheetCatBtn" data-cat="arbeit" style="
           padding:14px;
           border-radius:14px;
@@ -324,8 +457,10 @@
           font-size:18px;
           border:1px solid #ccc;
         ">Persönlich</button>
+
       </div>
 
+      <!-- Pulsante annulla -->
       <button id="categorySheetCancel" style="
         margin-top:18px;
         width:100%;
@@ -336,72 +471,60 @@
         color:black;
         font-size:18px;
       ">Abbrechen</button>
+
     </div>
 
-    <!-- Categorie -->
-    <div id="categories">
-      <div class="cat" data-cat="alle"><span class="catLabel">Alle</span></div>
-      <div class="cat" data-cat="favorite"><span class="catLabel">Favoriten</span></div>
-      <div class="cat" data-cat="arbeit"><span class="catLabel">Arbeit</span></div>
-      <div class="cat" data-cat="einkauf"><span class="catLabel">Einkauf</span></div>
-      <div class="cat" data-cat="zuhause"><span class="catLabel">Zuhause</span></div>
-      <div class="cat" data-cat="ideen"><span class="catLabel">Ideen</span></div>
-      <div class="cat" data-cat="personlich"><span class="catLabel">Persönlich</span></div>
-    </div>
 
-    <!-- Lista note -->
-    <div id="notesList"></div>
-
-    <!-- Editor -->
-    <div id="noteEditor">
-      <div id="noteEditorBox">
-        <h2 id="editorTitle">Neue Notiz</h2>
-        <textarea id="noteText" placeholder=""></textarea>
-        <div id="colorRow">
-          <div class="colorDot selected" data-color="#ffffff" style="background:#ffffff;"></div>
-          <div class="colorDot" data-color="#ffcc00" style="background:#ffcc00;"></div>
-          <div class="colorDot" data-color="#ff9500" style="background:#ff9500;"></div>
-          <div class="colorDot" data-color="#34c759" style="background:#34c759;"></div>
-          <div class="colorDot" data-color="#007aff" style="background:#007aff;"></div>
-        </div>
-        <div id="editorButtons">
-          <button id="cancelBtn">Abbrechen</button>
-          <button id="saveBtn">Speichern</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Backup popup -->
+    <!-- ---------------------------------------------------------
+         POPUP BACKUP
+         --------------------------------------------------------- -->
     <div id="backupPopup">
       <div id="backupBox">
         <h2>Sicherung</h2>
+
         <div class="backupBtnRow">
+
+          <!-- Backup automatico -->
           <button id="autoBackupBtn" class="backupAction">
             <span>Backup automatisch</span>
           </button>
+
+          <!-- Backup manuale -->
           <button id="manualBackupBtn" class="backupAction">
             <span>Backup manuell</span>
           </button>
+
+          <!-- Ripristino automatico -->
           <button id="autoRestoreBtn" class="backupAction">
             <span>Wiederherstellung automatisch</span>
           </button>
+
+          <!-- Ripristino manuale -->
           <button id="manualRestoreBtn" class="backupAction">
             <span>Wiederherstellung manuell</span>
           </button>
+
+          <!-- Chiudi -->
           <button id="backupCloseBtn" class="backupAction">
             <span>Schliessen</span>
           </button>
+
         </div>
+
+        <!-- Input file nascosto per ripristino manuale -->
         <input type="file" id="backupFile" accept="application/json" style="display:none;" />
+
       </div>
     </div>
-  </div>
-
-  <button id="addNoteBtn">+</button>
-
+  <!-- ---------------------------------------------------------
+       SCRIPT PRINCIPALE
+       --------------------------------------------------------- -->
   <script>
   document.addEventListener("DOMContentLoaded", () => {
 
+    /* =========================================================
+       1. DIZIONARIO LINGUE
+       ========================================================= */
     const LANG = {
       de: {
         appTitle: "Notizen",
@@ -501,35 +624,46 @@
       }
     };
 
+    /* =========================================================
+       2. FUNZIONE MULTILINGUA
+       ========================================================= */
     function applyLanguage(lang) {
       const L = LANG[lang];
 
-      document.getElementById("appTitle").textContent = L.appTitle;
+      // Titoli e pulsanti principali
+      document.getElementById("appTitle").textContent   = L.appTitle;
       document.getElementById("editorTitle").textContent = L.newNote;
-      document.getElementById("cancelBtn").textContent = L.cancel;
-      document.getElementById("saveBtn").textContent = L.save;
+      document.getElementById("cancelBtn").textContent  = L.cancel;
+      document.getElementById("saveBtn").textContent    = L.save;
 
+      // Categorie nella barra
       document.querySelectorAll(".cat").forEach(btn => {
         const key = btn.dataset.cat;
         btn.querySelector(".catLabel").textContent = L.categories[key];
       });
 
+      // Foglio iOS categorie
       document.getElementById("categorySheetTitle").textContent = L.chooseCategory;
       document.querySelectorAll(".sheetCatBtn").forEach(btn => {
         const key = btn.dataset.cat;
         btn.textContent = L.categories[key];
       });
 
-      document.querySelector("#backupBox h2").textContent = L.backup.title;
-      document.querySelector("#autoBackupBtn span").textContent = L.backup.autoBackup;
-      document.querySelector("#manualBackupBtn span").textContent = L.backup.manualBackup;
-      document.querySelector("#autoRestoreBtn span").textContent = L.backup.autoRestore;
-      document.querySelector("#manualRestoreBtn span").textContent = L.backup.manualRestore;
-      document.querySelector("#backupCloseBtn span").textContent = L.backup.close;
+      // Popup backup
+      document.querySelector("#backupBox h2").textContent              = L.backup.title;
+      document.querySelector("#autoBackupBtn span").textContent        = L.backup.autoBackup;
+      document.querySelector("#manualBackupBtn span").textContent      = L.backup.manualBackup;
+      document.querySelector("#autoRestoreBtn span").textContent       = L.backup.autoRestore;
+      document.querySelector("#manualRestoreBtn span").textContent     = L.backup.manualRestore;
+      document.querySelector("#backupCloseBtn span").textContent       = L.backup.close;
 
+      // Salva lingua scelta
       localStorage.setItem("lang", lang);
     }
 
+    /* =========================================================
+       3. COLORE TESTO IN BASE ALLO SFONDO
+       ========================================================= */
     function getTextColor(bg) {
       const c = bg.substring(1);
       const rgb = parseInt(c, 16);
@@ -540,6 +674,9 @@
       return luminance > 150 ? "#000" : "#fff";
     }
 
+    /* =========================================================
+       4. RIFERIMENTI DOM
+       ========================================================= */
     const notesList       = document.getElementById("notesList");
     const noteEditor      = document.getElementById("noteEditor");
     const noteText        = document.getElementById("noteText");
@@ -568,11 +705,14 @@
     const themeToggle     = document.getElementById("themeToggle");
     const addNoteBtn      = document.getElementById("addNoteBtn");
 
-    let editingIndex   = null;
-    let currentCategory = "alle";
-    let selectedColor   = "#ffffff";
-    let pendingCategory = null;
+    let editingIndex    = null;      // indice nota in modifica
+    let currentCategory = "alle";    // categoria corrente
+    let selectedColor   = "#ffffff"; // colore nota
+    let pendingCategory = null;      // categoria scelta per nuova nota
 
+    /* =========================================================
+       5. LOCAL STORAGE (carica/salva note)
+       ========================================================= */
     function loadNotes() {
       try {
         return JSON.parse(localStorage.getItem("notes") || "[]");
@@ -585,9 +725,13 @@
       localStorage.setItem("notes", JSON.stringify(arr));
     }
 
+    /* =========================================================
+       6. MOSTRA NOTE PER CATEGORIA
+       ========================================================= */
     function showNotes(cat) {
       const notes = loadNotes();
 
+      // Filtro per categoria
       const filtered =
         cat === "alle"
           ? notes
@@ -612,12 +756,14 @@
         textDiv.textContent = n.text;
         textDiv.style.flex = "1";
 
+        // Stella preferiti
         const star = document.createElement("span");
         star.textContent = n.favorite ? "★" : "☆";
         star.style.fontSize = "22px";
         star.style.cursor = "pointer";
         star.style.marginLeft = "12px";
 
+        // Toggle preferiti
         star.onclick = (e) => {
           e.stopPropagation();
           n.favorite = !n.favorite;
@@ -635,6 +781,7 @@
         row.appendChild(star);
         div.appendChild(row);
 
+        // Clic sulla nota → modifica
         div.onclick = () => {
           const allNotes = loadNotes();
           const realIndex = allNotes.indexOf(filtered[idx]);
@@ -645,28 +792,35 @@
       });
     }
 
+    /* =========================================================
+       7. EDITOR NOTE (apri/chiudi/salva)
+       ========================================================= */
     function openEditor(isNew, index) {
       noteEditor.style.display = "flex";
 
       if (isNew) {
+        // Nuova nota
         noteText.value = "";
         selectedColor = "#ffffff";
         editingIndex = null;
       } else {
+        // Modifica nota esistente
         const notes = loadNotes();
         const n = notes[index];
         if (!n) return;
 
         noteText.value = n.text;
-        selectedColor = n.color || "#ffffff";
-        editingIndex = index;
+        selectedColor  = n.color || "#ffffff";
+        editingIndex   = index;
       }
     }
 
+    // Chiudi editor
     cancelBtn.onclick = () => {
       noteEditor.style.display = "none";
     };
 
+    // Salva nota
     saveBtn.onclick = () => {
       const text = noteText.value.trim();
       if (!text) {
@@ -677,6 +831,7 @@
       const notes = loadNotes();
 
       if (editingIndex === null) {
+        // Nuova nota
         notes.push({
           text,
           color: selectedColor,
@@ -684,6 +839,7 @@
           favorite: false
         });
       } else {
+        // Modifica nota
         if (!notes[editingIndex]) {
           noteEditor.style.display = "none";
           return;
@@ -697,6 +853,9 @@
       showNotes(currentCategory);
     };
 
+    /* =========================================================
+       8. SCELTA COLORE
+       ========================================================= */
     document.querySelectorAll(".colorDot").forEach(dot => {
       dot.addEventListener("click", () => {
         selectedColor = dot.dataset.color;
@@ -705,18 +864,28 @@
       });
     });
 
+    /* =========================================================
+       9. CATEGORIE (click + touch iPhone)
+       ========================================================= */
     document.querySelectorAll(".cat").forEach(catEl => {
+
+      // Touch per iPhone
       catEl.addEventListener("touchstart", () => {
         currentCategory = catEl.dataset.cat;
         showNotes(currentCategory);
       }, { passive: true });
 
+      // Click normale
       catEl.addEventListener("click", () => {
         currentCategory = catEl.dataset.cat;
         showNotes(currentCategory);
       });
+
     });
 
+    /* =========================================================
+       10. FOGLIO iOS CATEGORIA (apri/chiudi)
+       ========================================================= */
     function openCategorySheet() {
       categorySheetOverlay.style.display = "block";
       setTimeout(() => {
@@ -732,8 +901,9 @@
     }
 
     categorySheetOverlay.onclick = closeCategorySheet;
-    categorySheetCancel.onclick = closeCategorySheet;
+    categorySheetCancel.onclick  = closeCategorySheet;
 
+    // Scelta categoria dal foglio
     document.querySelectorAll(".sheetCatBtn").forEach(btn => {
       btn.addEventListener("click", () => {
         pendingCategory = btn.dataset.cat;
@@ -742,17 +912,26 @@
       });
     });
 
+    /* =========================================================
+       11. NUOVA NOTA (+)
+       ========================================================= */
     addNoteBtn.onclick = () => {
       if (currentCategory === "alle") {
+        // Se sei in "Tutte" → apri foglio categorie
         openCategorySheet();
       } else if (currentCategory === "favorite") {
+        // Non si creano note direttamente nei preferiti
         alert("Non puoi creare note nei Preferiti.");
       } else {
+        // Se sei in una categoria specifica → usa quella
         pendingCategory = currentCategory;
         openEditor(true, null);
       }
     };
 
+    /* =========================================================
+       12. LINGUA (popup)
+       ========================================================= */
     langBtn.onclick = () => {
       langPopup.style.display = "flex";
     };
@@ -768,24 +947,34 @@
       });
     });
 
+    /* =========================================================
+       13. TEMA (chiaro/scuro)
+       ========================================================= */
     themeToggle.onclick = () => {
       document.body.classList.toggle("dark");
     };
 
+    /* =========================================================
+       14. BACKUP / RIPRISTINO
+       ========================================================= */
+    // Apri popup backup
     backupBtn.onclick = () => {
       backupPopup.style.display = "flex";
     };
 
+    // Chiudi popup backup
     backupCloseBtn.onclick = () => {
       backupPopup.style.display = "none";
     };
 
+    // Backup automatico → salva in localStorage
     autoBackupBtn.onclick = () => {
       const notes = localStorage.getItem("notes") || "[]";
       localStorage.setItem("autoBackup", notes);
       alert("Backup gespeichert.");
     };
 
+    // Backup manuale → scarica file JSON
     manualBackupBtn.onclick = () => {
       const notes = localStorage.getItem("notes") || "[]";
       const blob = new Blob([notes], { type: "application/json" });
@@ -799,6 +988,7 @@
       URL.revokeObjectURL(url);
     };
 
+    // Ripristino automatico da localStorage
     autoRestoreBtn.onclick = () => {
       const data = localStorage.getItem("autoBackup");
       if (!data) {
@@ -817,6 +1007,7 @@
       }
     };
 
+    // Ripristino manuale da file
     manualRestoreBtn.onclick = () => {
       backupFile.click();
     };
@@ -841,14 +1032,18 @@
       reader.readAsText(file);
     };
 
+    /* =========================================================
+       15. INIT (lingua, note, popup chiusi)
+       ========================================================= */
     const savedLang = localStorage.getItem("lang") || "de";
     applyLanguage(savedLang);
 
     showNotes(currentCategory);
-    langPopup.style.display = "none";
+    langPopup.style.display   = "none";
     backupPopup.style.display = "none";
 
   });
   </script>
+
 </body>
 </html>
