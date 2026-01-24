@@ -1,3 +1,103 @@
+<!-- FOGLIO iOS PER SCELTA CATEGORIA (80% larghezza) -->
+<div id="categorySheetOverlay" style="
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.35);
+  display: none;
+  z-index: 1200;
+"></div>
+
+<div id="categorySheet" style="
+  position: fixed;
+  bottom: -420px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  max-width: 420px;
+  background: var(--card);
+  border-top-left-radius: 22px;
+  border-top-right-radius: 22px;
+  box-shadow: 0 -4px 18px rgba(0,0,0,0.25);
+  padding: 20px;
+  z-index: 1300;
+  transition: bottom 0.28s ease;
+">
+
+  <h2 id="categorySheetTitle" style="
+    text-align:center;
+    margin-top:0;
+    margin-bottom:18px;
+    font-size:20px;
+    font-weight:600;
+  ">Kategorie wählen</h2>
+
+  <div id="categorySheetButtons" style="
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  ">
+
+    <button class="sheetCatBtn" data-cat="arbeit" style="
+      padding:14px;
+      border-radius:14px;
+      border:none;
+      background:#007aff;
+      color:white;
+      font-size:18px;
+    ">Arbeit</button>
+
+    <button class="sheetCatBtn" data-cat="einkauf" style="
+      padding:14px;
+      border-radius:14px;
+      border:none;
+      background:#ffcc00;
+      color:black;
+      font-size:18px;
+    ">Einkauf</button>
+
+    <button class="sheetCatBtn" data-cat="zuhause" style="
+      padding:14px;
+      border-radius:14px;
+      border:none;
+      background:#ff9500;
+      color:white;
+      font-size:18px;
+    ">Zuhause</button>
+
+    <button class="sheetCatBtn" data-cat="ideen" style="
+      padding:14px;
+      border-radius:14px;
+      border:none;
+      background:#34c759;
+      color:white;
+      font-size:18px;
+    ">Ideen</button>
+
+    <button class="sheetCatBtn" data-cat="personlich" style="
+      padding:14px;
+      border-radius:14px;
+      border:none;
+      background:#ffffff;
+      color:black;
+      font-size:18px;
+      border:1px solid #ccc;
+    ">Persönlich</button>
+
+  </div>
+
+  <button id="categorySheetCancel" style="
+    margin-top:18px;
+    width:100%;
+    padding:14px;
+    border-radius:14px;
+    border:none;
+    background:#ccc;
+    color:black;
+    font-size:18px;
+  ">Abbrechen</button>
+
+</div>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
