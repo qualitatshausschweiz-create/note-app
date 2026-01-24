@@ -1,584 +1,708 @@
-<!-- FOGLIO iOS PER SCELTA CATEGORIA (80% larghezza) -->
-<div id="categorySheetOverlay" style="
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.35);
-  display: none;
-  z-index: 1200;
-"></div>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notizen</title>
 
-<div id="categorySheet" style="
-  position: fixed;
-  bottom: -420px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
-  max-width: 420px;
-  background: var(--card);
-  border-top-left-radius: 22px;
-  border-top-right-radius: 22px;
-  box-shadow: 0 -4px 18px rgba(0,0,0,0.25);
-  padding: 20px;
-  z-index: 1300;
-  transition: bottom 0.28s ease;
-">
+  <style>
+    :root {
+      --bg: #f2f2f7;
+      --text: #000;
+      --card: #fff;
+    }
+    .dark {
+      --bg: #1c1c1e;
+      --text: #fff;
+      --card: #2c2c2e;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      transition: 0.3s;
+    }
 
-  <h2 id="categorySheetTitle" style="
-    text-align:center;
-    margin-top:0;
-    margin-bottom:18px;
-    font-size:20px;
-    font-weight:600;
-  ">Kategorie wählen</h2>
+    header {
+      padding: 12px 18px 16px 18px;
+      background: var(--card);
+      border-bottom: 1px solid #444;
+    }
+    #headerTitleRow {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    #headerControlsRow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #themeToggle, #addNoteBtn, #langBtn {
+      font-size: 20px;
+      padding: 6px 12px;
+      border-radius: 12px;
+      background: #007aff;
+      color: white;
+      border: none;
+    }
 
-  <div id="categorySheetButtons" style="
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-  ">
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 22px;
+      padding: 20px;
+    }
+    .cat {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+    .circle {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+    }
+    .arbeit { background: #007aff; }
+    .einkauf { background: #ffcc00; }
+    .zuhause { background: #ff9500; }
+    .ideen { background: #34c759; }
+    .personlich { background: #ffffff; border: 2px solid #ccc; }
 
-    <button class="sheetCatBtn" data-cat="arbeit" style="
-      padding:14px;
-      border-radius:14px;
-      border:none;
-      background:#007aff;
-      color:white;
-      font-size:18px;
-    ">Arbeit</button>
+    #notesList {
+      display: none;
+      padding: 20px;
+    }
+    .noteItem {
+      padding: 15px;
+      margin-bottom: 12px;
+      border-radius: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+      white-space: pre-wrap;
+    }
 
-    <button class="sheetCatBtn" data-cat="einkauf" style="
-      padding:14px;
-      border-radius:14px;
-      border:none;
-      background:#ffcc00;
-      color:black;
-      font-size:18px;
-    ">Einkauf</button>
+    #noteEditor {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 900;
+    }
+    #editorBox {
+      background: var(--card);
+      width: 90%;
+      padding: 20px;
+      border-radius: 16px;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      font-size: 18px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      background: var(--bg);
+      color: var(--text);
+    }
 
-    <button class="sheetCatBtn" data-cat="zuhause" style="
-      padding:14px;
-      border-radius:14px;
-      border:none;
-      background:#ff9500;
-      color:white;
-      font-size:18px;
-    ">Zuhause</button>
+    #colorPicker {
+      display: flex;
+      gap: 12px;
+      margin: 15px 0;
+      justify-content: center;
+    }
+    .colorDot {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .colorDot.selected {
+      border: 3px solid #007aff;
+      transform: scale(1.15);
+    }
 
-    <button class="sheetCatBtn" data-cat="ideen" style="
-      padding:14px;
-      border-radius:14px;
-      border:none;
-      background:#34c759;
-      color:white;
-      font-size:18px;
-    ">Ideen</button>
+    #backupBtn {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: white;
+      color: black;
+      font-size: 32px;
+      border: none;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      cursor: pointer;
+      z-index: 950;
+    }
 
-    <button class="sheetCatBtn" data-cat="personlich" style="
-      padding:14px;
-      border-radius:14px;
-      border:none;
-      background:#ffffff;
-      color:black;
-      font-size:18px;
-      border:1px solid #ccc;
-    ">Persönlich</button>
+    #backupPopup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #backupBox {
+      background: var(--card);
+      width: 90%;
+      max-width: 420px;
+      padding: 22px;
+      border-radius: 18px;
+    }
+    .backupBtn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      margin-top: 12px;
+      font-size: 17px;
+      cursor: pointer;
+    }
+    .greenBtn { background: #34c759; color: white; }
+    .blueBtn { background: #007aff; color: white; }
+    .orangeBtn { background: #ff9500; color: white; }
+    .grayBtn { background: #ccc; color: black; }
 
+    #langPopup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #langBox {
+      background: var(--card);
+      width: 90%;
+      max-width: 360px;
+      padding: 22px;
+      border-radius: 18px;
+      text-align: center;
+    }
+    .langChoice {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 12px;
+      font-size: 17px;
+      border: none;
+      border-radius: 12px;
+      background: #007aff;
+      color: white;
+      cursor: pointer;
+    }
+    .langChoice:last-child {
+      background: #ccc;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div id="headerTitleRow">
+    <span id="appTitle">Notizen</span>
   </div>
 
-  <button id="categorySheetCancel" style="
-    margin-top:18px;
-    width:100%;
-    padding:14px;
-    border-radius:14px;
-    border:none;
-    background:#ccc;
-    color:black;
-    font-size:18px;
-  ">Abbrechen</button>
+  <div id="headerControlsRow">
+    <button id="themeToggle">🌙</button>
+    <button id="addNoteBtn">+ Notiz</button>
+    <button id="langBtn">🌐</button>
+  </div>
+</header>
+
+<!-- Popup Lingua -->
+<div id="langPopup">
+  <div id="langBox">
+    <h2>Sprache / Language / Lingua / Idioma</h2>
+    <button class="langChoice" onclick="setLang('de')">Deutsch</button>
+    <button class="langChoice" onclick="setLang('it')">Italiano</button>
+    <button class="langChoice" onclick="setLang('en')">English</button>
+    <button class="langChoice" onclick="setLang('es')">Español</button>
+    <button class="langChoice" onclick="closeLangPopup()">❌</button>
+  </div>
+</div>
+
+<!-- Categorie -->
+<div class="grid" id="categories">
+
+  <div class="cat" data-cat="alle">
+    <div class="circle" style="background:#ccc;"></div>
+    <span class="catLabel" data-key="alle">Alle</span>
+  </div>
+
+  <div class="cat" data-cat="arbeit">
+    <div class="circle arbeit"></div>
+    <span class="catLabel" data-key="arbeit">Arbeit</span>
+  </div>
+
+  <div class="cat" data-cat="einkauf">
+    <div class="circle einkauf"></div>
+    <span class="catLabel" data-key="einkauf">Einkauf</span>
+  </div>
+
+  <div class="cat" data-cat="zuhause">
+    <div class="circle zuhause"></div>
+    <span class="catLabel" data-key="zuhause">Zuhause</span>
+  </div>
+
+  <div class="cat" data-cat="ideen">
+    <div class="circle ideen"></div>
+    <span class="catLabel" data-key="ideen">Ideen</span>
+  </div>
+
+  <div class="cat" data-cat="personlich">
+    <div class="circle personlich"></div>
+    <span class="catLabel" data-key="personlich">Persönlich</span>
+  </div>
 
 </div>
+
+<!-- Lista Note -->
+<div id="notesList"></div>
+
+<!-- Editor -->
+<div id="noteEditor">
+  <div id="editorBox">
+    <h3 id="editorTitle">Neue Notiz</h3>
+
+    <textarea id="noteText"></textarea>
+
+    <div id="colorPicker">
+      <span class="colorDot" data-color="#ffffff" style="background:#ffffff;"></span>
+      <span class="colorDot" data-color="#ffeb3b" style="background:#ffeb3b;"></span>
+      <span class="colorDot" data-color="#ff9500" style="background:#ff9500;"></span>
+      <span class="colorDot" data-color="#34c759" style="background:#34c759;"></span>
+      <span class="colorDot" data-color="#007aff" style="background:#007aff;"></span>
+      <span class="colorDot" data-color="#e91e63" style="background:#e91e63;"></span>
+    </div>
+
+    <div class="editorButtons">
+      <button class="cancelBtn" id="cancelBtn">Abbrechen</button>
+      <button class="saveBtn" id="saveBtn">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pulsante Sicherung -->
+<button id="backupBtn">🛟</button>
+
+<!-- Popup Sicherung -->
+<div id="backupPopup">
+  <div id="backupBox">
+
+    <h2 id="backupTitle">Sicherung</h2>
+
+    <button id="backupExportBtn" class="backupBtn greenBtn">Exportieren</button>
+
+    <!-- Importieren come LABEL per iPhone -->
+    <label for="backupFile" id="backupImportBtn" class="backupBtn blueBtn">Importieren</label>
+
+    <button id="backupAutoRestoreBtn" class="backupBtn orangeBtn">Automatische Sicherung wiederherstellen</button>
+
+    <button id="backupManualBtn" class="backupBtn greenBtn">📦 Backup manuell speichern</button>
+    <button id="backupManualRestoreBtn" class="backupBtn blueBtn">📧 Manuellen Backup wiederherstellen</button>
+
+    <p id="autoBackupLabel">Letzte automatische Sicherung: –</p>
+
+    <button id="backupCloseBtn" class="backupBtn grayBtn">Schliessen</button>
+
+    <!-- input file invisibile ma cliccabile -->
+    <input type="file" id="backupFile" accept="application/json"
+           style="opacity:0; position:absolute; width:1px; height:1px;">
+
+  </div>
+</div>
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+let editingIndex = null;
+let currentCategory = "alle";
+let currentLang = localStorage.getItem("lang") || "de";
+let selectedColor = "#ffffff";
 
-  /* -------------------------
-     DIZIONARIO LINGUE
-  ------------------------- */
-  const LANG = {
-    de: {
-      appTitle: "Notizen",
-      newNote: "Neue Notiz",
-      cancel: "Abbrechen",
-      save: "Speichern",
-      chooseCategory: "Kategorie wählen",
-      categories: {
-        favorite: "Favoriten",
-        alle: "Alle",
-        arbeit: "Arbeit",
-        einkauf: "Einkauf",
-        zuhause: "Zuhause",
-        ideen: "Ideen",
-        personlich: "Persönlich"
-      },
-      backup: {
-        title: "Sicherung",
-        autoBackup: "Backup automatisch",
-        manualBackup: "Backup manuell",
-        autoRestore: "Wiederherstellung automatisch",
-        manualRestore: "Wiederherstellung manuell",
-        close: "Schliessen"
-      }
-    },
+const appTitle = document.getElementById("appTitle");
+const addNoteBtn = document.getElementById("addNoteBtn");
+const themeToggle = document.getElementById("themeToggle");
+const langBtn = document.getElementById("langBtn");
+const langPopup = document.getElementById("langPopup");
+const noteEditor = document.getElementById("noteEditor");
+const editorTitle = document.getElementById("editorTitle");
+const noteText = document.getElementById("noteText");
+const cancelBtn = document.getElementById("cancelBtn");
+const saveBtn = document.getElementById("saveBtn");
+const notesList = document.getElementById("notesList");
+const categoriesDiv = document.getElementById("categories");
 
-    it: {
-      appTitle: "Note",
-      newNote: "Nuova nota",
-      cancel: "Annulla",
-      save: "Salva",
-      chooseCategory: "Scegli categoria",
-      categories: {
-        favorite: "Preferiti",
-        alle: "Tutte",
-        arbeit: "Lavoro",
-        einkauf: "Spesa",
-        zuhause: "Casa",
-        ideen: "Idee",
-        personlich: "Personale"
-      },
-      backup: {
-        title: "Backup",
-        autoBackup: "Backup automatico",
-        manualBackup: "Backup manuale",
-        autoRestore: "Ripristino automatico",
-        manualRestore: "Ripristino manuale",
-        close: "Chiudi"
-      }
-    },
+const backupBtn = document.getElementById("backupBtn");
+const backupPopup = document.getElementById("backupPopup");
+const backupTitle = document.getElementById("backupTitle");
+const backupExportBtn = document.getElementById("backupExportBtn");
+const backupAutoRestoreBtn = document.getElementById("backupAutoRestoreBtn");
+const backupManualBtn = document.getElementById("backupManualBtn");
+const backupManualRestoreBtn = document.getElementById("backupManualRestoreBtn");
+const backupCloseBtn = document.getElementById("backupCloseBtn");
+const backupFile = document.getElementById("backupFile");
+const autoBackupLabel = document.getElementById("autoBackupLabel");
 
-    en: {
-      appTitle: "Notes",
-      newNote: "New Note",
-      cancel: "Cancel",
-      save: "Save",
-      chooseCategory: "Choose category",
-      categories: {
-        favorite: "Favorites",
-        alle: "All",
-        arbeit: "Work",
-        einkauf: "Shopping",
-        zuhause: "Home",
-        ideen: "Ideas",
-        personlich: "Personal"
-      },
-      backup: {
-        title: "Backup",
-        autoBackup: "Automatic Backup",
-        manualBackup: "Manual Backup",
-        autoRestore: "Automatic Restore",
-        manualRestore: "Manual Restore",
-        close: "Close"
-      }
-    },
+/* Traduzioni categorie */
+const catNames = {
+  de:{alle:"Alle",arbeit:"Arbeit",einkauf:"Einkauf",zuhause:"Zuhause",ideen:"Ideen",personlich:"Persönlich"},
+  it:{alle:"Tutte",arbeit:"Lavoro",einkauf:"Spesa",zuhause:"Casa",ideen:"Idee",personlich:"Personale"},
+  en:{alle:"All",arbeit:"Work",einkauf:"Shopping",zuhause:"Home",ideen:"Ideas",personlich:"Personal"},
+  es:{alle:"Todas",arbeit:"Trabajo",einkauf:"Compra",zuhause:"Casa",ideen:"Ideas",personlich:"Personal"}
+};
 
-    es: {
-      appTitle: "Notas",
-      newNote: "Nueva nota",
-      cancel: "Cancelar",
-      save: "Guardar",
-      chooseCategory: "Elegir categoría",
-      categories: {
-        favorite: "Favoritos",
-        alle: "Todas",
-        arbeit: "Trabajo",
-        einkauf: "Compras",
-        zuhause: "Casa",
-        ideen: "Ideas",
-        personlich: "Personal"
-      },
-      backup: {
-        title: "Copia de seguridad",
-        autoBackup: "Copia automática",
-        manualBackup: "Copia manual",
-        autoRestore: "Restauración automática",
-        manualRestore: "Restauración manual",
-        close: "Cerrar"
-      }
-    }
-  };
-
-  /* -------------------------
-     MULTILINGUA
-  ------------------------- */
-  function applyLanguage(lang) {
-    const L = LANG[lang];
-
-    document.getElementById("appTitle").textContent = L.appTitle;
-    document.getElementById("editorTitle").textContent = L.newNote;
-    document.getElementById("cancelBtn").textContent = L.cancel;
-    document.getElementById("saveBtn").textContent = L.save;
-
-    // categorie griglia
-    document.querySelectorAll(".cat").forEach(btn => {
-      const key = btn.dataset.cat;
-      btn.querySelector(".catLabel").textContent = L.categories[key];
-    });
-
-    // foglio iOS
-    document.getElementById("categorySheetTitle").textContent = L.chooseCategory;
-    document.querySelectorAll(".sheetCatBtn").forEach(btn => {
-      const key = btn.dataset.cat;
-      btn.textContent = L.categories[key];
-    });
-
-    // backup
-    document.querySelector("#backupBox h2").textContent = L.backup.title;
-    document.querySelector("#autoBackupBtn span").textContent = L.backup.autoBackup;
-    document.querySelector("#manualBackupBtn span").textContent = L.backup.manualBackup;
-    document.querySelector("#autoRestoreBtn span").textContent = L.backup.autoRestore;
-    document.querySelector("#manualRestoreBtn span").textContent = L.backup.manualRestore;
-    document.querySelector("#backupCloseBtn span").textContent = L.backup.close;
-
-    localStorage.setItem("lang", lang);
+/* Traduzioni UI */
+const tr = {
+  de:{
+    appTitle:"Notizen",
+    addNoteBtn:"+ Notiz",
+    newNote:"Neue Notiz",
+    editNote:"Notiz bearbeiten",
+    cancelBtn:"Abbrechen",
+    saveBtn:"Speichern",
+    autoBackupLabel:"Letzte automatische Sicherung:",
+    sicherung:"Sicherung",
+    export:"Exportieren",
+    import:"Importieren",
+    autoRestore:"Automatische Sicherung wiederherstellen",
+    manualSave:"📦 Backup manuell speichern",
+    manualRestore:"📧 Manuellen Backup wiederherstellen",
+    close:"Schliessen"
+  },
+  it:{
+    appTitle:"Note",
+    addNoteBtn:"+ Nota",
+    newNote:"Nuova Nota",
+    editNote:"Modifica Nota",
+    cancelBtn:"Annulla",
+    saveBtn:"Salva",
+    autoBackupLabel:"Ultimo backup automatico:",
+    sicherung:"Backup",
+    export:"Esporta",
+    import:"Importa",
+    autoRestore:"Ripristina backup automatico",
+    manualSave:"📦 Salva backup manuale",
+    manualRestore:"📧 Ripristina backup manuale",
+    close:"Chiudi"
+  },
+  en:{
+    appTitle:"Notes",
+    addNoteBtn:"+ Note",
+    newNote:"New Note",
+    editNote:"Edit Note",
+    cancelBtn:"Cancel",
+    saveBtn:"Save",
+    autoBackupLabel:"Last automatic backup:",
+    sicherung:"Backup",
+    export:"Export",
+    import:"Import",
+    autoRestore:"Restore automatic backup",
+    manualSave:"📦 Save manual backup",
+    manualRestore:"📧 Restore manual backup",
+    close:"Close"
+  },
+  es:{
+    appTitle:"Notas",
+    addNoteBtn:"+ Nota",
+    newNote:"Nueva nota",
+    editNote:"Editar nota",
+    cancelBtn:"Cancelar",
+    saveBtn:"Guardar",
+    autoBackupLabel:"Último backup automático:",
+    sicherung:"Copia de seguridad",
+    export:"Exportar",
+    import:"Importar",
+    autoRestore:"Restaurar copia automática",
+    manualSave:"📦 Guardar copia manual",
+    manualRestore:"📧 Restaurar copia manual",
+    close:"Cerrar"
   }
+};
 
-  /* -------------------------
-     FIX COLORE TESTO NOTE
-  ------------------------- */
-  function getTextColor(bg) {
-    const c = bg.substring(1);
-    const rgb = parseInt(c, 16);
-    const r = (rgb >> 16) & 255;
-    const g = (rgb >> 8) & 255;
-    const b = rgb & 255;
-    const luminance = (0.299*r + 0.587*g + 0.114*b);
-    return luminance > 150 ? "#000" : "#fff";
+/* Gestione note */
+function loadNotes() {
+  try {
+    return JSON.parse(localStorage.getItem("notes") || "[]");
+  } catch(e) {
+    return [];
   }
+}
+function saveNotes(arr) {
+  localStorage.setItem("notes", JSON.stringify(arr));
+  saveAutoBackup();
+}
 
-  /* -------------------------
-     RIFERIMENTI DOM
-  ------------------------- */
-  const notesList       = document.getElementById("notesList");
-  const noteEditor      = document.getElementById("noteEditor");
-  const noteText        = document.getElementById("noteText");
-  const cancelBtn       = document.getElementById("cancelBtn");
-  const saveBtn         = document.getElementById("saveBtn");
+/* Timestamp */
+function getTimestamp() {
+  const d = new Date();
+  const pad = n => (n < 10 ? "0" + n : n);
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
 
-  const categorySheetOverlay = document.getElementById("categorySheetOverlay");
-  const categorySheet        = document.getElementById("categorySheet");
-  const categorySheetCancel  = document.getElementById("categorySheetCancel");
+/* Backup automatico */
+function saveAutoBackup() {
+  const notes = loadNotes();
+  const data = { timestamp: getTimestamp(), notes };
+  localStorage.setItem("autoBackup", JSON.stringify(data));
+  updateAutoBackupLabel();
+}
 
-  const backupBtn       = document.getElementById("backupBtn");
-  const backupPopup     = document.getElementById("backupPopup");
-  const backupCloseBtn  = document.getElementById("backupCloseBtn");
-
-  const autoBackupBtn   = document.getElementById("autoBackupBtn");
-  const manualBackupBtn = document.getElementById("manualBackupBtn");
-  const autoRestoreBtn  = document.getElementById("autoRestoreBtn");
-  const manualRestoreBtn= document.getElementById("manualRestoreBtn");
-
-  const backupFile      = document.getElementById("backupFile");
-
-  const langPopup       = document.getElementById("langPopup");
-  const langBtn         = document.getElementById("langBtn");
-  const langCloseBtn    = document.getElementById("langCloseBtn");
-
-  const themeToggle     = document.getElementById("themeToggle");
-  const addNoteBtn      = document.getElementById("addNoteBtn");
-
-  let editingIndex   = null;
-  let currentCategory = "alle";
-  let selectedColor   = "#ffffff";
-  let pendingCategory = null;
-
-  /* -------------------------
-     LOCAL STORAGE
-  ------------------------- */
-  function loadNotes() {
-    try {
-      return JSON.parse(localStorage.getItem("notes") || "[]");
-    } catch {
-      return [];
-    }
+function updateAutoBackupLabel() {
+  const t = tr[currentLang];
+  const auto = localStorage.getItem("autoBackup");
+  if (!auto) {
+    autoBackupLabel.textContent = t.autoBackupLabel + " –";
+    return;
   }
-
-  function saveNotes(arr) {
-    localStorage.setItem("notes", JSON.stringify(arr));
+  try {
+    const parsed = JSON.parse(auto);
+    autoBackupLabel.textContent = t.autoBackupLabel + " " + (parsed.timestamp || "–");
+  } catch(e) {
+    autoBackupLabel.textContent = t.autoBackupLabel + " –";
   }
+}
 
-  /* -------------------------
-     MOSTRA NOTE
-  ------------------------- */
-  function showNotes(cat) {
+/* Applica traduzioni */
+function applyTranslations() {
+  const t = tr[currentLang];
+
+  appTitle.textContent = t.appTitle;
+  addNoteBtn.textContent = t.addNoteBtn;
+  cancelBtn.textContent = t.cancelBtn;
+  saveBtn.textContent = t.saveBtn;
+
+  backupTitle.textContent = t.sicherung;
+  backupExportBtn.textContent = t.export;
+  document.getElementById("backupImportBtn").textContent = t.import;
+  backupAutoRestoreBtn.textContent = t.autoRestore;
+  backupManualBtn.textContent = t.manualSave;
+  backupManualRestoreBtn.textContent = t.manualRestore;
+  backupCloseBtn.textContent = t.close;
+
+  document.querySelectorAll(".catLabel").forEach(label => {
+    const key = label.dataset.key;
+    label.textContent = catNames[currentLang][key];
+  });
+
+  updateAutoBackupLabel();
+  showNotes(currentCategory);
+}
+
+/* Popup lingua */
+langBtn.onclick = () => langPopup.style.display = "flex";
+function closeLangPopup() { langPopup.style.display = "none"; }
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem("lang", lang);
+  applyTranslations();
+  closeLangPopup();
+}
+
+/* Tema */
+function applyTheme() {
+  const theme = localStorage.getItem("theme") || "light";
+  if (theme === "dark") {
+    document.body.classList.add("dark");
+    themeToggle.textContent = "☀️";
+  } else {
+    document.body.classList.remove("dark");
+    themeToggle.textContent = "🌙";
+  }
+}
+themeToggle.onclick = () => {
+  const theme = localStorage.getItem("theme") === "dark" ? "light" : "dark";
+  localStorage.setItem("theme", theme);
+  applyTheme();
+};
+
+/* Editor */
+function openEditor(isNew, index) {
+  noteEditor.style.display = "flex";
+  if (isNew) {
+    editorTitle.textContent = tr[currentLang].newNote;
+    noteText.value = "";
+    selectedColor = "#ffffff";
+    editingIndex = null;
+  } else {
+    editorTitle.textContent = tr[currentLang].editNote;
     const notes = loadNotes();
+    const n = notes[index];
+    noteText.value = n.text;
+    selectedColor = n.color || "#ffffff";
+    editingIndex = index;
+  }
+  updateColorDots();
+}
+function closeEditor() {
+  noteEditor.style.display = "none";
+  editingIndex = null;
+}
+cancelBtn.onclick = closeEditor;
 
-    const filtered =
-      cat === "alle"
-        ? notes
-        : cat === "favorite"
-          ? notes.filter(n => n.favorite)
-          : notes.filter(n => n.category === cat);
-
-    notesList.innerHTML = "";
-    notesList.style.display = filtered.length ? "block" : "none";
-
-    filtered.forEach((n, idx) => {
-      const div = document.createElement("div");
-      div.className = "noteItem";
-      div.style.background = n.color || "#ffffff";
-      div.style.color = getTextColor(n.color || "#ffffff");
-
-      const row = document.createElement("div");
-      row.style.display = "flex";
-      row.style.justifyContent = "space-between";
-
-      const textDiv = document.createElement("div");
-      textDiv.textContent = n.text;
-      textDiv.style.flex = "1";
-
-      const star = document.createElement("span");
-      star.textContent = n.favorite ? "★" : "☆";
-      star.style.fontSize = "22px";
-      star.style.cursor = "pointer";
-      star.style.marginLeft = "12px";
-
-      star.onclick = (e) => {
-        e.stopPropagation();
-        n.favorite = !n.favorite;
-
-        const allNotes = loadNotes();
-        const realIndex = allNotes.indexOf(filtered[idx]);
-        if (realIndex !== -1) {
-          allNotes[realIndex].favorite = n.favorite;
-          saveNotes(allNotes);
-        }
-        showNotes(currentCategory);
-      };
-
-      row.appendChild(textDiv);
-      row.appendChild(star);
-      div.appendChild(row);
-
-      div.onclick = () => {
-        const allNotes = loadNotes();
-        const realIndex = allNotes.indexOf(filtered[idx]);
-        openEditor(false, realIndex);
-      };
-
-      notesList.appendChild(div);
+saveBtn.onclick = () => {
+  const text = noteText.value.trim();
+  if (!text) {
+    closeEditor();
+    return;
+  }
+  const notes = loadNotes();
+  if (editingIndex === null) {
+    notes.push({
+      text,
+      color: selectedColor,
+      category: currentCategory || "alle",
+      createdAt: getTimestamp()
     });
+  } else {
+    notes[editingIndex].text = text;
+    notes[editingIndex].color = selectedColor;
   }
+  saveNotes(notes);
+  closeEditor();
+  showNotes(currentCategory);
+};
 
-  /* -------------------------
-     EDITOR NOTE
-  ------------------------- */
-  function openEditor(isNew, index) {
-    noteEditor.style.display = "flex";
-
-    if (isNew) {
-      noteText.value = "";
-      selectedColor = "#ffffff";
-      editingIndex = null;
-    } else {
-      const notes = loadNotes();
-      const n = notes[index];
-      if (!n) return;
-
-      noteText.value = n.text;
-      selectedColor = n.color || "#ffffff";
-      editingIndex = index;
-    }
-  }
-
-  cancelBtn.onclick = () => {
-    noteEditor.style.display = "none";
-  };
-
-  saveBtn.onclick = () => {
-    const text = noteText.value.trim();
-    if (!text) {
-      noteEditor.style.display = "none";
-      return;
-    }
-
-    const notes = loadNotes();
-
-    if (editingIndex === null) {
-      notes.push({
-        text,
-        color: selectedColor,
-        category: pendingCategory,
-        favorite: false
-      });
-
-    } else {
-      if (!notes[editingIndex]) {
-        noteEditor.style.display = "none";
-        return;
-      }
-      notes[editingIndex].text  = text;
-      notes[editingIndex].color = selectedColor;
-    }
-
-    saveNotes(notes);
-    noteEditor.style.display = "none";
-    showNotes(currentCategory);
-  };
-
-  /* -------------------------
-     COLORI
-  ------------------------- */
+function updateColorDots() {
   document.querySelectorAll(".colorDot").forEach(dot => {
-    dot.addEventListener("click", () => {
-      selectedColor = dot.dataset.color;
-      document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
-      dot.classList.add("selected");
-    });
+    dot.classList.toggle("selected", dot.dataset.color === selectedColor);
   });
-
-  /* -------------------------
-     CATEGORIE — FIX iPHONE
-  ------------------------- */
-  document.querySelectorAll(".cat").forEach(catEl => {
-
-    catEl.addEventListener("touchstart", () => {
-      currentCategory = catEl.dataset.cat;
-      showNotes(currentCategory);
-    }, { passive: true });
-
-    catEl.addEventListener("click", () => {
-      currentCategory = catEl.dataset.cat;
-      showNotes(currentCategory);
-    });
-
+}
+document.querySelectorAll(".colorDot").forEach(dot => {
+  dot.addEventListener("click", () => {
+    selectedColor = dot.dataset.color;
+    updateColorDots();
   });
+});
 
-  /* -------------------------
-     FOGLIO iOS — APERTURA
-  ------------------------- */
-  function openCategorySheet() {
-    categorySheetOverlay.style.display = "block";
-    setTimeout(() => {
-      categorySheet.style.bottom = "0px";
-    }, 10);
+/* Categorie */
+document.querySelectorAll(".cat").forEach(cat => {
+  cat.addEventListener("click", () => {
+    currentCategory = cat.dataset.cat;
+    showNotes(currentCategory);
+  });
+});
+
+/* Mostra note */
+function showNotes(cat) {
+  const notes = loadNotes();
+  const filtered = cat === "alle" ? notes : notes.filter(n => n.category === cat);
+  notesList.innerHTML = "";
+  if (filtered.length === 0) {
+    notesList.style.display = "none";
+    return;
   }
-
-  function closeCategorySheet() {
-    categorySheet.style.bottom = "-420px";
-    setTimeout(() => {
-      categorySheetOverlay.style.display = "none";
-    }, 280);
-  }
-
-  categorySheetOverlay.onclick = closeCategorySheet;
-  categorySheetCancel.onclick = closeCategorySheet;
-
-  /* -------------------------
-     SCELTA CATEGORIA DAL FOGLIO
-  ------------------------- */
-  document.querySelectorAll(".sheetCatBtn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      pendingCategory = btn.dataset.cat;
-      closeCategorySheet();
-      openEditor(true, null);
+  notesList.style.display = "block";
+  filtered.forEach((n, idx) => {
+    const div = document.createElement("div");
+    div.className = "noteItem";
+    div.style.background = n.color || "#ffffff";
+    div.textContent = n.text;
+    div.addEventListener("click", () => {
+      const realIndex = notes.indexOf(filtered[idx]);
+      openEditor(false, realIndex);
     });
+    notesList.appendChild(div);
   });
+}
 
-  /* -------------------------
-     NUOVA NOTA
-  ------------------------- */
-  addNoteBtn.onclick = () => {
-    if (currentCategory === "alle") {
-      openCategorySheet();
-    } else if (currentCategory === "favorite") {
-      alert("Non puoi creare note nei Preferiti.");
-    } else {
-      pendingCategory = currentCategory;
-      openEditor(true, null);
-    }
-  };
+/* Pulsanti backup */
+backupBtn.onclick = () => backupPopup.style.display = "flex";
+backupCloseBtn.onclick = () => backupPopup.style.display = "none";
 
-  /* -------------------------
-     LINGUA
-  ------------------------- */
-  langBtn.onclick = () => {
-    langPopup.style.display = "flex";
-  };
+/* Export */
+backupExportBtn.onclick = () => {
+  const notes = localStorage.getItem("notes") || "[]";
+  const blob = new Blob([notes], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "backup-notes.json";
+  a.click();
+};
 
-  langCloseBtn.onclick = () => {
-    langPopup.style.display = "none";
-  };
-
-  document.querySelectorAll(".langChoice[data-lang]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      applyLanguage(btn.dataset.lang);
-      langPopup.style.display = "none";
-    });
-  });
-
-  /* -------------------------
-     TEMA
-  ------------------------- */
-  themeToggle.onclick = () => {
-    document.body.classList.toggle("dark");
-  };
-
-  /* -------------------------
-     BACKUP (non toccato)
-  ------------------------- */
-  backupBtn.onclick = () => {
-    backupPopup.style.display = "flex";
-  };
-
-  backupCloseBtn.onclick = () => {
-    backupPopup.style.display = "none";
-  };
-
-  autoBackupBtn.onclick = () => {
-    const notes = localStorage.getItem("notes") || "[]";
-    localStorage.setItem("autoBackup", notes);
-    alert("Backup gespeichert.");
-  };
-
-  manualBackupBtn.onclick = () => {
-    const notes = localStorage.getItem("notes") || "[]";
-    const blob = new Blob([notes], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "backup-notes.json";
-    a.click();
-
-    URL.revokeObjectURL(url);
-  };
-
-  autoRestoreBtn.onclick = () => {
-    const data = localStorage.getItem("autoBackup");
-    if (!data) {
-      alert("Kein Backup gefunden.");
-      return;
-    }
+/* Import (via input file, label compatibile iPhone) */
+backupFile.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
     try {
-      const arr = JSON.parse(data);
-      if (Array.isArray(arr)) {
-        saveNotes(arr);
+      const data = JSON.parse(ev.target.result);
+      if (Array.isArray(data)) {
+        saveNotes(data);
         showNotes(currentCategory);
-        alert("Wiederhergestellt.");
       }
-    } catch {
-      alert("Fehler.");
+    } catch(err) {
+      console.error("Backup non valido", err);
     }
   };
+  reader.readAsText(file);
+  e.target.value = "";
+});
 
-  manualRestoreBtn.onclick = () => {
-    backupFile.click();
-  };
+/* Backup automatico: ripristina */
+backupAutoRestoreBtn.onclick = () => {
+  const auto = localStorage.getItem("autoBackup");
+  if (!auto) return;
+  try {
+    const parsed = JSON.parse(auto);
+    if (Array.isArray(parsed.notes)) {
+      saveNotes(parsed.notes);
+      showNotes(currentCategory);
+    }
+  } catch(e) {
+    console.error(e);
+  }
+};
 
-  backupFile.onchange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+/* Backup manuale: salva con nome diverso */
+backupManualBtn.onclick = () => {
+  const notes = localStorage.getItem("notes") || "[]";
+  const blob = new Blob([notes], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "manual-backup-" + Date.now() + ".json";
+  a.click();
+};
 
-    const reader = new FileReader();
-    reader.onload = ev => {
-      try {
-        const data = JSON.parse
+/* Backup manuale: usa lo stesso input file */
+backupManualRestoreBtn.onclick = () => {
+  backupFile.click();
+};
+
+/* Aggiungi nota */
+addNoteBtn.onclick = () => {
+  if (!currentCategory) currentCategory = "alle";
+  openEditor(true, null);
+};
+
+/* Init */
+document.addEventListener("DOMContentLoaded", () => {
+  applyTheme();
+  applyTranslations();
+  showNotes(currentCategory);
+});
+</script>
+</body>
+</html>
