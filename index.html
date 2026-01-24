@@ -217,6 +217,7 @@
 <body>
   <div id="app">
 
+    <!-- HEADER -->
     <header>
       <div id="appTitle">Notizen</div>
       <div>
@@ -226,6 +227,7 @@
       </div>
     </header>
 
+    <!-- CATEGORIE -->
     <div id="categories">
       <div class="cat" data-cat="alle"><span class="catLabel">Alle</span></div>
       <div class="cat" data-cat="favorite"><span class="catLabel">Favoriten</span></div>
@@ -236,8 +238,10 @@
       <div class="cat" data-cat="personlich"><span class="catLabel">Persönlich</span></div>
     </div>
 
+    <!-- LISTA NOTE -->
     <div id="notesList"></div>
 
+    <!-- EDITOR -->
     <div id="noteEditor">
       <div id="noteEditorBox">
         <h2 id="editorTitle">Neue Notiz</h2>
@@ -260,8 +264,10 @@
 
   </div>
 
+  <!-- BOTTONE + -->
   <button id="addNoteBtn">+</button>
 
+  <!-- POPUP LINGUA -->
   <div id="langPopup">
     <div id="langBox">
       <h2>Sprache</h2>
@@ -273,6 +279,7 @@
     </div>
   </div>
 
+  <!-- OVERLAY FOGLIO CATEGORIA -->
   <div id="categorySheetOverlay" style="
     position: fixed;
     top: 0; left: 0;
@@ -282,6 +289,7 @@
     z-index: 1200;
   "></div>
 
+  <!-- FOGLIO CATEGORIA 80% -->
   <div id="categorySheet" style="
     position: fixed;
     bottom: -420px;
@@ -328,7 +336,7 @@
       font-size:18px;
     ">Abbrechen</button>
   </div>
-
+  <!-- POPUP BACKUP -->
   <div id="backupPopup">
     <div id="backupBox">
       <h2>Sicherung</h2>
@@ -346,6 +354,9 @@
   <script>
   document.addEventListener("DOMContentLoaded", () => {
 
+    /* ============================
+       LINGUE
+    ============================ */
     const LANG = {
       de: {
         appTitle: "Notizen",
@@ -473,17 +484,257 @@
       localStorage.setItem("lang", lang);
     }
 
-    function getTextColor(bg) {
-      const c = bg.substring(1);
-      const rgb = parseInt(c, 16);
-      const r = (rgb >> 16) & 255;
-      const g = (rgb >> 8) & 255;
-      const b = rgb & 255;
-      const luminance = (0.299*r + 0.587*g + 0.114*b);
-      return luminance > 150 ? "#000" : "#fff";
+    /* ============================
+       NOTE STORAGE
+    ============================ */
+    function loadNotes() {
+      return JSON.parse(localStorage.getItem("notes") || "[]");
+    }
+    function saveNotes(arr) {
+      localStorage.setItem("notes", JSON.stringify(arr));
     }
 
+    /* ============================
+       MOSTRA NOTE
+    ============================ */
     const notesList = document.getElementById("notesList");
+    let currentCategory = "alle";
+
+    function showNotes(cat) {
+      currentCategory = cat;
+      const all = loadNotes();
+      let filtered = all;
+
+      if (cat === "favorite") {
+        filtered = all.filter(n => n.favorite);
+      } else if (cat !== "alle") {
+        filtered = all.filter(n => n.category === cat);
+      }
+
+      notesList.innerHTML = "";
+
+      filtered.forEach((n, idx) => {
+        const div = document.createElement("div");
+        div.className = "noteItem";
+        div.style.background = n.color;
+        div.style.color = getTextColor(n.color);
+        div.textContent = n.text;
+
+        const star = document.createElement("span");
+        star.style.float = "right";
+        star.style.fontSize = "20px";
+        star.style.cursor = "pointer";
+        star.textContent = n.favorite ? "⭐" : "☆";
+
+        /* ⭐ CORREZIONE DEFINITIVA STELLINA (compatibile iPhone) */
+        star.onclick = (e) => {
+          e.stopPropagation();
+          n.favorite = !n.favorite;
+
+          const allNotes = loadNotes();
+
+          const realIndex = allNotes.findIndex(note =>
+            note.text === n.text &&
+            note.category === n.category &&
+            note.color === n.color
+          );
+
+          if (realIndex !== -1) {
+            allNotes[realIndex].favorite = n.favorite;
+            saveNotes(allNotes);
+          }
+
+          showNotes(currentCategory);
+        };
+
+        div.appendChild(star);
+
+        div.onclick = () => openEditor(n, idx);
+        notesList.appendChild(div);
+      });
+    }
+
+    /* ============================
+       EDITOR
+    ============================ */
     const noteEditor = document.getElementById("noteEditor");
     const noteText = document.getElementById("noteText");
-    const cancel
+    let editIndex = null;
+    let selectedColor = "#ffffff";
+
+    function openEditor(note, index) {
+      editIndex = index;
+      noteText.value = note.text;
+      selectedColor = note.color;
+
+      document.querySelectorAll(".colorDot").forEach(dot => {
+        dot.classList.toggle("selected", dot.dataset.color === selectedColor);
+      });
+
+      noteEditor.style.display = "flex";
+    }
+
+    document.getElementById("addNoteBtn").onclick = () => {
+      editIndex = null;
+      noteText.value = "";
+      selectedColor = "#ffffff";
+
+      document.querySelectorAll(".colorDot").forEach(dot => {
+        dot.classList.toggle("selected", dot.dataset.color === "#ffffff");
+      });
+
+      noteEditor.style.display = "flex";
+    };
+
+    document.getElementById("cancelBtn").onclick = () => {
+      noteEditor.style.display = "none";
+    };
+
+    document.getElementById("saveBtn").onclick = () => {
+      const txt = noteText.value.trim();
+      if (!txt) return;
+
+      const all = loadNotes();
+
+      if (editIndex === null) {
+        all.push({
+          text: txt,
+          color: selectedColor,
+          category: currentCategory === "alle" ? "personlich" : currentCategory,
+          favorite: false
+        });
+      } else {
+        const filtered = loadNotes();
+        const note = filtered[editIndex];
+
+        const realIndex = all.findIndex(n =>
+          n.text === note.text &&
+          n.category === note.category &&
+          n.color === note.color
+        );
+
+        if (realIndex !== -1) {
+          all[realIndex].text = txt;
+          all[realIndex].color = selectedColor;
+        }
+      }
+
+      saveNotes(all);
+      noteEditor.style.display = "none";
+      showNotes(currentCategory);
+    };
+
+    document.querySelectorAll(".colorDot").forEach(dot => {
+      dot.onclick = () => {
+        selectedColor = dot.dataset.color;
+        document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
+        dot.classList.add("selected");
+      };
+    });
+
+    /* ============================
+       CATEGORIE
+    ============================ */
+    document.querySelectorAll(".cat").forEach(btn => {
+      btn.onclick = () => showNotes(btn.dataset.cat);
+    });
+
+    /* ============================
+       FOGLIO CATEGORIA
+    ============================ */
+    const sheet = document.getElementById("categorySheet");
+    const overlay = document.getElementById("categorySheetOverlay");
+
+    function openSheet() {
+      overlay.style.display = "block";
+      sheet.style.bottom = "0";
+    }
+    function closeSheet() {
+      overlay.style.display = "none";
+      sheet.style.bottom = "-420px";
+    }
+
+    document.getElementById("categorySheetCancel").onclick = closeSheet;
+    overlay.onclick = closeSheet;
+
+    document.querySelectorAll(".sheetCatBtn").forEach(btn => {
+      btn.onclick = () => {
+        currentCategory = btn.dataset.cat;
+        closeSheet();
+      };
+    });
+
+    /* ============================
+       BACKUP
+    ============================ */
+    document.getElementById("backupBtn").onclick = () => {
+      document.getElementById("backupPopup").style.display = "flex";
+    };
+    document.getElementById("backupCloseBtn").onclick = () => {
+      document.getElementById("backupPopup").style.display = "none";
+    };
+
+    document.getElementById("manualBackupBtn").onclick = () => {
+      const data = JSON.stringify(loadNotes());
+      const blob = new Blob([data], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "backup.json";
+      a.click();
+    };
+
+    document.getElementById("manualRestoreBtn").onclick = () => {
+      document.getElementById("backupFile").click();
+    };
+
+    document.getElementById("backupFile").onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const arr = JSON.parse(reader.result);
+          saveNotes(arr);
+          showNotes(currentCategory);
+        } catch (err) {
+          alert("Fehler beim Import");
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    /* ============================
+       TEMA
+    ============================ */
+    document.getElementById("themeToggle").onclick = () => {
+      document.body.classList.toggle("dark");
+    };
+
+    /* ============================
+       LINGUA
+    ============================ */
+    document.getElementById("langBtn").onclick = () => {
+      document.getElementById("langPopup").style.display = "flex";
+    };
+    document.getElementById("langCloseBtn").onclick = () => {
+      document.getElementById("langPopup").style.display = "none";
+    };
+    document.querySelectorAll(".langChoice[data-lang]").forEach(btn => {
+      btn.onclick = () => applyLanguage(btn.dataset.lang);
+    });
+
+    /* ============================
+       AVVIO
+    ============================ */
+    const savedLang = localStorage.getItem("lang") || "de";
+    applyLanguage(savedLang);
+    showNotes("alle");
+
+  });
+  </script>
+
+</body>
+</html>
