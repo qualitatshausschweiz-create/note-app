@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Notizen</title>
 
+  <!-- ============================
+       STILI BASE (PARTE A)
+  ============================ -->
   <style>
     :root {
       --bg: #f2f2f7;
@@ -22,11 +25,14 @@
       background: var(--bg);
       color: var(--text);
     }
+
     #app {
       max-width: 600px;
       margin: 0 auto;
       padding: 16px;
     }
+
+    /* HEADER */
     header {
       display: flex;
       align-items: center;
@@ -45,6 +51,8 @@
       margin-left: 8px;
       color: var(--text);
     }
+
+    /* CATEGORIE */
     #categories {
       display: flex;
       gap: 8px;
@@ -64,6 +72,8 @@
     .catLabel {
       font-size: 14px;
     }
+
+    /* LISTA NOTE */
     #notesList {
       display: block;
     }
@@ -75,6 +85,8 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
       cursor: pointer;
     }
+
+    /* BOTTONE + */
     #addNoteBtn {
       position: fixed;
       right: 20px;
@@ -93,6 +105,8 @@
       cursor: pointer;
       z-index: 1100;
     }
+
+    /* EDITOR NOTE (PARTE B) */
     #noteEditor {
       position: fixed;
       top: 0; left: 0;
@@ -125,6 +139,7 @@
       background: transparent;
       color: inherit;
     }
+
     #editorButtons {
       display: flex;
       justify-content: flex-end;
@@ -145,6 +160,8 @@
       background: #007aff;
       color: #fff;
     }
+
+    /* COLORI */
     #colorRow {
       display: flex;
       gap: 8px;
@@ -160,6 +177,8 @@
     .colorDot.selected {
       border-color: #000;
     }
+
+    /* POPUP LINGUA */
     #langPopup,
     #backupPopup {
       position: fixed;
@@ -191,6 +210,8 @@
       font-size: 16px;
       cursor: pointer;
     }
+
+    /* BACKUP */
     .backupBtnRow {
       display: flex;
       flex-direction: column;
@@ -217,7 +238,9 @@
 <body>
   <div id="app">
 
-    <!-- HEADER -->
+    <!-- ============================
+         HEADER
+    ============================ -->
     <header>
       <div id="appTitle">Notizen</div>
       <div>
@@ -227,7 +250,9 @@
       </div>
     </header>
 
-    <!-- CATEGORIE -->
+    <!-- ============================
+         CATEGORIE (PARTE C)
+    ============================ -->
     <div id="categories">
       <div class="cat" data-cat="alle"><span class="catLabel">Alle</span></div>
       <div class="cat" data-cat="favorite"><span class="catLabel">Favoriten</span></div>
@@ -241,7 +266,9 @@
     <!-- LISTA NOTE -->
     <div id="notesList"></div>
 
-    <!-- EDITOR -->
+    <!-- ============================
+         EDITOR NOTE
+    ============================ -->
     <div id="noteEditor">
       <div id="noteEditorBox">
         <h2 id="editorTitle">Neue Notiz</h2>
@@ -336,7 +363,10 @@
       font-size:18px;
     ">Abbrechen</button>
   </div>
-  <!-- POPUP BACKUP -->
+
+  <!-- ============================
+       POPUP BACKUP
+  ============================ -->
   <div id="backupPopup">
     <div id="backupBox">
       <h2>Sicherung</h2>
@@ -351,6 +381,9 @@
     </div>
   </div>
 
+  <!-- ============================
+       SCRIPT PRINCIPALE (PARTE D)
+  ============================ -->
   <script>
   document.addEventListener("DOMContentLoaded", () => {
 
@@ -500,6 +533,15 @@
     const notesList = document.getElementById("notesList");
     let currentCategory = "alle";
 
+    function getTextColor(bg) {
+      const c = bg.replace("#", "");
+      const r = parseInt(c.substr(0, 2), 16);
+      const g = parseInt(c.substr(2, 2), 16);
+      const b = parseInt(c.substr(4, 2), 16);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b);
+      return luminance > 150 ? "#000" : "#fff";
+    }
+
     function showNotes(cat) {
       currentCategory = cat;
       const all = loadNotes();
@@ -513,26 +555,27 @@
 
       notesList.innerHTML = "";
 
-      filtered.forEach((n, idx) => {
+      filtered.forEach((n) => {
         const div = document.createElement("div");
         div.className = "noteItem";
         div.style.background = n.color;
         div.style.color = getTextColor(n.color);
         div.textContent = n.text;
 
+        /* ============================
+           STELLINA (CORRETTA)
+        ============================ */
         const star = document.createElement("span");
         star.style.float = "right";
         star.style.fontSize = "20px";
         star.style.cursor = "pointer";
         star.textContent = n.favorite ? "⭐" : "☆";
 
-        /* ⭐ CORREZIONE DEFINITIVA STELLINA (compatibile iPhone) */
         star.onclick = (e) => {
           e.stopPropagation();
           n.favorite = !n.favorite;
 
           const allNotes = loadNotes();
-
           const realIndex = allNotes.findIndex(note =>
             note.text === n.text &&
             note.category === n.category &&
@@ -549,7 +592,7 @@
 
         div.appendChild(star);
 
-        div.onclick = () => openEditor(n, idx);
+        div.onclick = () => openEditor(n);
         notesList.appendChild(div);
       });
     }
@@ -559,11 +602,11 @@
     ============================ */
     const noteEditor = document.getElementById("noteEditor");
     const noteText = document.getElementById("noteText");
-    let editIndex = null;
     let selectedColor = "#ffffff";
+    let editingNote = null;
 
-    function openEditor(note, index) {
-      editIndex = index;
+    function openEditor(note) {
+      editingNote = note;
       noteText.value = note.text;
       selectedColor = note.color;
 
@@ -575,7 +618,7 @@
     }
 
     document.getElementById("addNoteBtn").onclick = () => {
-      editIndex = null;
+      editingNote = null;
       noteText.value = "";
       selectedColor = "#ffffff";
 
@@ -596,7 +639,7 @@
 
       const all = loadNotes();
 
-      if (editIndex === null) {
+      if (editingNote === null) {
         all.push({
           text: txt,
           color: selectedColor,
@@ -604,13 +647,10 @@
           favorite: false
         });
       } else {
-        const filtered = loadNotes();
-        const note = filtered[editIndex];
-
         const realIndex = all.findIndex(n =>
-          n.text === note.text &&
-          n.category === note.category &&
-          n.color === note.color
+          n.text === editingNote.text &&
+          n.category === editingNote.category &&
+          n.color === editingNote.color
         );
 
         if (realIndex !== -1) {
