@@ -258,7 +258,7 @@
   </div>
 </div>
 
-<!-- CATEGORIE (ORA SONO BUTTON) -->
+<!-- CATEGORIE (BUTTON) -->
 <div class="grid" id="categories">
 
   <button class="cat" data-cat="favorite">
@@ -358,6 +358,149 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   /* -------------------------
+     DIZIONARIO LINGUE
+  ------------------------- */
+  const LANG = {
+    de: {
+      appTitle: "Notizen",
+      newNote: "Neue Notiz",
+      cancel: "Abbrechen",
+      save: "Speichern",
+      categories: {
+        favorite: "Favoriten",
+        alle: "Alle",
+        arbeit: "Arbeit",
+        einkauf: "Einkauf",
+        zuhause: "Zuhause",
+        ideen: "Ideen",
+        personlich: "Persönlich"
+      },
+      backup: {
+        title: "Sicherung",
+        autoBackup: "Backup automatisch",
+        manualBackup: "Backup manuell",
+        autoRestore: "Wiederherstellung automatisch",
+        manualRestore: "Wiederherstellung manuell",
+        close: "Schliessen"
+      }
+    },
+
+    it: {
+      appTitle: "Note",
+      newNote: "Nuova nota",
+      cancel: "Annulla",
+      save: "Salva",
+      categories: {
+        favorite: "Preferiti",
+        alle: "Tutte",
+        arbeit: "Lavoro",
+        einkauf: "Spesa",
+        zuhause: "Casa",
+        ideen: "Idee",
+        personlich: "Personale"
+      },
+      backup: {
+        title: "Backup",
+        autoBackup: "Backup automatico",
+        manualBackup: "Backup manuale",
+        autoRestore: "Ripristino automatico",
+        manualRestore: "Ripristino manuale",
+        close: "Chiudi"
+      }
+    },
+
+    en: {
+      appTitle: "Notes",
+      newNote: "New Note",
+      cancel: "Cancel",
+      save: "Save",
+      categories: {
+        favorite: "Favorites",
+        alle: "All",
+        arbeit: "Work",
+        einkauf: "Shopping",
+        zuhause: "Home",
+        ideen: "Ideas",
+        personlich: "Personal"
+      },
+      backup: {
+        title: "Backup",
+        autoBackup: "Automatic Backup",
+        manualBackup: "Manual Backup",
+        autoRestore: "Automatic Restore",
+        manualRestore: "Manual Restore",
+        close: "Close"
+      }
+    },
+
+    es: {
+      appTitle: "Notas",
+      newNote: "Nueva nota",
+      cancel: "Cancelar",
+      save: "Guardar",
+      categories: {
+        favorite: "Favoritos",
+        alle: "Todas",
+        arbeit: "Trabajo",
+        einkauf: "Compras",
+        zuhause: "Casa",
+        ideen: "Ideas",
+        personlich: "Personal"
+      },
+      backup: {
+        title: "Copia de seguridad",
+        autoBackup: "Copia automática",
+        manualBackup: "Copia manual",
+        autoRestore: "Restauración automática",
+        manualRestore: "Restauración manual",
+        close: "Cerrar"
+      }
+    }
+  };
+
+
+  /* -------------------------
+     FUNZIONE MULTILINGUA
+  ------------------------- */
+  function applyLanguage(lang) {
+    const L = LANG[lang];
+
+    document.getElementById("appTitle").textContent = L.appTitle;
+    document.getElementById("editorTitle").textContent = L.newNote;
+    document.getElementById("cancelBtn").textContent = L.cancel;
+    document.getElementById("saveBtn").textContent = L.save;
+
+    document.querySelectorAll(".cat").forEach(btn => {
+      const key = btn.dataset.cat;
+      btn.querySelector(".catLabel").textContent = L.categories[key];
+    });
+
+    document.querySelector("#backupBox h2").textContent = L.backup.title;
+    document.querySelector("#autoBackupBtn span").textContent = L.backup.autoBackup;
+    document.querySelector("#manualBackupBtn span").textContent = L.backup.manualBackup;
+    document.querySelector("#autoRestoreBtn span").textContent = L.backup.autoRestore;
+    document.querySelector("#manualRestoreBtn span").textContent = L.backup.manualRestore;
+    document.querySelector("#backupCloseBtn span").textContent = L.backup.close;
+
+    localStorage.setItem("lang", lang);
+  }
+
+
+  /* -------------------------
+     FIX COLORE TESTO NOTE
+  ------------------------- */
+  function getTextColor(bg) {
+    const c = bg.substring(1);
+    const rgb = parseInt(c, 16);
+    const r = (rgb >> 16) & 255;
+    const g = (rgb >> 8) & 255;
+    const b = rgb & 255;
+    const luminance = (0.299*r + 0.587*g + 0.114*b);
+    return luminance > 150 ? "#000" : "#fff";
+  }
+
+
+  /* -------------------------
      RIFERIMENTI DOM
   ------------------------- */
   const notesList       = document.getElementById("notesList");
@@ -425,6 +568,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const div = document.createElement("div");
       div.className = "noteItem";
       div.style.background = n.color || "#ffffff";
+      div.style.color = getTextColor(n.color || "#ffffff");
 
       const row = document.createElement("div");
       row.style.display = "flex";
@@ -541,17 +685,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* -------------------------
-     CATEGORIE — FIX iPHONE (button + touchstart)
+     CATEGORIE — FIX iPHONE
   ------------------------- */
   document.querySelectorAll(".cat").forEach(catEl => {
 
-    // iPhone: evento immediato
     catEl.addEventListener("touchstart", () => {
       currentCategory = catEl.dataset.cat;
       showNotes(currentCategory);
     }, { passive: true });
 
-    // Desktop / Android
     catEl.addEventListener("click", () => {
       currentCategory = catEl.dataset.cat;
       showNotes(currentCategory);
@@ -561,7 +703,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* -------------------------
-     SALVAGENTE 🛟 VERSIONE B
+     SALVAGENTE 🛟
   ------------------------- */
   backupBtn.onclick = () => {
     backupPopup.style.display = "flex";
@@ -572,14 +714,12 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
-  /* BACKUP AUTOMATICO */
   autoBackupBtn.onclick = () => {
     const notes = localStorage.getItem("notes") || "[]";
     localStorage.setItem("autoBackup", notes);
-    alert("Automatisches Backup gespeichert.");
+    alert("Backup gespeichert.");
   };
 
-  /* BACKUP MANUALE */
   manualBackupBtn.onclick = () => {
     const notes = localStorage.getItem("notes") || "[]";
     const blob = new Blob([notes], { type: "application/json" });
@@ -593,11 +733,10 @@ document.addEventListener("DOMContentLoaded", () => {
     URL.revokeObjectURL(url);
   };
 
-  /* RIPRISTINO AUTOMATICO */
   autoRestoreBtn.onclick = () => {
     const data = localStorage.getItem("autoBackup");
     if (!data) {
-      alert("Kein automatisches Backup gefunden.");
+      alert("Kein Backup gefunden.");
       return;
     }
     try {
@@ -605,14 +744,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (Array.isArray(arr)) {
         saveNotes(arr);
         showNotes(currentCategory);
-        alert("Automatische Wiederherstellung abgeschlossen.");
+        alert("Wiederhergestellt.");
       }
     } catch {
-      alert("Fehler beim Wiederherstellen.");
+      alert("Fehler.");
     }
   };
 
-  /* RIPRISTINO MANUALE */
   manualRestoreBtn.onclick = () => {
     backupFile.click();
   };
@@ -628,7 +766,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (Array.isArray(data)) {
           saveNotes(data);
           showNotes(currentCategory);
-          alert("Manuelle Wiederherstellung abgeschlossen.");
+          alert("Wiederhergestellt.");
         }
       } catch {
         alert("Ungültige Datei.");
@@ -651,6 +789,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll(".langChoice[data-lang]").forEach(btn => {
     btn.addEventListener("click", () => {
+      applyLanguage(btn.dataset.lang);
       langPopup.style.display = "none";
     });
   });
@@ -675,6 +814,9 @@ document.addEventListener("DOMContentLoaded", () => {
   /* -------------------------
      INIT
   ------------------------- */
+  const savedLang = localStorage.getItem("lang") || "de";
+  applyLanguage(savedLang);
+
   showNotes(currentCategory);
   langPopup.style.display = "none";
   backupPopup.style.display = "none";
