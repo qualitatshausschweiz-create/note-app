@@ -84,6 +84,7 @@
       margin-bottom: 12px;
       border-radius: 14px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
     }
 
     #noteEditor {
@@ -179,11 +180,6 @@
     .orangeBtn { background: #ff9500; color: white; }
     .grayBtn { background: #ccc; color: black; }
 
-    #backupFile {
-      margin-top: 12px;
-      width: 100%;
-    }
-
     #langPopup {
       position: fixed;
       top: 0; left: 0;
@@ -220,7 +216,6 @@
     }
   </style>
 </head>
-
 <body>
 
 <header>
@@ -332,13 +327,13 @@
 
   </div>
 </div>
-
 <script>
 let editingIndex = null;
 let currentCategory = null;
 let currentLang = localStorage.getItem("lang") || "de";
 let selectedColor = "#ffffff";
 
+/* Traduzioni categorie */
 const catNames = {
   de:{alle:"Alle",arbeit:"Arbeit",einkauf:"Einkauf",zuhause:"Zuhause",ideen:"Ideen",personlich:"Persönlich"},
   it:{alle:"Tutte",arbeit:"Lavoro",einkauf:"Spesa",zuhause:"Casa",ideen:"Idee",personlich:"Personale"},
@@ -346,13 +341,15 @@ const catNames = {
   es:{alle:"Todas",arbeit:"Trabajo",einkauf:"Compra",zuhause:"Casa",ideen:"Ideas",personlich:"Personal"}
 };
 
+/* Traduzioni UI */
 const tr = {
-  de:{appTitle:"Notizen",addNoteBtn:"+ Notiz",newNote:"Neue Notiz",cancelBtn:"Abbrechen",saveBtn:"Speichern",back:"Zurück",search:"🔍 Suchen..."},
-  it:{appTitle:"Note",addNoteBtn:"+ Nota",newNote:"Nuova Nota",cancelBtn:"Annulla",saveBtn:"Salva",back:"Indietro",search:"🔍 Cerca..."},
-  en:{appTitle:"Notes",addNoteBtn:"+ Note",newNote:"New Note",cancelBtn:"Cancel",saveBtn:"Save",back:"Back",search:"🔍 Search..."},
-  es:{appTitle:"Notas",addNoteBtn:"+ Nota",newNote:"Nueva nota",cancelBtn:"Cancelar",saveBtn:"Guardar",back:"Atrás",search:"🔍 Buscar..."}
+  de:{appTitle:"Notizen",addNoteBtn:"+ Notiz",newNote:"Neue Notiz",editNote:"Notiz bearbeiten",cancelBtn:"Abbrechen",saveBtn:"Speichern",back:"Zurück",search:"🔍 Suchen...",autoBackupLabel:"Letzte automatische Sicherung:"},
+  it:{appTitle:"Note",addNoteBtn:"+ Nota",newNote:"Nuova Nota",editNote:"Modifica Nota",cancelBtn:"Annulla",saveBtn:"Salva",back:"Indietro",search:"🔍 Cerca...",autoBackupLabel:"Ultimo backup automatico:"},
+  en:{appTitle:"Notes",addNoteBtn:"+ Note",newNote:"New Note",editNote:"Edit Note",cancelBtn:"Cancel",saveBtn:"Save",back:"Back",search:"🔍 Search...",autoBackupLabel:"Last automatic backup:"},
+  es:{appTitle:"Notas",addNoteBtn:"+ Nota",newNote:"Nueva nota",editNote:"Editar nota",cancelBtn:"Cancelar",saveBtn:"Guardar",back:"Atrás",search:"🔍 Buscar...",autoBackupLabel:"Último bécap automático:"}
 };
 
+/* Applica traduzioni */
 function applyTranslations() {
   const t = tr[currentLang];
 
@@ -366,9 +363,12 @@ function applyTranslations() {
     label.textContent = catNames[currentLang][key];
   });
 
+  updateAutoBackupLabel();
+
   if (currentCategory) showNotes(currentCategory);
 }
 
+/* Popup lingua */
 langBtn.onclick = () => langPopup.style.display = "flex";
 function closeLangPopup() { langPopup.style.display = "none"; }
 function setLang(lang) {
@@ -378,128 +378,89 @@ function setLang(lang) {
   closeLangPopup();
 }
 
+/* Sicherung */
 backupBtn.onclick = () => backupPopup.style.display = "flex";
 backupCloseBtn.onclick = () => backupPopup.style.display = "none";
 
+/* Backup: esporta */
+backupExportBtn.onclick = () => {
+  const notes = localStorage.getItem("notes") || "[]";
+  const blob = new Blob([notes], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "backup.json";
+  a.click();
+};
+
+/* Backup: importa */
+backupFile.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    localStorage.setItem("notes", ev.target.result);
+    if (currentCategory) showNotes(currentCategory);
+  };
+  reader.readAsText(file);
+});
+
+/* Timestamp */
+function getTimestamp() {
+  const d = new Date();
+  const pad = n => (n < 10 ? "0" + n : n);
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+/* Backup automatico */
+function saveAutoBackup() {
+  const notes = JSON.parse(localStorage.getItem("notes"));
+  const data = { timestamp: getTimestamp(), notes };
+  localStorage.setItem("autoBackup", JSON.stringify(data));
+  updateAutoBackupLabel();
+}
+
+function updateAutoBackupLabel() {
+  const t = tr[currentLang];
+  const auto = localStorage.getItem("autoBackup");
+  if (!auto) {
+    autoBackupLabel.textContent = t.autoBackupLabel + " –";
+    return;
+  }
+  const parsed = JSON.parse(auto);
+  autoBackupLabel.textContent = t.autoBackupLabel + " " + parsed.timestamp;
+}
+
+/* Ripristina automatico */
+backupAutoRestoreBtn.onclick = () => {
+  const auto = localStorage.getItem("autoBackup");
+  if (!auto) return alert("Kein automatisches Backup gefunden.");
+  const parsed = JSON.parse(auto);
+  localStorage.setItem("notes", JSON.stringify(parsed.notes));
+  alert("✔ Automatisches Backup wiederhergestellt.");
+  if (currentCategory) showNotes(currentCategory);
+};
+
+/* Backup manuale */
+backupManualBtn.onclick = () => {
+  const notes = JSON.parse(localStorage.getItem("notes"));
+  const data = { timestamp: getTimestamp(), notes };
+  localStorage.setItem("manualBackup", JSON.stringify(data));
+  alert("✔ Manuelles Backup gespeichert.");
+};
+
+/* Ripristina manuale */
+backupManualRestoreBtn.onclick = () => {
+  const manual = localStorage.getItem("manualBackup");
+  if (!manual) return alert("Kein manuelles Backup gefunden.");
+  const parsed = JSON.parse(manual);
+  localStorage.setItem("notes", JSON.stringify(parsed.notes));
+  alert("✔ Manuelles Backup wiederhergestellt.");
+  if (currentCategory) showNotes(currentCategory);
+};
+
+/* Apri editor */
 addNoteBtn.onclick = () => {
   editorTitle.textContent = tr[currentLang].newNote;
   noteText.value = "";
   selectedColor = "#ffffff";
-  document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
-  editingIndex = null;
-  noteEditor.style.display = "flex";
-};
-
-cancelBtn.onclick = () => {
-  noteEditor.style.display = "none";
-};
-
-saveBtn.onclick = () => {
-  const text = noteText.value.trim();
-  if (!text) return;
-
-  const notes = JSON.parse(localStorage.getItem("notes")) || [];
-
-  if (editingIndex !== null) {
-    notes[editingIndex].text = text;
-    notes[editingIndex].color = selectedColor;
-  } else {
-    notes.push({
-      text,
-      category: currentCategory,
-      color: selectedColor
-    });
-  }
-
-  localStorage.setItem("notes", JSON.stringify(notes));
-  noteEditor.style.display = "none";
-  if (currentCategory) showNotes(currentCategory);
-};
-
-document.querySelectorAll(".colorDot").forEach(dot => {
-  dot.addEventListener("click", () => {
-    document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
-    dot.classList.add("selected");
-    selectedColor = dot.dataset.color;
-  });
-});
-
-document.querySelectorAll(".cat").forEach(cat => {
-  cat.addEventListener("click", () => {
-    currentCategory = cat.dataset.cat;
-    showNotes(currentCategory);
-  });
-});
-
-function showNotes(category) {
-  currentCategory = category;
-  categories.style.display = "none";
-  notesList.style.display = "block";
-
-  const notes = JSON.parse(localStorage.getItem("notes")) || [];
-  const t = tr[currentLang];
-
-  let filtered = notes;
-  if (category !== "alle") {
-    filtered = notes.filter(n => n.category === category);
-  }
-
-  let html = `
-    <div style="display:flex; align-items:center; margin-bottom:12px;">
-      <button onclick="goBack()" style="
-        background:none;
-        border:none;
-        font-size:26px;
-        padding:6px 12px;
-        cursor:pointer;
-      ">←</button>
-      <span style="font-size:18px; font-weight:600; margin-left:6px;">
-        ${catNames[currentLang][category]}
-      </span>
-    </div>
-
-    <input id="searchBar" placeholder="${t.search}" oninput="filterNotes(this.value)">
-    <div id="notesContainer">
-  `;
-
-  filtered.forEach(n => {
-    const translatedCat = catNames[currentLang][n.category];
-    html += `
-      <div class="noteItem" style="background:${n.color}">
-        <b>${translatedCat}</b><br>${n.text}
-      </div>
-    `;
-  });
-
-  html += "</div>";
-  notesList.innerHTML = html;
-}
-
-function filterNotes(query) {
-  const items = document.querySelectorAll(".noteItem");
-  items.forEach(item => {
-    const text = item.textContent.toLowerCase();
-    item.style.display = text.includes(query.toLowerCase()) ? "" : "none";
-  });
-}
-
-function goBack() {
-  notesList.style.display = "none";
-  categories.style.display = "grid";
-  currentCategory = null;
-}
-
-themeToggle.onclick = () => {
-  document.body.classList.toggle("dark");
-  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-};
-
-if (localStorage.getItem("theme") === "dark") {
-  document.body.classList.add("dark");
-}
-
-applyTranslations();
-</script>
-
-</body>
-</html>
