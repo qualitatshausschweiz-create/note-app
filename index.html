@@ -1,40 +1,44 @@
-<!-- FOGLIO iOS PER SCELTA CATEGORIA -->
-<div id="categorySheetOverlay" style="
+<!-- POPUP CENTRALE PER SCELTA CATEGORIA -->
+<div id="categoryPopupOverlay" style="
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
   background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(4px);
   display: none;
   z-index: 1200;
 "></div>
 
-<div id="categorySheet" style="
+<div id="categoryPopup" style="
   position: fixed;
-  bottom: -400px;
-  left: 0;
-  width: 100%;
-  background: var(--card);
-  border-top-left-radius: 22px;
-  border-top-right-radius: 22px;
-  box-shadow: 0 -4px 18px rgba(0,0,0,0.25);
-  padding: 20px;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 85%;
+  max-width: 380px;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  border-radius: 22px;
+  padding: 22px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+  display: none;
   z-index: 1300;
-  transition: bottom 0.28s ease;
 ">
 
-  <h2 id="categorySheetTitle" style="
+  <h2 id="categoryPopupTitle" style="
     text-align:center;
     margin-top:0;
     margin-bottom:18px;
+    font-size:22px;
+    font-weight:600;
   ">Kategorie wählen</h2>
 
-  <div id="categorySheetButtons" style="
+  <div id="categoryPopupButtons" style="
     display:flex;
     flex-direction:column;
     gap:12px;
   ">
 
-    <button class="sheetCatBtn" data-cat="arbeit" style="
+    <button class="popupCatBtn" data-cat="arbeit" style="
       padding:14px;
       border-radius:14px;
       border:none;
@@ -43,7 +47,7 @@
       font-size:18px;
     ">Arbeit</button>
 
-    <button class="sheetCatBtn" data-cat="einkauf" style="
+    <button class="popupCatBtn" data-cat="einkauf" style="
       padding:14px;
       border-radius:14px;
       border:none;
@@ -52,7 +56,7 @@
       font-size:18px;
     ">Einkauf</button>
 
-    <button class="sheetCatBtn" data-cat="zuhause" style="
+    <button class="popupCatBtn" data-cat="zuhause" style="
       padding:14px;
       border-radius:14px;
       border:none;
@@ -61,7 +65,7 @@
       font-size:18px;
     ">Zuhause</button>
 
-    <button class="sheetCatBtn" data-cat="ideen" style="
+    <button class="popupCatBtn" data-cat="ideen" style="
       padding:14px;
       border-radius:14px;
       border:none;
@@ -70,7 +74,7 @@
       font-size:18px;
     ">Ideen</button>
 
-    <button class="sheetCatBtn" data-cat="personlich" style="
+    <button class="popupCatBtn" data-cat="personlich" style="
       padding:14px;
       border-radius:14px;
       border:none;
@@ -82,7 +86,7 @@
 
   </div>
 
-  <button id="categorySheetCancel" style="
+  <button id="categoryPopupCancel" style="
     margin-top:18px;
     width:100%;
     padding:14px;
@@ -204,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* -------------------------
-     FUNZIONE MULTILINGUA
+     MULTILINGUA
   ------------------------- */
   function applyLanguage(lang) {
     const L = LANG[lang];
@@ -220,15 +224,14 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.querySelector(".catLabel").textContent = L.categories[key];
     });
 
-    // foglio iOS
-    document.getElementById("categorySheetTitle").textContent = L.chooseCategory;
-
-    document.querySelectorAll(".sheetCatBtn").forEach(btn => {
+    // popup centrale
+    document.getElementById("categoryPopupTitle").textContent = L.chooseCategory;
+    document.querySelectorAll(".popupCatBtn").forEach(btn => {
       const key = btn.dataset.cat;
       btn.textContent = L.categories[key];
     });
 
-    // popup backup
+    // backup
     document.querySelector("#backupBox h2").textContent = L.backup.title;
     document.querySelector("#autoBackupBtn span").textContent = L.backup.autoBackup;
     document.querySelector("#manualBackupBtn span").textContent = L.backup.manualBackup;
@@ -263,9 +266,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const cancelBtn       = document.getElementById("cancelBtn");
   const saveBtn         = document.getElementById("saveBtn");
 
-  const categorySheetOverlay = document.getElementById("categorySheetOverlay");
-  const categorySheet        = document.getElementById("categorySheet");
-  const categorySheetCancel  = document.getElementById("categorySheetCancel");
+  const categoryPopupOverlay = document.getElementById("categoryPopupOverlay");
+  const categoryPopup        = document.getElementById("categoryPopup");
+  const categoryPopupCancel  = document.getElementById("categoryPopupCancel");
 
   const backupBtn       = document.getElementById("backupBtn");
   const backupPopup     = document.getElementById("backupPopup");
@@ -459,33 +462,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* -------------------------
-     FOGLIO iOS — APERTURA
+     POPUP CENTRALE — APERTURA
   ------------------------- */
-  function openCategorySheet() {
-    categorySheetOverlay.style.display = "block";
-    setTimeout(() => {
-      categorySheet.style.bottom = "0px";
-    }, 10);
+  function openCategoryPopup() {
+    categoryPopupOverlay.style.display = "block";
+    categoryPopup.style.display = "block";
   }
 
-  function closeCategorySheet() {
-    categorySheet.style.bottom = "-400px";
-    setTimeout(() => {
-      categorySheetOverlay.style.display = "none";
-    }, 280);
+  function closeCategoryPopup() {
+    categoryPopup.style.display = "none";
+    categoryPopupOverlay.style.display = "none";
   }
 
-  categorySheetOverlay.onclick = closeCategorySheet;
-  categorySheetCancel.onclick = closeCategorySheet;
+  categoryPopupOverlay.onclick = closeCategoryPopup;
+  categoryPopupCancel.onclick = closeCategoryPopup;
 
 
   /* -------------------------
-     SCELTA CATEGORIA DAL FOGLIO
+     SCELTA CATEGORIA DAL POPUP
   ------------------------- */
-  document.querySelectorAll(".sheetCatBtn").forEach(btn => {
+  document.querySelectorAll(".popupCatBtn").forEach(btn => {
     btn.addEventListener("click", () => {
       pendingCategory = btn.dataset.cat;
-      closeCategorySheet();
+      closeCategoryPopup();
       openEditor(true, null);
     });
   });
@@ -496,7 +495,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ------------------------- */
   addNoteBtn.onclick = () => {
     if (currentCategory === "alle") {
-      openCategorySheet();
+      openCategoryPopup();
     } else if (currentCategory === "favorite") {
       alert("Non puoi creare note nei Preferiti.");
     } else {
