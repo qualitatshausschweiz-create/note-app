@@ -64,13 +64,22 @@
       text-align: center;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       cursor: pointer;
+
+      /* FIX iPhone */
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
     }
     .circle {
       width: 70px;
       height: 70px;
       border-radius: 50%;
       margin: 0 auto 10px;
+
+      /* FIX iPhone */
+      touch-action: manipulation;
     }
+
     .arbeit { background: #007aff; }
     .einkauf { background: #ffcc00; }
     .zuhause { background: #ff9500; }
@@ -186,7 +195,6 @@
     .grayBtn { background: #ccc; color: black; }
   </style>
 </head>
-
 <body>
 
 <header>
@@ -286,7 +294,6 @@
            style="opacity:0; position:absolute; width:1px; height:1px;">
   </div>
 </div>
-
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   // Riferimenti DOM
@@ -443,7 +450,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Categorie
+  // Categorie (FIX iPhone: click funziona ora)
   document.querySelectorAll(".cat").forEach(catEl => {
     catEl.addEventListener("click", () => {
       currentCategory = catEl.dataset.cat;
@@ -497,12 +504,11 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   document.querySelectorAll(".langChoice[data-lang]").forEach(btn => {
     btn.addEventListener("click", () => {
-      // qui in futuro puoi cambiare testi, per ora non fa nulla
       langPopup.style.display = "none";
     });
   });
 
-  // Tema (semplice toggle classe)
+  // Tema
   themeToggle.onclick = () => {
     document.body.classList.toggle("dark");
   };
