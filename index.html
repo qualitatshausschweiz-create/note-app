@@ -178,7 +178,7 @@
       border-color: #000;
     }
 
-    /* POPUP LINGUA */
+    /* POPUP LINGUA + BACKUP */
     #langPopup,
     #backupPopup {
       position: fixed;
@@ -199,6 +199,7 @@
       padding: 16px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.3);
     }
+
     .langChoice {
       width: 100%;
       padding: 10px;
@@ -211,7 +212,7 @@
       cursor: pointer;
     }
 
-    /* BACKUP */
+    /* BACKUP — COLORI ORIGINALI RIPRISTINATI */
     .backupBtnRow {
       display: flex;
       flex-direction: column;
@@ -222,25 +223,27 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 10px;
+      padding: 12px;
       border-radius: 12px;
-      border: 1px solid #ccc;
-      background: transparent;
-      color: inherit;
+      border: none;
+      font-size: 16px;
       cursor: pointer;
+      color: #000;
     }
-    .backupAction span {
-      flex: 1;
-    }
+
+    #autoBackupBtn { background: #007aff; color: white; }
+    #manualBackupBtn { background: #ffcc00; color: black; }
+    #autoRestoreBtn { background: #ff9500; color: white; }
+    #manualRestoreBtn { background: #34c759; color: white; }
+    #backupCloseBtn { background: #ccc; color: black; }
+
   </style>
 </head>
 
 <body>
   <div id="app">
 
-    <!-- ============================
-         HEADER
-    ============================ -->
+    <!-- HEADER -->
     <header>
       <div id="appTitle">Notizen</div>
       <div>
@@ -250,9 +253,7 @@
       </div>
     </header>
 
-    <!-- ============================
-         CATEGORIE (PARTE C)
-    ============================ -->
+    <!-- CATEGORIE -->
     <div id="categories">
       <div class="cat" data-cat="alle"><span class="catLabel">Alle</span></div>
       <div class="cat" data-cat="favorite"><span class="catLabel">Favoriten</span></div>
@@ -266,9 +267,7 @@
     <!-- LISTA NOTE -->
     <div id="notesList"></div>
 
-    <!-- ============================
-         EDITOR NOTE
-    ============================ -->
+    <!-- EDITOR -->
     <div id="noteEditor">
       <div id="noteEditorBox">
         <h2 id="editorTitle">Neue Notiz</h2>
@@ -363,7 +362,6 @@
       font-size:18px;
     ">Abbrechen</button>
   </div>
-
   <!-- ============================
        POPUP BACKUP
   ============================ -->
@@ -388,7 +386,7 @@
   document.addEventListener("DOMContentLoaded", () => {
 
     /* ============================
-       LINGUE
+       LINGUE (NON TOCCATE)
     ============================ */
     const LANG = {
       de: {
@@ -563,7 +561,7 @@
         div.textContent = n.text;
 
         /* ============================
-           STELLINA (CORRETTA)
+           STELLINA CORRETTA
         ============================ */
         const star = document.createElement("span");
         star.style.float = "right";
@@ -639,11 +637,16 @@
 
       const all = loadNotes();
 
+      /* ============================
+         CORREZIONE NOTE CHE SPARIVANO
+         Ora la nota viene salvata
+         nella categoria attuale.
+      ============================ */
       if (editingNote === null) {
         all.push({
           text: txt,
           color: selectedColor,
-          category: currentCategory === "alle" ? "personlich" : currentCategory,
+          category: currentCategory,   // <--- CORRETTO
           favorite: false
         });
       } else {
@@ -685,10 +688,6 @@
     const sheet = document.getElementById("categorySheet");
     const overlay = document.getElementById("categorySheetOverlay");
 
-    function openSheet() {
-      overlay.style.display = "block";
-      sheet.style.bottom = "0";
-    }
     function closeSheet() {
       overlay.style.display = "none";
       sheet.style.bottom = "-420px";
@@ -767,7 +766,7 @@
     });
 
     /* ============================
-       AVVIO
+       AVVIO APP
     ============================ */
     const savedLang = localStorage.getItem("lang") || "de";
     applyLanguage(savedLang);
