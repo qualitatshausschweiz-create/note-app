@@ -48,6 +48,7 @@
       background: #007aff;
       color: white;
       border: none;
+      cursor: pointer;
     }
 
     .grid {
@@ -203,11 +204,11 @@
 <div id="langPopup">
   <div id="langBox">
     <h2>Sprache / Language / Lingua / Idioma</h2>
-    <button class="langChoice" onclick="setLang('de')">Deutsch</button>
-    <button class="langChoice" onclick="setLang('it')">Italiano</button>
-    <button class="langChoice" onclick="setLang('en')">English</button>
-    <button class="langChoice" onclick="setLang('es')">Español</button>
-    <button class="langChoice" onclick="closeLangPopup()">❌</button>
+    <button class="langChoice" data-lang="de">Deutsch</button>
+    <button class="langChoice" data-lang="it">Italiano</button>
+    <button class="langChoice" data-lang="en">English</button>
+    <button class="langChoice" data-lang="es">Español</button>
+    <button id="langCloseBtn" class="langChoice">❌</button>
   </div>
 </div>
 
@@ -287,174 +288,234 @@
 </div>
 
 <script>
-let editingIndex = null;
-let currentCategory = "alle";
-let selectedColor = "#ffffff";
+document.addEventListener("DOMContentLoaded", () => {
+  // Riferimenti DOM
+  const notesList       = document.getElementById("notesList");
+  const noteEditor      = document.getElementById("noteEditor");
+  const noteText        = document.getElementById("noteText");
+  const cancelBtn       = document.getElementById("cancelBtn");
+  const saveBtn         = document.getElementById("saveBtn");
+  const backupBtn       = document.getElementById("backupBtn");
+  const backupPopup     = document.getElementById("backupPopup");
+  const backupExportBtn = document.getElementById("backupExportBtn");
+  const backupCloseBtn  = document.getElementById("backupCloseBtn");
+  const backupFile      = document.getElementById("backupFile");
+  const langPopup       = document.getElementById("langPopup");
+  const langBtn         = document.getElementById("langBtn");
+  const langCloseBtn    = document.getElementById("langCloseBtn");
+  const themeToggle     = document.getElementById("themeToggle");
+  const addNoteBtn      = document.getElementById("addNoteBtn");
 
-/* Carica note */
-function loadNotes() {
-  try { return JSON.parse(localStorage.getItem("notes") || "[]"); }
-  catch { return []; }
-}
-function saveNotes(arr) {
-  localStorage.setItem("notes", JSON.stringify(arr));
-}
+  let editingIndex   = null;
+  let currentCategory = "alle";
+  let selectedColor   = "#ffffff";
 
-/* Mostra note */
-function showNotes(cat) {
-  const notes = loadNotes();
-
-  const filtered =
-    cat === "alle"
-      ? notes
-      : cat === "favorite"
-        ? notes.filter(n => n.favorite)
-        : notes.filter(n => n.category === cat);
-
-  notesList.innerHTML = "";
-  notesList.style.display = filtered.length ? "block" : "none";
-
-  filtered.forEach((n, idx) => {
-    const div = document.createElement("div");
-    div.className = "noteItem";
-    div.style.background = n.color || "#ffffff";
-
-    const row = document.createElement("div");
-    row.style.display = "flex";
-    row.style.justifyContent = "space-between";
-
-    const textDiv = document.createElement("div");
-    textDiv.textContent = n.text;
-    textDiv.style.flex = "1";
-
-    const star = document.createElement("span");
-    star.textContent = n.favorite ? "★" : "☆";
-    star.style.fontSize = "22px";
-    star.style.cursor = "pointer";
-    star.style.marginLeft = "12px";
-
-    star.onclick = (e) => {
-      e.stopPropagation();
-      n.favorite = !n.favorite;
-      saveNotes(notes);
-      showNotes(currentCategory);
-    };
-
-    row.appendChild(textDiv);
-    row.appendChild(star);
-    div.appendChild(row);
-
-    div.onclick = () => {
-      const realIndex = notes.indexOf(filtered[idx]);
-      openEditor(false, realIndex);
-    };
-
-    notesList.appendChild(div);
-  });
-}
-
-/* Editor */
-function openEditor(isNew, index) {
-  noteEditor.style.display = "flex";
-  if (isNew) {
-    noteText.value = "";
-    selectedColor = "#ffffff";
-    editingIndex = null;
-  } else {
-    const notes = loadNotes();
-    const n = notes[index];
-    noteText.value = n.text;
-    selectedColor = n.color || "#ffffff";
-    editingIndex = index;
-  }
-}
-cancelBtn.onclick = () => noteEditor.style.display = "none";
-
-saveBtn.onclick = () => {
-  const text = noteText.value.trim();
-  if (!text) { noteEditor.style.display = "none"; return; }
-
-  const notes = loadNotes();
-  if (editingIndex === null) {
-    let cat = currentCategory;
-    if (cat === "alle") {
-      cat = "personlich"; // categoria di default se sei su "Alle"
+  // LocalStorage helpers
+  function loadNotes() {
+    try {
+      return JSON.parse(localStorage.getItem("notes") || "[]");
+    } catch {
+      return [];
     }
-    notes.push({
-      text,
-      color: selectedColor,
-      category: cat,
-      favorite: false
-    });
-  } else {
-    notes[editingIndex].text = text;
-    notes[editingIndex].color = selectedColor;
   }
-  saveNotes(notes);
-  noteEditor.style.display = "none";
-  showNotes(currentCategory);
-};
+  function saveNotes(arr) {
+    localStorage.setItem("notes", JSON.stringify(arr));
+  }
 
-/* Colori */
-document.querySelectorAll(".colorDot").forEach(dot => {
-  dot.onclick = () => {
-    selectedColor = dot.dataset.color;
-    document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
-    dot.classList.add("selected");
+  // Mostra note
+  function showNotes(cat) {
+    const notes = loadNotes();
+
+    const filtered =
+      cat === "alle"
+        ? notes
+        : cat === "favorite"
+          ? notes.filter(n => n.favorite)
+          : notes.filter(n => n.category === cat);
+
+    notesList.innerHTML = "";
+    notesList.style.display = filtered.length ? "block" : "none";
+
+    filtered.forEach((n, idx) => {
+      const div = document.createElement("div");
+      div.className = "noteItem";
+      div.style.background = n.color || "#ffffff";
+
+      const row = document.createElement("div");
+      row.style.display = "flex";
+      row.style.justifyContent = "space-between";
+
+      const textDiv = document.createElement("div");
+      textDiv.textContent = n.text;
+      textDiv.style.flex = "1";
+
+      const star = document.createElement("span");
+      star.textContent = n.favorite ? "★" : "☆";
+      star.style.fontSize = "22px";
+      star.style.cursor = "pointer";
+      star.style.marginLeft = "12px";
+
+      star.onclick = (e) => {
+        e.stopPropagation();
+        n.favorite = !n.favorite;
+        const allNotes = loadNotes();
+        const realIndex = allNotes.indexOf(filtered[idx]);
+        if (realIndex !== -1) {
+          allNotes[realIndex].favorite = n.favorite;
+          saveNotes(allNotes);
+        }
+        showNotes(currentCategory);
+      };
+
+      row.appendChild(textDiv);
+      row.appendChild(star);
+      div.appendChild(row);
+
+      div.onclick = () => {
+        const allNotes = loadNotes();
+        const realIndex = allNotes.indexOf(filtered[idx]);
+        openEditor(false, realIndex);
+      };
+
+      notesList.appendChild(div);
+    });
+  }
+
+  // Editor
+  function openEditor(isNew, index) {
+    noteEditor.style.display = "flex";
+    if (isNew) {
+      noteText.value = "";
+      selectedColor = "#ffffff";
+      editingIndex = null;
+    } else {
+      const notes = loadNotes();
+      const n = notes[index];
+      if (!n) return;
+      noteText.value = n.text;
+      selectedColor = n.color || "#ffffff";
+      editingIndex = index;
+    }
+  }
+
+  cancelBtn.onclick = () => {
+    noteEditor.style.display = "none";
   };
-});
 
-/* Categorie */
-document.querySelectorAll(".cat").forEach(cat => {
-  cat.onclick = () => {
-    currentCategory = cat.dataset.cat;
+  saveBtn.onclick = () => {
+    const text = noteText.value.trim();
+    if (!text) {
+      noteEditor.style.display = "none";
+      return;
+    }
+
+    const notes = loadNotes();
+    if (editingIndex === null) {
+      let cat = currentCategory;
+      if (cat === "alle") {
+        cat = "personlich"; // default se sei su "Alle"
+      }
+      notes.push({
+        text,
+        color: selectedColor,
+        category: cat,
+        favorite: false
+      });
+    } else {
+      if (!notes[editingIndex]) {
+        noteEditor.style.display = "none";
+        return;
+      }
+      notes[editingIndex].text  = text;
+      notes[editingIndex].color = selectedColor;
+    }
+    saveNotes(notes);
+    noteEditor.style.display = "none";
     showNotes(currentCategory);
   };
-});
 
-/* Backup */
-backupBtn.onclick = () => backupPopup.style.display = "flex";
-backupCloseBtn.onclick = () => backupPopup.style.display = "none";
+  // Colori
+  document.querySelectorAll(".colorDot").forEach(dot => {
+    dot.addEventListener("click", () => {
+      selectedColor = dot.dataset.color;
+      document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
+      dot.classList.add("selected");
+    });
+  });
 
-backupExportBtn.onclick = () => {
-  const notes = localStorage.getItem("notes") || "[]";
-  const blob = new Blob([notes], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "backup-notes.json";
-  a.click();
-};
+  // Categorie
+  document.querySelectorAll(".cat").forEach(catEl => {
+    catEl.addEventListener("click", () => {
+      currentCategory = catEl.dataset.cat;
+      showNotes(currentCategory);
+    });
+  });
 
-backupFile.onchange = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const data = JSON.parse(ev.target.result);
-      if (Array.isArray(data)) {
-        saveNotes(data);
-        showNotes(currentCategory);
-      }
-    } catch {}
+  // Backup
+  backupBtn.onclick = () => {
+    backupPopup.style.display = "flex";
   };
-  reader.readAsText(file);
-};
+  backupCloseBtn.onclick = () => {
+    backupPopup.style.display = "none";
+  };
 
-/* Lingua (placeholder per non rompere gli onclick) */
-function setLang(lang) {
-  // qui puoi aggiungere la logica in futuro
-}
-function closeLangPopup() {
-  langPopup.style.display = "none";
-}
+  backupExportBtn.onclick = () => {
+    const notes = localStorage.getItem("notes") || "[]";
+    const blob = new Blob([notes], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "backup-notes.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
-/* Init */
-document.addEventListener("DOMContentLoaded", () => {
+  backupFile.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (Array.isArray(data)) {
+          saveNotes(data);
+          showNotes(currentCategory);
+        }
+      } catch (err) {
+        console.log("Backup import error", err);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  // Lingua (placeholder)
+  langBtn.onclick = () => {
+    langPopup.style.display = "flex";
+  };
+  langCloseBtn.onclick = () => {
+    langPopup.style.display = "none";
+  };
+  document.querySelectorAll(".langChoice[data-lang]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      // qui in futuro puoi cambiare testi, per ora non fa nulla
+      langPopup.style.display = "none";
+    });
+  });
+
+  // Tema (semplice toggle classe)
+  themeToggle.onclick = () => {
+    document.body.classList.toggle("dark");
+  };
+
+  // Nuova nota
+  addNoteBtn.onclick = () => {
+    openEditor(true, null);
+  };
+
+  // Init
   showNotes(currentCategory);
-  // opzionale: chiudi popup lingua all'avvio
   langPopup.style.display = "none";
+  backupPopup.style.display = "none";
 });
 </script>
 
