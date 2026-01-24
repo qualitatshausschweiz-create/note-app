@@ -4,7 +4,6 @@
     --card: #ffffff;
     --text: #000000;
 
-    /* Banner adattivo */
     --banner-bg: rgba(0,0,0,0.85);
     --banner-text: #ffffff;
   }
@@ -51,7 +50,7 @@
     color: var(--text);
   }
 
-  /* BANNER MESSAGGI */
+  /* BANNER */
   #bannerMsg {
     position: fixed;
     top: -60px;
@@ -125,7 +124,7 @@
     z-index: 1100;
   }
 
-  /* EDITOR NOTE */
+  /* EDITOR */
   #noteEditor {
     position: fixed;
     top: 0; left: 0;
@@ -159,6 +158,7 @@
     border: none;
     color: var(--text);
     cursor: pointer;
+    display: none;
   }
 
   #noteText {
@@ -211,7 +211,7 @@
     border-color: #000;
   }
 
-  /* POPUP LINGUA + BACKUP */
+  /* POPUP */
   #langPopup,
   #backupPopup {
     position: fixed;
@@ -245,7 +245,6 @@
     cursor: pointer;
   }
 
-  /* BACKUP */
   .backupBtnRow {
     display: flex;
     flex-direction: column;
@@ -269,25 +268,20 @@
   #autoRestoreBtn { background: #ff9500; color: white; }
   #manualRestoreBtn { background: #34c759; color: white; }
   #backupCloseBtn { background: #ccc; color: black; }
-
 </style>
 <body>
 <div id="app">
 
-  <!-- Banner messaggi (nuovo, invisibile finché non usato) -->
   <div id="bannerMsg"></div>
 
-  <!-- HEADER -->
   <header>
     <div id="appTitle">Notizen</div>
-
     <div>
       <button id="langBtn" class="iconBtn">🌐</button>
       <button id="backupBtn" class="iconBtn">🛟</button>
     </div>
   </header>
 
-  <!-- CATEGORIE -->
   <div id="categories">
     <div class="cat" data-cat="favorite"><span class="catLabel">Favoriten</span></div>
     <div class="cat" data-cat="alle"><span class="catLabel">Alle</span></div>
@@ -298,28 +292,21 @@
     <div class="cat" data-cat="personlich"><span class="catLabel">Persönlich</span></div>
   </div>
 
-  <!-- LISTA NOTE -->
   <div id="notesList"></div>
 
-  <!-- BOTTONE + -->
   <button id="addNoteBtn">+</button>
 
 </div>
 
-<!-- ============================
-     EDITOR NOTE (identico + icona 🗑)
-============================ -->
 <div id="noteEditor">
   <div id="noteEditorBox">
 
-    <!-- Icona elimina nota (nuova) -->
-    <button id="deleteNoteBtn" style="display:none;">🗑</button>
+    <button id="deleteNoteBtn">🗑</button>
 
     <h2 id="editorTitle">Neue Notiz</h2>
 
     <textarea id="noteText"></textarea>
 
-    <!-- Colori -->
     <div id="colorRow">
       <div class="colorDot" data-color="#ffffff" style="background:#ffffff;"></div>
       <div class="colorDot" data-color="#ffeb3b" style="background:#ffeb3b;"></div>
@@ -329,7 +316,6 @@
       <div class="colorDot" data-color="#e91e63" style="background:#e91e63;"></div>
     </div>
 
-    <!-- Pulsanti -->
     <div id="editorButtons">
       <button id="cancelBtn">Abbrechen</button>
       <button id="saveBtn">Speichern</button>
@@ -338,9 +324,6 @@
   </div>
 </div>
 
-<!-- ============================
-     POPUP LINGUA
-============================ -->
 <div id="langPopup">
   <div id="langBox">
     <h2>Sprache</h2>
@@ -351,9 +334,6 @@
   </div>
 </div>
 
-<!-- ============================
-     POPUP BACKUP
-============================ -->
 <div id="backupPopup">
   <div id="backupBox">
     <h2>Sicherung</h2>
@@ -369,36 +349,24 @@
   </div>
 </div>
 <script>
-/* ============================================
-   VARIABILI GLOBALI
-============================================ */
 let notes = [];
 let currentNoteId = null;
 let currentLang = localStorage.getItem("lang") || "de";
 
-/* ============================================
-   BANNER MESSAGGI (nuovo)
-============================================ */
+/* BANNER */
 function showBanner(msg) {
   const b = document.getElementById("bannerMsg");
   b.textContent = msg;
   b.classList.add("show");
-
-  setTimeout(() => {
-    b.classList.remove("show");
-  }, 1800);
+  setTimeout(() => b.classList.remove("show"), 1800);
 }
 
-/* ============================================
-   BACKUP AUTOMATICO (nuovo)
-============================================ */
+/* BACKUP AUTO */
 function autoBackup() {
   localStorage.setItem("notes_backup_auto", JSON.stringify(notes));
 }
 
-/* ============================================
-   RIPRISTINO AUTOMATICO (nuovo)
-============================================ */
+/* RIPRISTINO AUTO */
 function autoRestore() {
   const saved = localStorage.getItem("notes_backup_auto");
   if (saved) {
@@ -407,21 +375,16 @@ function autoRestore() {
   }
 }
 
-/* ============================================
-   STORAGE NOTE
-============================================ */
+/* STORAGE */
 function saveNotes() {
   localStorage.setItem("notes", JSON.stringify(notes));
-  autoBackup(); // nuovo
+  autoBackup();
 }
-
 function loadNotes() {
   return JSON.parse(localStorage.getItem("notes") || "[]");
 }
 
-/* ============================================
-   MOSTRA NOTE
-============================================ */
+/* MOSTRA NOTE */
 function showNotes(filter = "alle") {
   const list = document.getElementById("notesList");
   list.innerHTML = "";
@@ -438,18 +401,26 @@ function showNotes(filter = "alle") {
     const div = document.createElement("div");
     div.className = "noteItem";
     div.style.background = note.color;
+
     div.innerHTML = `
       <div>${note.text.substring(0, 80)}</div>
-      <div style="font-size:18px;margin-top:6px;">${note.favorite ? "⭐" : "☆"}</div>
+      <div class="favBtn" style="font-size:18px;margin-top:6px;cursor:pointer;">
+        ${note.favorite ? "⭐" : "☆"}
+      </div>
     `;
+
+    div.querySelector(".favBtn").onclick = (e) => {
+      e.stopPropagation();
+      toggleFavorite(note.id);
+    };
+
     div.onclick = () => openEditor(note.id);
+
     list.appendChild(div);
   });
 }
 
-/* ============================================
-   APRI EDITOR
-============================================ */
+/* APRI EDITOR */
 function openEditor(id = null) {
   currentNoteId = id;
 
@@ -458,14 +429,12 @@ function openEditor(id = null) {
   const delBtn = document.getElementById("deleteNoteBtn");
 
   if (id === null) {
-    // nuova nota
     title.textContent = LANG[currentLang].newNote;
     document.getElementById("noteText").value = "";
     delBtn.style.display = "none";
   } else {
-    // modifica nota
     const note = notes.find(n => n.id === id);
-    title.textContent = "Modifica nota"; // multilingua dopo
+    title.textContent = LANG[currentLang].editNote;
     document.getElementById("noteText").value = note.text;
     delBtn.style.display = "block";
   }
@@ -473,9 +442,7 @@ function openEditor(id = null) {
   editor.style.display = "flex";
 }
 
-/* ============================================
-   SALVA NOTA
-============================================ */
+/* SALVA */
 function saveNote() {
   const text = document.getElementById("noteText").value.trim();
   if (!text) {
@@ -484,7 +451,6 @@ function saveNote() {
   }
 
   if (currentNoteId === null) {
-    // nuova nota
     notes.push({
       id: Date.now(),
       text,
@@ -493,7 +459,6 @@ function saveNote() {
       favorite: false
     });
   } else {
-    // modifica nota
     const note = notes.find(n => n.id === currentNoteId);
     note.text = text;
   }
@@ -503,9 +468,7 @@ function saveNote() {
   closeEditor();
 }
 
-/* ============================================
-   ELIMINA NOTA (nuovo)
-============================================ */
+/* ELIMINA */
 function deleteNote() {
   if (!confirm("Sei sicuro?")) return;
 
@@ -514,12 +477,10 @@ function deleteNote() {
   showNotes();
   closeEditor();
 
-  showBanner("Nota eliminata");
+  showBanner(LANG[currentLang].msg.deleted);
 }
 
-/* ============================================
-   PREFERITI (nuovo messaggio)
-============================================ */
+/* PREFERITI */
 function toggleFavorite(id) {
   const note = notes.find(n => n.id === id);
   note.favorite = !note.favorite;
@@ -527,50 +488,31 @@ function toggleFavorite(id) {
   saveNotes();
   showNotes();
 
-  if (note.favorite) {
-    showBanner("Aggiunto ai preferiti");
-  } else {
-    showBanner("Rimosso dai preferiti");
-  }
+  showBanner(note.favorite ? LANG[currentLang].msg.favAdd : LANG[currentLang].msg.favRemove);
 }
 
-/* ============================================
-   CHIUDI EDITOR
-============================================ */
+/* CHIUDI */
 function closeEditor() {
   document.getElementById("noteEditor").style.display = "none";
   currentNoteId = null;
 }
 
-/* ============================================
-   EVENTI
-============================================ */
+/* EVENTI */
 document.getElementById("addNoteBtn").onclick = () => openEditor();
 document.getElementById("cancelBtn").onclick = closeEditor;
 document.getElementById("saveBtn").onclick = saveNote;
 document.getElementById("deleteNoteBtn").onclick = deleteNote;
 
-/* ============================================
-   CATEGORIE
-============================================ */
 document.querySelectorAll(".cat").forEach(btn => {
-  btn.onclick = () => {
-    const cat = btn.dataset.cat;
-    showNotes(cat);
-  };
+  btn.onclick = () => showNotes(btn.dataset.cat);
 });
 
-/* ============================================
-   AVVIO APP
-============================================ */
+/* AVVIO */
 notes = loadNotes();
-autoRestore(); // nuovo
+autoRestore();
 showNotes();
 </script>
 <script>
-/* ============================================
-   LINGUE (uguale al tuo originale)
-============================================ */
 const LANG = {
   de: {
     appTitle: "Notizen",
@@ -615,195 +557,3 @@ const LANG = {
       alle: "Tutte",
       arbeit: "Lavoro",
       einkauf: "Spesa",
-      zuhause: "Casa",
-      ideen: "Idee",
-      personlich: "Personale"
-    },
-    backup: {
-      title: "Backup",
-      autoBackup: "Backup automatico",
-      manualBackup: "Backup manuale",
-      autoRestore: "Ripristino automatico",
-      manualRestore: "Ripristino manuale",
-      close: "Chiudi"
-    },
-    msg: {
-      favAdd: "Aggiunto ai preferiti",
-      favRemove: "Rimosso dai preferiti",
-      deleted: "Nota eliminata"
-    }
-  },
-
-  en: {
-    appTitle: "Notes",
-    newNote: "New Note",
-    editNote: "Edit Note",
-    cancel: "Cancel",
-    save: "Save",
-    chooseCategory: "Choose category",
-    categories: {
-      favorite: "Favorites",
-      alle: "All",
-      arbeit: "Work",
-      einkauf: "Shopping",
-      zuhause: "Home",
-      ideen: "Ideas",
-      personlich: "Personal"
-    },
-    backup: {
-      title: "Backup",
-      autoBackup: "Automatic Backup",
-      manualBackup: "Manual Backup",
-      autoRestore: "Automatic Restore",
-      manualRestore: "Manual Restore",
-      close: "Close"
-    },
-    msg: {
-      favAdd: "Added to favorites",
-      favRemove: "Removed from favorites",
-      deleted: "Note deleted"
-    }
-  },
-
-  es: {
-    appTitle: "Notas",
-    newNote: "Nueva nota",
-    editNote: "Editar nota",
-    cancel: "Cancelar",
-    save: "Guardar",
-    chooseCategory: "Elegir categoría",
-    categories: {
-      favorite: "Favoritos",
-      alle: "Todas",
-      arbeit: "Trabajo",
-      einkauf: "Compras",
-      zuhause: "Casa",
-      ideen: "Ideas",
-      personlich: "Personal"
-    },
-    backup: {
-      title: "Copia de seguridad",
-      autoBackup: "Copia automática",
-      manualBackup: "Copia manual",
-      autoRestore: "Restauración automática",
-      manualRestore: "Restauración manual",
-      close: "Cerrar"
-    },
-    msg: {
-      favAdd: "Añadido a favoritos",
-      favRemove: "Eliminado de favoritos",
-      deleted: "Nota eliminada"
-    }
-  }
-};
-
-/* ============================================
-   APPLICA LINGUA
-============================================ */
-function applyLanguage(lang) {
-  currentLang = lang;
-  const L = LANG[lang];
-
-  document.getElementById("appTitle").textContent = L.appTitle;
-  document.getElementById("cancelBtn").textContent = L.cancel;
-  document.getElementById("saveBtn").textContent = L.save;
-  document.getElementById("categorySheetTitle").textContent = L.chooseCategory;
-
-  document.querySelectorAll(".cat").forEach(btn => {
-    const key = btn.dataset.cat;
-    btn.querySelector(".catLabel").textContent = L.categories[key];
-  });
-
-  document.querySelector("#backupBox h2").textContent = L.backup.title;
-  document.querySelector("#autoBackupBtn span").textContent = L.backup.autoBackup;
-  document.querySelector("#manualBackupBtn span").textContent = L.backup.manualBackup;
-  document.querySelector("#autoRestoreBtn span").textContent = L.backup.autoRestore;
-  document.querySelector("#manualRestoreBtn span").textContent = L.backup.manualRestore;
-  document.querySelector("#backupCloseBtn span").textContent = L.backup.close;
-
-  localStorage.setItem("lang", lang);
-  showNotes();
-}
-
-/* ============================================
-   POPUP LINGUA
-============================================ */
-document.getElementById("langBtn").onclick = () => {
-  document.getElementById("langPopup").style.display = "flex";
-};
-
-document.querySelectorAll(".langChoice").forEach(btn => {
-  btn.onclick = () => {
-    applyLanguage(btn.dataset.lang);
-    document.getElementById("langPopup").style.display = "none";
-  };
-});
-
-document.getElementById("langPopup").onclick = e => {
-  if (e.target.id === "langPopup") {
-    document.getElementById("langPopup").style.display = "none";
-  }
-};
-
-/* ============================================
-   POPUP BACKUP
-============================================ */
-document.getElementById("backupBtn").onclick = () => {
-  document.getElementById("backupPopup").style.display = "flex";
-};
-
-document.getElementById("backupCloseBtn").onclick = () => {
-  document.getElementById("backupPopup").style.display = "none";
-};
-
-document.getElementById("backupPopup").onclick = e => {
-  if (e.target.id === "backupPopup") {
-    document.getElementById("backupPopup").style.display = "none";
-  }
-};
-
-/* ============================================
-   BACKUP MANUALE
-============================================ */
-document.getElementById("manualBackupBtn").onclick = () => {
-  localStorage.setItem("notes_backup_manual", JSON.stringify(notes));
-  showBanner("Backup salvato");
-};
-
-/* ============================================
-   RIPRISTINO MANUALE
-============================================ */
-document.getElementById("manualRestoreBtn").onclick = () => {
-  const saved = localStorage.getItem("notes_backup_manual");
-  if (saved) {
-    notes = JSON.parse(saved);
-    saveNotes();
-    showNotes();
-    showBanner("Backup ripristinato");
-  }
-};
-
-/* ============================================
-   BACKUP AUTOMATICO (toggle)
-============================================ */
-document.getElementById("autoBackupBtn").onclick = () => {
-  showBanner("Backup automatico attivo");
-};
-
-/* ============================================
-   RIPRISTINO AUTOMATICO (toggle)
-============================================ */
-document.getElementById("autoRestoreBtn").onclick = () => {
-  autoRestore();
-  showNotes();
-  showBanner("Ripristino automatico eseguito");
-};
-
-/* ============================================
-   AVVIO APP
-============================================ */
-applyLanguage(currentLang);
-notes = loadNotes();
-autoRestore();
-showNotes();
-</script>
