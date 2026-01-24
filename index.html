@@ -208,24 +208,62 @@
       color: #fff;
     }
 
-    /* COLORI */
+    /* SELETTORE PALETTE + COLORI */
+    #paletteSelector {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+    .paletteBtn {
+      padding: 4px 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      background: var(--card);
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.25s ease, transform 0.2s ease, color 0.2s ease;
+    }
+    .paletteBtn.active {
+      background: #007aff;
+      color: #fff;
+      transform: scale(1.05);
+    }
+    .paletteBtn:active {
+      transform: scale(0.9);
+    }
+
     #colorRow {
       display: flex;
       gap: 8px;
       margin-top: 4px;
+      flex-wrap: wrap;
     }
+
     .colorDot {
       width: 22px;
       height: 22px;
       border-radius: 50%;
       border: 2px solid transparent;
       cursor: pointer;
+      transition: transform 0.25s ease, opacity 0.25s ease, box-shadow 0.25s ease;
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    .colorDot.show {
+      opacity: 1;
+      transform: translateY(0);
     }
     .colorDot.selected {
-      border-color: #000;
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.4);
+      transform: scale(1.15);
+    }
+    .colorDot:active {
+      transform: scale(0.85);
+      opacity: 0.7;
     }
 
-    /* POPUP */
+    /* POPUP LINGUA / BACKUP */
     #langPopup,
     #backupPopup {
       position: fixed;
@@ -293,6 +331,7 @@
     <header>
       <div id="appTitle">Notizen</div>
       <div>
+        <button id="themeBtn" class="iconBtn">🌙</button>
         <button id="langBtn" class="iconBtn">🌐</button>
         <button id="backupBtn" class="iconBtn">🛟</button>
       </div>
@@ -323,14 +362,15 @@
 
       <textarea id="noteText"></textarea>
 
-      <div id="colorRow">
-        <div class="colorDot" data-color="#ffffff" style="background:#ffffff;"></div>
-        <div class="colorDot" data-color="#ffeb3b" style="background:#ffeb3b;"></div>
-        <div class="colorDot" data-color="#ff9800" style="background:#ff9800;"></div>
-        <div class="colorDot" data-color="#4caf50" style="background:#4caf50;"></div>
-        <div class="colorDot" data-color="#2196f3" style="background:#2196f3;"></div>
-        <div class="colorDot" data-color="#e91e63" style="background:#e91e63;"></div>
+      <div id="paletteSelector">
+        <span style="font-size:14px; opacity:0.7;">Palette:</span>
+        <button class="paletteBtn" data-pal="warm">Caldi</button>
+        <button class="paletteBtn" data-pal="cool">Freddi</button>
+        <button class="paletteBtn" data-pal="pastel">Pastello</button>
+        <button class="paletteBtn" data-pal="mix">Mix</button>
       </div>
+
+      <div id="colorRow"></div>
 
       <div id="editorButtons">
         <button id="cancelBtn">Abbrechen</button>
@@ -367,11 +407,19 @@
     </div>
   </div>
 
-  <!-- PARTE C — LOGICA NOTE -->
+  <!-- PARTE C + D — LOGICA NOTE, LINGUE, PALETTE, TEMA -->
   <script>
     let notes = [];
     let currentNoteId = null;
     let currentLang = localStorage.getItem("lang") || "de";
+
+    /* PALETTE */
+    const PALETTES = {
+      warm: ["#FFE4E1", "#FFD166", "#FF8C42", "#FFB5A7", "#F4A261", "#E76F51", "#E63946"],
+      cool: ["#DDE7F2", "#CDE7F0", "#A8DADC", "#457B9D", "#3A86FF", "#2A9D8F", "#264653"],
+      pastel: ["#FDE2E4", "#E2F0CB", "#DDE7F2", "#FFF1C1", "#E0F7FA", "#E8F5E9", "#F7EDE2"],
+      mix: ["#FDE2E4", "#E2F0CB", "#DDE7F2", "#FFD166", "#FF8C42", "#3A86FF", "#E63946"]
+    };
 
     /* BANNER */
     function showBanner(msg) {
@@ -386,7 +434,6 @@
       localStorage.setItem("notes_backup_auto", JSON.stringify(notes));
     }
 
-    /* RIPRISTINO AUTO */
     function autoRestore() {
       const saved = localStorage.getItem("notes_backup_auto");
       if (saved) {
@@ -430,20 +477,18 @@
           </div>
         `;
 
-        // click sulla stellina
         div.querySelector(".favBtn").onclick = (e) => {
           e.stopPropagation();
           toggleFavorite(note.id);
         };
 
-        // apri editor
         div.onclick = () => openEditor(note.id);
 
         list.appendChild(div);
       });
     }
 
-    /* APRI EDITOR */
+    /* EDITOR */
     function openEditor(id = null) {
       currentNoteId = id;
 
@@ -455,18 +500,22 @@
         title.textContent = LANG[currentLang].newNote;
         document.getElementById("noteText").value = "";
         delBtn.style.display = "none";
+        document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
       } else {
         const note = notes.find(n => n.id === id);
         if (!note) return;
         title.textContent = LANG[currentLang].editNote;
         document.getElementById("noteText").value = note.text;
         delBtn.style.display = "block";
+
+        document.querySelectorAll(".colorDot").forEach(d => {
+          d.classList.toggle("selected", d.dataset.color === note.color);
+        });
       }
 
       editor.style.display = "flex";
     }
 
-    /* SALVA */
     function saveNote() {
       const text = document.getElementById("noteText").value.trim();
       if (!text) {
@@ -474,11 +523,15 @@
         return;
       }
 
+      let selectedColor = "#ffffff";
+      const selectedDot = document.querySelector(".colorDot.selected");
+      if (selectedDot) selectedColor = selectedDot.dataset.color;
+
       if (currentNoteId === null) {
         notes.push({
           id: Date.now(),
           text,
-          color: "#ffffff",
+          color: selectedColor,
           category: "alle",
           favorite: false
         });
@@ -486,6 +539,7 @@
         const note = notes.find(n => n.id === currentNoteId);
         if (note) {
           note.text = text;
+          note.color = selectedColor;
         }
       }
 
@@ -494,7 +548,6 @@
       closeEditor();
     }
 
-    /* ELIMINA */
     function deleteNote() {
       if (!confirm("Sei sicuro?")) return;
 
@@ -506,7 +559,6 @@
       showBanner(LANG[currentLang].msg.deleted);
     }
 
-    /* PREFERITI */
     function toggleFavorite(id) {
       const note = notes.find(n => n.id === id);
       if (!note) return;
@@ -519,25 +571,55 @@
       showBanner(note.favorite ? LANG[currentLang].msg.favAdd : LANG[currentLang].msg.favRemove);
     }
 
-    /* CHIUDI */
     function closeEditor() {
       document.getElementById("noteEditor").style.display = "none";
       currentNoteId = null;
     }
 
-    /* EVENTI */
-    document.getElementById("addNoteBtn").onclick = () => openEditor();
-    document.getElementById("cancelBtn").onclick = closeEditor;
-    document.getElementById("saveBtn").onclick = saveNote;
-    document.getElementById("deleteNoteBtn").onclick = deleteNote;
+    /* PALETTE + ANIMAZIONI */
+    function applyPalette(name) {
+      const row = document.getElementById("colorRow");
+      row.innerHTML = "";
 
-    document.querySelectorAll(".cat").forEach(btn => {
-      btn.onclick = () => showNotes(btn.dataset.cat);
-    });
-  </script>
+      PALETTES[name].forEach((color, index) => {
+        const dot = document.createElement("div");
+        dot.className = "colorDot";
+        dot.dataset.color = color;
+        dot.style.background = color;
 
-  <!-- PARTE D — LINGUE + BACKUP -->
-  <script>
+        row.appendChild(dot);
+
+        setTimeout(() => {
+          dot.classList.add("show");
+        }, index * 60);
+      });
+
+      document.querySelectorAll(".colorDot").forEach(dot => {
+        dot.onclick = () => {
+          const color = dot.dataset.color;
+
+          document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
+          dot.classList.add("selected");
+
+          if (currentNoteId !== null) {
+            const note = notes.find(n => n.id === currentNoteId);
+            if (note) {
+              note.color = color;
+              saveNotes();
+              showNotes();
+            }
+          }
+        };
+      });
+
+      document.querySelectorAll(".paletteBtn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.pal === name);
+      });
+
+      localStorage.setItem("palette", name);
+    }
+
+    /* LINGUE */
     const LANG = {
       de: {
         appTitle: "Notizen",
@@ -545,7 +627,6 @@
         editNote: "Notiz bearbeiten",
         cancel: "Abbrechen",
         save: "Speichern",
-        chooseCategory: "Kategorie wählen",
         categories: {
           favorite: "Favoriten",
           alle: "Alle",
@@ -569,14 +650,12 @@
           deleted: "Notiz gelöscht"
         }
       },
-
       it: {
         appTitle: "Note",
         newNote: "Nuova nota",
         editNote: "Modifica nota",
         cancel: "Annulla",
         save: "Salva",
-        chooseCategory: "Scegli categoria",
         categories: {
           favorite: "Preferiti",
           alle: "Tutte",
@@ -600,14 +679,12 @@
           deleted: "Nota eliminata"
         }
       },
-
       en: {
         appTitle: "Notes",
         newNote: "New Note",
         editNote: "Edit Note",
         cancel: "Cancel",
         save: "Save",
-        chooseCategory: "Choose category",
         categories: {
           favorite: "Favorites",
           alle: "All",
@@ -631,14 +708,12 @@
           deleted: "Note deleted"
         }
       },
-
       es: {
         appTitle: "Notas",
         newNote: "Nueva nota",
         editNote: "Editar nota",
         cancel: "Cancelar",
         save: "Guardar",
-        chooseCategory: "Elegir categoría",
         categories: {
           favorite: "Favoritos",
           alle: "Todas",
@@ -688,46 +763,55 @@
       showNotes();
     }
 
-    /* POPUP LINGUA */
+    /* TEMA CHIARO/SCURO */
+    function toggleTheme() {
+      const body = document.body;
+      const isDark = body.classList.toggle("dark");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+      document.getElementById("themeBtn").textContent = isDark ? "☀️" : "🌙";
+    }
+
+    /* EVENTI */
+    document.getElementById("addNoteBtn").onclick = () => openEditor();
+    document.getElementById("cancelBtn").onclick = closeEditor;
+    document.getElementById("saveBtn").onclick = saveNote;
+    document.getElementById("deleteNoteBtn").onclick = deleteNote;
+
+    document.querySelectorAll(".cat").forEach(btn => {
+      btn.onclick = () => showNotes(btn.dataset.cat);
+    });
+
     document.getElementById("langBtn").onclick = () => {
       document.getElementById("langPopup").style.display = "flex";
     };
-
     document.querySelectorAll(".langChoice").forEach(btn => {
       btn.onclick = () => {
         applyLanguage(btn.dataset.lang);
         document.getElementById("langPopup").style.display = "none";
       };
     });
-
     document.getElementById("langPopup").onclick = e => {
       if (e.target.id === "langPopup") {
         document.getElementById("langPopup").style.display = "none";
       }
     };
 
-    /* POPUP BACKUP */
     document.getElementById("backupBtn").onclick = () => {
       document.getElementById("backupPopup").style.display = "flex";
     };
-
     document.getElementById("backupCloseBtn").onclick = () => {
       document.getElementById("backupPopup").style.display = "none";
     };
-
     document.getElementById("backupPopup").onclick = e => {
       if (e.target.id === "backupPopup") {
         document.getElementById("backupPopup").style.display = "none";
       }
     };
 
-    /* BACKUP MANUALE */
     document.getElementById("manualBackupBtn").onclick = () => {
       localStorage.setItem("notes_backup_manual", JSON.stringify(notes));
       showBanner("Backup salvato");
     };
-
-    /* RIPRISTINO MANUALE */
     document.getElementById("manualRestoreBtn").onclick = () => {
       const saved = localStorage.getItem("notes_backup_manual");
       if (saved) {
@@ -737,22 +821,36 @@
         showBanner("Backup ripristinato");
       }
     };
-
-    /* BACKUP AUTO (toggle “finto” informativo) */
     document.getElementById("autoBackupBtn").onclick = () => {
       showBanner("Backup automatico attivo");
     };
-
-    /* RIPRISTINO AUTO (esegue autoRestore) */
     document.getElementById("autoRestoreBtn").onclick = () => {
       autoRestore();
       showNotes();
       showBanner("Ripristino automatico eseguito");
     };
 
+    document.getElementById("themeBtn").onclick = toggleTheme;
+
+    document.querySelectorAll(".paletteBtn").forEach(btn => {
+      btn.onclick = () => {
+        applyPalette(btn.dataset.pal);
+      };
+    });
+
     /* AVVIO APP */
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark");
+      document.getElementById("themeBtn").textContent = "☀️";
+    }
+
     notes = loadNotes();
     autoRestore();
+
+    const savedPalette = localStorage.getItem("palette") || "mix";
+    applyPalette(savedPalette);
+
     applyLanguage(currentLang);
     showNotes();
   </script>
