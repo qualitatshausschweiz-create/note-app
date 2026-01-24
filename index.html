@@ -216,6 +216,7 @@
     }
   </style>
 </head>
+
 <body>
 
 <header>
@@ -327,6 +328,7 @@
 
   </div>
 </div>
+
 <script>
 let editingIndex = null;
 let currentCategory = null;
@@ -494,4 +496,19 @@ function getTimestamp() {
 
 /* Backup automatico */
 function saveAutoBackup() {
-  const notes = JSON.parse(localStorage.getItem("notes") || "
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+  const data = { timestamp: getTimestamp(), notes };
+  localStorage.setItem("autoBackup", JSON.stringify(data));
+  updateAutoBackupLabel();
+}
+
+function updateAutoBackupLabel() {
+  const t = tr[currentLang];
+  const auto = localStorage.getItem("autoBackup");
+  const label = document.getElementById("autoBackupLabel");
+  if (!label) return;
+  if (!auto) {
+    label.textContent = t.autoBackupLabel + " –";
+    return;
+  }
+  const parsed = JSON
