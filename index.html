@@ -16,6 +16,7 @@
       --text: #fff;
       --card: #2c2c2e;
     }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
       margin: 0;
@@ -30,17 +31,20 @@
       background: var(--card);
       border-bottom: 1px solid #444;
     }
+
     #headerTitleRow {
       text-align: center;
       font-size: 22px;
       font-weight: 600;
       margin-bottom: 8px;
     }
+
     #headerControlsRow {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+
     #themeToggle, #addNoteBtn, #langBtn {
       font-size: 20px;
       padding: 6px 12px;
@@ -51,12 +55,22 @@
       cursor: pointer;
     }
 
+    /* GRID CATEGORIE */
     .grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 22px;
       padding: 20px;
     }
+
+    /* FIX DEFINITIVO PER iPHONE */
+    #categories, .cat, .circle, .cat * {
+      pointer-events: auto;
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
     .cat {
       background: var(--card);
       padding: 20px;
@@ -64,20 +78,13 @@
       text-align: center;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       cursor: pointer;
-
-      /* FIX iPhone */
-      touch-action: manipulation;
-      -webkit-user-select: none;
-      user-select: none;
     }
+
     .circle {
       width: 70px;
       height: 70px;
       border-radius: 50%;
       margin: 0 auto 10px;
-
-      /* FIX iPhone */
-      touch-action: manipulation;
     }
 
     .arbeit { background: #007aff; }
@@ -87,10 +94,12 @@
     .personlich { background: #ffffff; border: 2px solid #ccc; }
     .favorite { background: #ffd700; }
 
+    /* LISTA NOTE */
     #notesList {
       display: none;
       padding: 20px;
     }
+
     .noteItem {
       padding: 15px;
       margin-bottom: 12px;
@@ -100,6 +109,7 @@
       white-space: pre-wrap;
     }
 
+    /* EDITOR */
     #noteEditor {
       position: fixed;
       top: 0; left: 0;
@@ -110,12 +120,14 @@
       align-items: center;
       z-index: 900;
     }
+
     #editorBox {
       background: var(--card);
       width: 90%;
       padding: 20px;
       border-radius: 16px;
     }
+
     textarea {
       width: 100%;
       height: 150px;
@@ -127,12 +139,14 @@
       color: var(--text);
     }
 
+    /* COLORI */
     #colorPicker {
       display: flex;
       gap: 12px;
       margin: 15px 0;
       justify-content: center;
     }
+
     .colorDot {
       width: 34px;
       height: 34px;
@@ -141,11 +155,13 @@
       cursor: pointer;
       transition: 0.15s;
     }
+
     .colorDot.selected {
       border: 3px solid #007aff;
       transform: scale(1.15);
     }
 
+    /* SALVAGENTE 🛟 */
     #backupBtn {
       position: fixed;
       bottom: 22px;
@@ -172,6 +188,7 @@
       align-items: center;
       z-index: 1000;
     }
+
     #backupBox, #langBox {
       background: var(--card);
       width: 90%;
@@ -180,7 +197,30 @@
       border-radius: 18px;
       text-align: center;
     }
-    .backupBtn, .langChoice {
+
+    /* BOTTONI SALVAGENTE VERSIONE B */
+    .backupBtn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      margin-top: 12px;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .autoBackup { background: #34c759; color: white; }
+    .manualBackup { background: #007aff; color: white; }
+    .autoRestore { background: #ff9500; color: white; }
+    .manualRestore { background: #af52de; color: white; }
+    .closeBtn { background: #ccc; color: black; }
+
+    /* LINGUA */
+    .langChoice {
       width: 100%;
       padding: 12px;
       border-radius: 12px;
@@ -189,10 +229,6 @@
       font-size: 17px;
       cursor: pointer;
     }
-    .greenBtn { background: #34c759; color: white; }
-    .blueBtn { background: #007aff; color: white; }
-    .orangeBtn { background: #ff9500; color: white; }
-    .grayBtn { background: #ccc; color: black; }
   </style>
 </head>
 <body>
@@ -209,6 +245,7 @@
   </div>
 </header>
 
+<!-- POPUP LINGUA -->
 <div id="langPopup">
   <div id="langBox">
     <h2>Sprache / Language / Lingua / Idioma</h2>
@@ -220,6 +257,7 @@
   </div>
 </div>
 
+<!-- CATEGORIE -->
 <div class="grid" id="categories">
   <div class="cat" data-cat="favorite">
     <div class="circle favorite"></div>
@@ -257,8 +295,10 @@
   </div>
 </div>
 
+<!-- LISTA NOTE -->
 <div id="notesList"></div>
 
+<!-- EDITOR NOTE -->
 <div id="noteEditor">
   <div id="editorBox">
     <h3 id="editorTitle">Neue Notiz</h3>
@@ -279,37 +319,66 @@
   </div>
 </div>
 
+<!-- SALVAGENTE 🛟 -->
 <button id="backupBtn">🛟</button>
 
+<!-- POPUP BACKUP VERSIONE B -->
 <div id="backupPopup">
   <div id="backupBox">
     <h2>Sicherung</h2>
 
-    <button id="backupExportBtn" class="backupBtn greenBtn">Exportieren</button>
-    <label for="backupFile" class="backupBtn blueBtn">Importieren</label>
+    <button id="autoBackupBtn" class="backupBtn autoBackup">
+      🟢 <span>Backup automatisch</span>
+    </button>
 
-    <button id="backupCloseBtn" class="backupBtn grayBtn">Schliessen</button>
+    <button id="manualBackupBtn" class="backupBtn manualBackup">
+      🔵 <span>Backup manuell</span>
+    </button>
 
+    <button id="autoRestoreBtn" class="backupBtn autoRestore">
+      🟠 <span>Wiederherstellung automatisch</span>
+    </button>
+
+    <button id="manualRestoreBtn" class="backupBtn manualRestore">
+      🟣 <span>Wiederherstellung manuell</span>
+    </button>
+
+    <button id="backupCloseBtn" class="backupBtn closeBtn">
+      ⚪ <span>Schliessen</span>
+    </button>
+
+    <!-- FILE INPUT NASCOSTO -->
     <input type="file" id="backupFile" accept="application/json"
            style="opacity:0; position:absolute; width:1px; height:1px;">
   </div>
 </div>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  // Riferimenti DOM
+
+  /* -------------------------
+     RIFERIMENTI DOM
+  ------------------------- */
   const notesList       = document.getElementById("notesList");
   const noteEditor      = document.getElementById("noteEditor");
   const noteText        = document.getElementById("noteText");
   const cancelBtn       = document.getElementById("cancelBtn");
   const saveBtn         = document.getElementById("saveBtn");
+
   const backupBtn       = document.getElementById("backupBtn");
   const backupPopup     = document.getElementById("backupPopup");
-  const backupExportBtn = document.getElementById("backupExportBtn");
   const backupCloseBtn  = document.getElementById("backupCloseBtn");
+
+  const autoBackupBtn   = document.getElementById("autoBackupBtn");
+  const manualBackupBtn = document.getElementById("manualBackupBtn");
+  const autoRestoreBtn  = document.getElementById("autoRestoreBtn");
+  const manualRestoreBtn= document.getElementById("manualRestoreBtn");
+
   const backupFile      = document.getElementById("backupFile");
+
   const langPopup       = document.getElementById("langPopup");
   const langBtn         = document.getElementById("langBtn");
   const langCloseBtn    = document.getElementById("langCloseBtn");
+
   const themeToggle     = document.getElementById("themeToggle");
   const addNoteBtn      = document.getElementById("addNoteBtn");
 
@@ -317,7 +386,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentCategory = "alle";
   let selectedColor   = "#ffffff";
 
-  // LocalStorage helpers
+
+  /* -------------------------
+     LOCAL STORAGE
+  ------------------------- */
   function loadNotes() {
     try {
       return JSON.parse(localStorage.getItem("notes") || "[]");
@@ -325,11 +397,15 @@ document.addEventListener("DOMContentLoaded", () => {
       return [];
     }
   }
+
   function saveNotes(arr) {
     localStorage.setItem("notes", JSON.stringify(arr));
   }
 
-  // Mostra note
+
+  /* -------------------------
+     MOSTRA NOTE
+  ------------------------- */
   function showNotes(cat) {
     const notes = loadNotes();
 
@@ -365,6 +441,7 @@ document.addEventListener("DOMContentLoaded", () => {
       star.onclick = (e) => {
         e.stopPropagation();
         n.favorite = !n.favorite;
+
         const allNotes = loadNotes();
         const realIndex = allNotes.indexOf(filtered[idx]);
         if (realIndex !== -1) {
@@ -388,9 +465,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Editor
+
+  /* -------------------------
+     EDITOR NOTE
+  ------------------------- */
   function openEditor(isNew, index) {
     noteEditor.style.display = "flex";
+
     if (isNew) {
       noteText.value = "";
       selectedColor = "#ffffff";
@@ -399,6 +480,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const notes = loadNotes();
       const n = notes[index];
       if (!n) return;
+
       noteText.value = n.text;
       selectedColor = n.color || "#ffffff";
       editingIndex = index;
@@ -417,17 +499,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const notes = loadNotes();
+
     if (editingIndex === null) {
       let cat = currentCategory;
-      if (cat === "alle") {
-        cat = "personlich"; // default se sei su "Alle"
-      }
+      if (cat === "alle") cat = "personlich";
+
       notes.push({
         text,
         color: selectedColor,
         category: cat,
         favorite: false
       });
+
     } else {
       if (!notes[editingIndex]) {
         noteEditor.style.display = "none";
@@ -436,12 +519,16 @@ document.addEventListener("DOMContentLoaded", () => {
       notes[editingIndex].text  = text;
       notes[editingIndex].color = selectedColor;
     }
+
     saveNotes(notes);
     noteEditor.style.display = "none";
     showNotes(currentCategory);
   };
 
-  // Colori
+
+  /* -------------------------
+     COLORI
+  ------------------------- */
   document.querySelectorAll(".colorDot").forEach(dot => {
     dot.addEventListener("click", () => {
       selectedColor = dot.dataset.color;
@@ -450,7 +537,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Categorie (FIX iPhone: click funziona ora)
+
+  /* -------------------------
+     CATEGORIE (FIX iPHONE)
+  ------------------------- */
   document.querySelectorAll(".cat").forEach(catEl => {
     catEl.addEventListener("click", () => {
       currentCategory = catEl.dataset.cat;
@@ -458,28 +548,68 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Backup
+
+  /* -------------------------
+     SALVAGENTE 🛟 VERSIONE B
+  ------------------------- */
   backupBtn.onclick = () => {
     backupPopup.style.display = "flex";
   };
+
   backupCloseBtn.onclick = () => {
     backupPopup.style.display = "none";
   };
 
-  backupExportBtn.onclick = () => {
+
+  /* BACKUP AUTOMATICO */
+  autoBackupBtn.onclick = () => {
+    const notes = localStorage.getItem("notes") || "[]";
+    localStorage.setItem("autoBackup", notes);
+    alert("Automatisches Backup gespeichert.");
+  };
+
+  /* BACKUP MANUALE */
+  manualBackupBtn.onclick = () => {
     const notes = localStorage.getItem("notes") || "[]";
     const blob = new Blob([notes], { type: "application/json" });
     const url = URL.createObjectURL(blob);
+
     const a = document.createElement("a");
     a.href = url;
     a.download = "backup-notes.json";
     a.click();
+
     URL.revokeObjectURL(url);
+  };
+
+  /* RIPRISTINO AUTOMATICO */
+  autoRestoreBtn.onclick = () => {
+    const data = localStorage.getItem("autoBackup");
+    if (!data) {
+      alert("Kein automatisches Backup gefunden.");
+      return;
+    }
+    try {
+      const arr = JSON.parse(data);
+      if (Array.isArray(arr)) {
+        saveNotes(arr);
+        showNotes(currentCategory);
+        alert("Automatische Wiederherstellung abgeschlossen.");
+      }
+    } catch {
+      alert("Fehler beim Wiederherstellen.");
+    }
+  };
+
+  /* RIPRISTINO MANUALE */
+  manualRestoreBtn.onclick = () => {
+    backupFile.click();
   };
 
   backupFile.onchange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
     const reader = new FileReader();
     reader.onload = ev => {
       try {
@@ -487,41 +617,57 @@ document.addEventListener("DOMContentLoaded", () => {
         if (Array.isArray(data)) {
           saveNotes(data);
           showNotes(currentCategory);
+          alert("Manuelle Wiederherstellung abgeschlossen.");
         }
-      } catch (err) {
-        console.log("Backup import error", err);
+      } catch {
+        alert("Ungültige Datei.");
       }
     };
     reader.readAsText(file);
   };
 
-  // Lingua (placeholder)
+
+  /* -------------------------
+     LINGUA
+  ------------------------- */
   langBtn.onclick = () => {
     langPopup.style.display = "flex";
   };
+
   langCloseBtn.onclick = () => {
     langPopup.style.display = "none";
   };
+
   document.querySelectorAll(".langChoice[data-lang]").forEach(btn => {
     btn.addEventListener("click", () => {
       langPopup.style.display = "none";
     });
   });
 
-  // Tema
+
+  /* -------------------------
+     TEMA
+  ------------------------- */
   themeToggle.onclick = () => {
     document.body.classList.toggle("dark");
   };
 
-  // Nuova nota
+
+  /* -------------------------
+     NUOVA NOTA
+  ------------------------- */
   addNoteBtn.onclick = () => {
     openEditor(true, null);
   };
 
-  // Init
+
+  /* -------------------------
+     INIT
+  ------------------------- */
   showNotes(currentCategory);
   langPopup.style.display = "none";
   backupPopup.style.display = "none";
+
 });
 </script>
 
