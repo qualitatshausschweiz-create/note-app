@@ -74,6 +74,7 @@
     .zuhause { background: #ff9500; }
     .ideen { background: #34c759; }
     .personlich { background: #ffffff; border: 2px solid #ccc; }
+    .favorite { background: #ffd700; }
 
     #notesList {
       display: none;
@@ -246,6 +247,12 @@
 <!-- Categorie -->
 <div class="grid" id="categories">
 
+  <!-- ⭐ Preferiti in cima -->
+  <div class="cat" data-cat="favorite">
+    <div class="circle favorite"></div>
+    <span class="catLabel" data-key="favorite">Favoriten</span>
+  </div>
+
   <div class="cat" data-cat="alle">
     <div class="circle" style="background:#ccc;"></div>
     <span class="catLabel" data-key="alle">Alle</span>
@@ -365,10 +372,10 @@ const autoBackupLabel = document.getElementById("autoBackupLabel");
 
 /* Traduzioni categorie */
 const catNames = {
-  de:{alle:"Alle",arbeit:"Arbeit",einkauf:"Einkauf",zuhause:"Zuhause",ideen:"Ideen",personlich:"Persönlich"},
-  it:{alle:"Tutte",arbeit:"Lavoro",einkauf:"Spesa",zuhause:"Casa",ideen:"Idee",personlich:"Personale"},
-  en:{alle:"All",arbeit:"Work",einkauf:"Shopping",zuhause:"Home",ideen:"Ideas",personlich:"Personal"},
-  es:{alle:"Todas",arbeit:"Trabajo",einkauf:"Compra",zuhause:"Casa",ideen:"Ideas",personlich:"Personal"}
+  de:{favorite:"Favoriten",alle:"Alle",arbeit:"Arbeit",einkauf:"Einkauf",zuhause:"Zuhause",ideen:"Ideen",personlich:"Persönlich"},
+  it:{favorite:"Preferiti",alle:"Tutte",arbeit:"Lavoro",einkauf:"Spesa",zuhause:"Casa",ideen:"Idee",personlich:"Personale"},
+  en:{favorite:"Favorites",alle:"All",arbeit:"Work",einkauf:"Shopping",zuhause:"Home",ideen:"Ideas",personlich:"Personal"},
+  es:{favorite:"Favoritos",alle:"Todas",arbeit:"Trabajo",einkauf:"Compra",zuhause:"Casa",ideen:"Ideas",personlich:"Personal"}
 };
 
 /* Traduzioni UI */
@@ -482,7 +489,7 @@ function updateAutoBackupLabel() {
   }
 }
 
-/* Applica traduzioni */
+/* Traduzioni */
 function applyTranslations() {
   const t = tr[currentLang];
 
@@ -571,7 +578,8 @@ saveBtn.onclick = () => {
       text,
       color: selectedColor,
       category: currentCategory || "alle",
-      createdAt: getTimestamp()
+      createdAt: getTimestamp(),
+      favorite: false
     });
   } else {
     notes[editingIndex].text = text;
@@ -605,22 +613,58 @@ document.querySelectorAll(".cat").forEach(cat => {
 /* Mostra note */
 function showNotes(cat) {
   const notes = loadNotes();
-  const filtered = cat === "alle" ? notes : notes.filter(n => n.category === cat);
+
+  const filtered =
+    cat === "alle"
+      ? notes
+      : cat === "favorite"
+        ? notes.filter(n => n.favorite)
+        : notes.filter(n => n.category === cat);
+
   notesList.innerHTML = "";
   if (filtered.length === 0) {
     notesList.style.display = "none";
     return;
   }
   notesList.style.display = "block";
+
   filtered.forEach((n, idx) => {
     const div = document.createElement("div");
     div.className = "noteItem";
     div.style.background = n.color || "#ffffff";
-    div.textContent = n.text;
+
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.style.justifyContent = "space-between";
+    row.style.alignItems = "flex-start";
+
+    const textDiv = document.createElement("div");
+    textDiv.textContent = n.text;
+    textDiv.style.whiteSpace = "pre-wrap";
+    textDiv.style.flex = "1";
+
+    const star = document.createElement("span");
+    star.textContent = n.favorite ? "★" : "☆";
+    star.style.fontSize = "22px";
+    star.style.cursor = "pointer";
+    star.style.marginLeft = "12px";
+
+    star.onclick = (e) => {
+      e.stopPropagation();
+      n.favorite = !n.favorite;
+      saveNotes(notes);
+      showNotes(currentCategory);
+    };
+
+    row.appendChild(textDiv);
+    row.appendChild(star);
+    div.appendChild(row);
+
     div.addEventListener("click", () => {
       const realIndex = notes.indexOf(filtered[idx]);
       openEditor(false, realIndex);
     });
+
     notesList.appendChild(div);
   });
 }
@@ -640,7 +684,7 @@ backupExportBtn.onclick = () => {
   a.click();
 };
 
-/* Import (via input file, label compatibile iPhone) */
+/* Import */
 backupFile.addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
@@ -675,7 +719,7 @@ backupAutoRestoreBtn.onclick = () => {
   }
 };
 
-/* Backup manuale: salva con nome diverso */
+/* Backup manuale */
 backupManualBtn.onclick = () => {
   const notes = localStorage.getItem("notes") || "[]";
   const blob = new Blob([notes], { type: "application/json" });
@@ -686,7 +730,6 @@ backupManualBtn.onclick = () => {
   a.click();
 };
 
-/* Backup manuale: usa lo stesso input file */
 backupManualRestoreBtn.onclick = () => {
   backupFile.click();
 };
