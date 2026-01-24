@@ -85,6 +85,7 @@
       border-radius: 14px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       cursor: pointer;
+      white-space: pre-wrap;
     }
 
     #noteEditor {
@@ -216,7 +217,6 @@
     }
   </style>
 </head>
-
 <body>
 
 <header>
@@ -314,7 +314,10 @@
     <h2 id="backupTitle">Sicherung</h2>
 
     <button id="backupExportBtn" class="backupBtn greenBtn">Exportieren</button>
-    <button id="backupImportBtn" class="backupBtn blueBtn">Importieren</button>
+
+    <!-- Importieren come LABEL per iPhone -->
+    <label for="backupFile" id="backupImportBtn" class="backupBtn blueBtn">Importieren</label>
+
     <button id="backupAutoRestoreBtn" class="backupBtn orangeBtn">Automatische Sicherung wiederherstellen</button>
 
     <button id="backupManualBtn" class="backupBtn greenBtn">📦 Backup manuell speichern</button>
@@ -324,16 +327,41 @@
 
     <button id="backupCloseBtn" class="backupBtn grayBtn">Schliessen</button>
 
-    <input type="file" id="backupFile" accept="application/json">
+    <!-- input file invisibile ma cliccabile -->
+    <input type="file" id="backupFile" accept="application/json"
+           style="opacity:0; position:absolute; width:1px; height:1px;">
 
   </div>
 </div>
-
 <script>
 let editingIndex = null;
-let currentCategory = null;
+let currentCategory = "alle";
 let currentLang = localStorage.getItem("lang") || "de";
 let selectedColor = "#ffffff";
+
+const appTitle = document.getElementById("appTitle");
+const addNoteBtn = document.getElementById("addNoteBtn");
+const themeToggle = document.getElementById("themeToggle");
+const langBtn = document.getElementById("langBtn");
+const langPopup = document.getElementById("langPopup");
+const noteEditor = document.getElementById("noteEditor");
+const editorTitle = document.getElementById("editorTitle");
+const noteText = document.getElementById("noteText");
+const cancelBtn = document.getElementById("cancelBtn");
+const saveBtn = document.getElementById("saveBtn");
+const notesList = document.getElementById("notesList");
+const categoriesDiv = document.getElementById("categories");
+
+const backupBtn = document.getElementById("backupBtn");
+const backupPopup = document.getElementById("backupPopup");
+const backupTitle = document.getElementById("backupTitle");
+const backupExportBtn = document.getElementById("backupExportBtn");
+const backupAutoRestoreBtn = document.getElementById("backupAutoRestoreBtn");
+const backupManualBtn = document.getElementById("backupManualBtn");
+const backupManualRestoreBtn = document.getElementById("backupManualRestoreBtn");
+const backupCloseBtn = document.getElementById("backupCloseBtn");
+const backupFile = document.getElementById("backupFile");
+const autoBackupLabel = document.getElementById("autoBackupLabel");
 
 /* Traduzioni categorie */
 const catNames = {
@@ -352,8 +380,6 @@ const tr = {
     editNote:"Notiz bearbeiten",
     cancelBtn:"Abbrechen",
     saveBtn:"Speichern",
-    back:"Zurück",
-    search:"🔍 Suchen...",
     autoBackupLabel:"Letzte automatische Sicherung:",
     sicherung:"Sicherung",
     export:"Exportieren",
@@ -370,8 +396,6 @@ const tr = {
     editNote:"Modifica Nota",
     cancelBtn:"Annulla",
     saveBtn:"Salva",
-    back:"Indietro",
-    search:"🔍 Cerca...",
     autoBackupLabel:"Ultimo backup automatico:",
     sicherung:"Backup",
     export:"Esporta",
@@ -388,8 +412,6 @@ const tr = {
     editNote:"Edit Note",
     cancelBtn:"Cancel",
     saveBtn:"Save",
-    back:"Back",
-    search:"🔍 Search...",
     autoBackupLabel:"Last automatic backup:",
     sicherung:"Backup",
     export:"Export",
@@ -406,8 +428,6 @@ const tr = {
     editNote:"Editar nota",
     cancelBtn:"Cancelar",
     saveBtn:"Guardar",
-    back:"Atrás",
-    search:"🔍 Buscar...",
     autoBackupLabel:"Último backup automático:",
     sicherung:"Copia de seguridad",
     export:"Exportar",
@@ -418,6 +438,49 @@ const tr = {
     close:"Cerrar"
   }
 };
+
+/* Gestione note */
+function loadNotes() {
+  try {
+    return JSON.parse(localStorage.getItem("notes") || "[]");
+  } catch(e) {
+    return [];
+  }
+}
+function saveNotes(arr) {
+  localStorage.setItem("notes", JSON.stringify(arr));
+  saveAutoBackup();
+}
+
+/* Timestamp */
+function getTimestamp() {
+  const d = new Date();
+  const pad = n => (n < 10 ? "0" + n : n);
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+/* Backup automatico */
+function saveAutoBackup() {
+  const notes = loadNotes();
+  const data = { timestamp: getTimestamp(), notes };
+  localStorage.setItem("autoBackup", JSON.stringify(data));
+  updateAutoBackupLabel();
+}
+
+function updateAutoBackupLabel() {
+  const t = tr[currentLang];
+  const auto = localStorage.getItem("autoBackup");
+  if (!auto) {
+    autoBackupLabel.textContent = t.autoBackupLabel + " –";
+    return;
+  }
+  try {
+    const parsed = JSON.parse(auto);
+    autoBackupLabel.textContent = t.autoBackupLabel + " " + (parsed.timestamp || "–");
+  } catch(e) {
+    autoBackupLabel.textContent = t.autoBackupLabel + " –";
+  }
+}
 
 /* Applica traduzioni */
 function applyTranslations() {
@@ -430,7 +493,7 @@ function applyTranslations() {
 
   backupTitle.textContent = t.sicherung;
   backupExportBtn.textContent = t.export;
-  backupImportBtn.textContent = t.import;
+  document.getElementById("backupImportBtn").textContent = t.import;
   backupAutoRestoreBtn.textContent = t.autoRestore;
   backupManualBtn.textContent = t.manualSave;
   backupManualRestoreBtn.textContent = t.manualRestore;
@@ -442,8 +505,7 @@ function applyTranslations() {
   });
 
   updateAutoBackupLabel();
-
-  if (currentCategory) showNotes(currentCategory);
+  showNotes(currentCategory);
 }
 
 /* Popup lingua */
@@ -456,59 +518,191 @@ function setLang(lang) {
   closeLangPopup();
 }
 
-/* Sicherung */
+/* Tema */
+function applyTheme() {
+  const theme = localStorage.getItem("theme") || "light";
+  if (theme === "dark") {
+    document.body.classList.add("dark");
+    themeToggle.textContent = "☀️";
+  } else {
+    document.body.classList.remove("dark");
+    themeToggle.textContent = "🌙";
+  }
+}
+themeToggle.onclick = () => {
+  const theme = localStorage.getItem("theme") === "dark" ? "light" : "dark";
+  localStorage.setItem("theme", theme);
+  applyTheme();
+};
+
+/* Editor */
+function openEditor(isNew, index) {
+  noteEditor.style.display = "flex";
+  if (isNew) {
+    editorTitle.textContent = tr[currentLang].newNote;
+    noteText.value = "";
+    selectedColor = "#ffffff";
+    editingIndex = null;
+  } else {
+    editorTitle.textContent = tr[currentLang].editNote;
+    const notes = loadNotes();
+    const n = notes[index];
+    noteText.value = n.text;
+    selectedColor = n.color || "#ffffff";
+    editingIndex = index;
+  }
+  updateColorDots();
+}
+function closeEditor() {
+  noteEditor.style.display = "none";
+  editingIndex = null;
+}
+cancelBtn.onclick = closeEditor;
+
+saveBtn.onclick = () => {
+  const text = noteText.value.trim();
+  if (!text) {
+    closeEditor();
+    return;
+  }
+  const notes = loadNotes();
+  if (editingIndex === null) {
+    notes.push({
+      text,
+      color: selectedColor,
+      category: currentCategory || "alle",
+      createdAt: getTimestamp()
+    });
+  } else {
+    notes[editingIndex].text = text;
+    notes[editingIndex].color = selectedColor;
+  }
+  saveNotes(notes);
+  closeEditor();
+  showNotes(currentCategory);
+};
+
+function updateColorDots() {
+  document.querySelectorAll(".colorDot").forEach(dot => {
+    dot.classList.toggle("selected", dot.dataset.color === selectedColor);
+  });
+}
+document.querySelectorAll(".colorDot").forEach(dot => {
+  dot.addEventListener("click", () => {
+    selectedColor = dot.dataset.color;
+    updateColorDots();
+  });
+});
+
+/* Categorie */
+document.querySelectorAll(".cat").forEach(cat => {
+  cat.addEventListener("click", () => {
+    currentCategory = cat.dataset.cat;
+    showNotes(currentCategory);
+  });
+});
+
+/* Mostra note */
+function showNotes(cat) {
+  const notes = loadNotes();
+  const filtered = cat === "alle" ? notes : notes.filter(n => n.category === cat);
+  notesList.innerHTML = "";
+  if (filtered.length === 0) {
+    notesList.style.display = "none";
+    return;
+  }
+  notesList.style.display = "block";
+  filtered.forEach((n, idx) => {
+    const div = document.createElement("div");
+    div.className = "noteItem";
+    div.style.background = n.color || "#ffffff";
+    div.textContent = n.text;
+    div.addEventListener("click", () => {
+      const realIndex = notes.indexOf(filtered[idx]);
+      openEditor(false, realIndex);
+    });
+    notesList.appendChild(div);
+  });
+}
+
+/* Pulsanti backup */
 backupBtn.onclick = () => backupPopup.style.display = "flex";
 backupCloseBtn.onclick = () => backupPopup.style.display = "none";
 
-/* Backup: esporta */
+/* Export */
 backupExportBtn.onclick = () => {
   const notes = localStorage.getItem("notes") || "[]";
   const blob = new Blob([notes], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "backup.json";
+  a.download = "backup-notes.json";
   a.click();
 };
 
-/* Backup: importa */
-backupImportBtn.onclick = () => {
-  backupFile.click();
-};
-
+/* Import (via input file, label compatibile iPhone) */
 backupFile.addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
-    localStorage.setItem("notes", ev.target.result);
-    if (currentCategory) showNotes(currentCategory);
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (Array.isArray(data)) {
+        saveNotes(data);
+        showNotes(currentCategory);
+      }
+    } catch(err) {
+      console.error("Backup non valido", err);
+    }
   };
   reader.readAsText(file);
+  e.target.value = "";
 });
 
-/* Timestamp */
-function getTimestamp() {
-  const d = new Date();
-  const pad = n => (n < 10 ? "0" + n : n);
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-}
-
-/* Backup automatico */
-function saveAutoBackup() {
-  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-  const data = { timestamp: getTimestamp(), notes };
-  localStorage.setItem("autoBackup", JSON.stringify(data));
-  updateAutoBackupLabel();
-}
-
-function updateAutoBackupLabel() {
-  const t = tr[currentLang];
+/* Backup automatico: ripristina */
+backupAutoRestoreBtn.onclick = () => {
   const auto = localStorage.getItem("autoBackup");
-  const label = document.getElementById("autoBackupLabel");
-  if (!label) return;
-  if (!auto) {
-    label.textContent = t.autoBackupLabel + " –";
-    return;
+  if (!auto) return;
+  try {
+    const parsed = JSON.parse(auto);
+    if (Array.isArray(parsed.notes)) {
+      saveNotes(parsed.notes);
+      showNotes(currentCategory);
+    }
+  } catch(e) {
+    console.error(e);
   }
-  const parsed = JSON
+};
+
+/* Backup manuale: salva con nome diverso */
+backupManualBtn.onclick = () => {
+  const notes = localStorage.getItem("notes") || "[]";
+  const blob = new Blob([notes], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "manual-backup-" + Date.now() + ".json";
+  a.click();
+};
+
+/* Backup manuale: usa lo stesso input file */
+backupManualRestoreBtn.onclick = () => {
+  backupFile.click();
+};
+
+/* Aggiungi nota */
+addNoteBtn.onclick = () => {
+  if (!currentCategory) currentCategory = "alle";
+  openEditor(true, null);
+};
+
+/* Init */
+document.addEventListener("DOMContentLoaded", () => {
+  applyTheme();
+  applyTranslations();
+  showNotes(currentCategory);
+});
+</script>
+</body>
+</html>
