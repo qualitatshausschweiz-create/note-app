@@ -1,11 +1,408 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sandro Premium Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg: #050814;
+      --bg-soft: rgba(10, 14, 30, 0.9);
+      --card: rgba(18, 24, 48, 0.9);
+      --border: rgba(255, 255, 255, 0.06);
+      --text: #f7f9ff;
+      --text-soft: #a5b0d0;
+      --accent: #4f8cff;
+      --accent-light: #4f8cff55;
+      --accent-glow: #4f8cff55;
+      --danger: #ff4b5c;
+      --blur-amount: 18px;
+      --text-size: 16px;
+      --anim: 1;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, system-ui, sans-serif;
+      background: radial-gradient(circle at top, #1b2a4a 0, #050814 55%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    body.dark {
+      background: radial-gradient(circle at top, #0f172a 0, #020617 60%, #000 100%);
+    }
+
+    body.amoled {
+      background: #000;
+    }
+
+    .appShell {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 18px 14px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .glass {
+      background: var(--bg-soft);
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(var(--blur-amount));
+      -webkit-backdrop-filter: blur(var(--blur-amount));
+      box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+
+    .header {
+      padding: 14px 16px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    #appTitle {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #appTitle .sub {
+      font-size: 11px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      margin-top: 2px;
+    }
+
+    .headerButtons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .iconBtn {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: radial-gradient(circle at top, #1f2937 0, #020617 80%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-soft);
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform 0.18s ease;
+    }
+
+    .iconBtn:active {
+      transform: scale(0.94);
+    }
+
+    .categories {
+      padding: 0 10px 10px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .categories::-webkit-scrollbar {
+      display: none;
+    }
+
+    .cat {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-soft);
+      cursor: pointer;
+      white-space: nowrap;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .cat.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent-light);
+    }
+
+    .notesCard {
+      padding: 10px 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #notesList {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 55vh;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .noteItem {
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border);
+      padding: 10px 11px 9px;
+      cursor: pointer;
+      border-left: 3px solid var(--accent);
+    }
+
+    .noteTitleRow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .noteTitle {
+      font-size: 15px;
+      font-weight: 600;
+      color: #e5edff;
+    }
+
+    .noteMeta {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .noteTextPreview {
+      font-size: 13px;
+      color: var(--text-soft);
+      margin-top: 4px;
+    }
+
+    .addNoteBar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 2px 2px;
+    }
+
+    #addNoteBtn {
+      border-radius: 999px;
+      padding: 7px 14px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), #7c5cff);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- PIN overlay -->
+  <div id="pinOverlay">
+    <div class="pinCard glass">
+      <div class="pinTitle">PIN</div>
+      <div class="pinCircles">
+        <div class="pinCircle"></div>
+        <div class="pinCircle"></div>
+        <div class="pinCircle"></div>
+        <div class="pinCircle"></div>
+      </div>
+      <div id="pinError" class="pinError"></div>
+      <div class="pinPad">
+        <button class="pinKey" data-digit="1">1</button>
+        <button class="pinKey" data-digit="2">2</button>
+        <button class="pinKey" data-digit="3">3</button>
+        <button class="pinKey" data-digit="4">4</button>
+        <button class="pinKey" data-digit="5">5</button>
+        <button class="pinKey" data-digit="6">6</button>
+        <button class="pinKey" data-digit="7">7</button>
+        <button class="pinKey" data-digit="8">8</button>
+        <button class="pinKey" data-digit="9">9</button>
+        <div></div>
+        <button class="pinKey" data-digit="0">0</button>
+        <button id="pinBackspace">⌫</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Shell -->
+  <div class="appShell">
+    <div class="glass">
+      <div class="header">
+        <div id="appTitle">
+          Note
+          <span class="sub">Premium</span>
+        </div>
+        <div class="headerButtons">
+          <button id="langBtn" class="iconBtn">🌐</button>
+          <button id="themeBtn" class="iconBtn">☾</button>
+          <button id="settingsBtn" class="iconBtn">⚙︎</button>
+        </div>
+      </div>
+
+      <div class="categories">
+        <div class="cat active" data-cat="all">All</div>
+        <div class="cat" data-cat="work">Work</div>
+        <div class="cat" data-cat="personal">Personal</div>
+        <div class="cat" data-cat="ideas">Ideas</div>
+        <div class="cat" data-cat="todo">To‑Do</div>
+      </div>
+
+      <div class="notesCard">
+        <div id="notesList"></div>
+        <div class="addNoteBar">
+          <button id="addNoteBtn">＋ Nuova</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- EDITOR -->
+  <div id="noteEditor" style="display:none;">
+    <div class="editorCard glass">
+      <div id="editorTitle">Nuova nota</div>
+
+      <div class="editorInputs">
+        <input id="noteTitleInput" type="text" placeholder="Titolo" />
+        <textarea id="noteText" placeholder="Scrivi qui..."></textarea>
+      </div>
+
+      <div class="paletteRow">
+        <div class="paletteBtns">
+          <button class="paletteBtn" data-pal="warm">Warm</button>
+          <button class="paletteBtn" data-pal="cool">Cool</button>
+          <button class="paletteBtn" data-pal="pastel">Pastel</button>
+          <button class="paletteBtn" data-pal="mix">Mix</button>
+        </div>
+        <div id="colorRow"></div>
+      </div>
+
+      <div class="editorActions">
+        <div class="editorLeft">
+          <button id="deleteNoteBtn" class="btnDanger">🗑 Elimina</button>
+        </div>
+        <div class="editorRight">
+          <button id="cancelBtn" class="btnGhost">Annulla</button>
+          <button id="saveBtn" class="btnPrimary">Salva</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS PANEL -->
+  <div id="settingsPanel" style="display:none;">
+    <div class="settingsCard glass">
+      <div class="settingsHeader">
+        <div class="settingsTitle">Impostazioni</div>
+        <div class="settingsClose">✕</div>
+      </div>
+
+      <div class="settingsList">
+        <div id="settingsTheme" class="settingsItem">
+          <span class="label">Tema</span><span class="value">Toggle</span>
+        </div>
+
+        <div id="settingsAmoled" class="settingsItem">
+          <span class="label">AMOLED</span><span class="value">On/Off</span>
+        </div>
+
+        <div id="settingsFont" class="settingsItem">
+          <span class="label">Font</span><span class="value">Cycle</span>
+        </div>
+
+        <div id="settingsTextSize" class="settingsItem">
+          <span class="label">Dimensione testo</span><span class="value">Cycle</span>
+        </div>
+
+        <div id="settingsAccent" class="settingsItem">
+          <span class="label">Colore accento</span><span class="value">Cycle</span>
+        </div>
+
+        <div id="settingsBlur" class="settingsItem">
+          <span class="label">Sfocatura</span><span class="value">Cycle</span>
+        </div>
+
+        <div id="settingsAnimations" class="settingsItem">
+          <span class="label">Animazioni</span><span class="value">On/Off</span>
+        </div>
+
+        <div id="settingsHaptics" class="settingsItem">
+          <span class="label">Haptics</span><span class="value">On/Off</span>
+        </div>
+
+        <div id="settingsExport" class="settingsItem">
+          <span class="label">Esporta</span><span class="value">JSON</span>
+        </div>
+
+        <div id="settingsImport" class="settingsItem">
+          <span class="label">Importa</span><span class="value">JSON</span>
+        </div>
+
+        <div id="settingsArchive" class="settingsItem">
+          <span class="label">Archivio</span><span class="value">Apri</span>
+        </div>
+
+        <div id="settingsChangePin" class="settingsItem">
+          <span class="label">Cambia PIN</span><span class="value">Manuale</span>
+        </div>
+
+        <div id="settingsResetApp" class="settingsItem settingsDanger">
+          <span class="label">Reset app</span><span class="value">Danger</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARCHIVE POPUP -->
+  <div id="archivePopup" style="display:none;">
+    <div class="popupCard glass">
+      <div class="popupHeader">
+        <div class="popupTitle">Archivio</div>
+        <div id="archiveCloseBtn" class="popupClose">✕</div>
+      </div>
+      <div id="archiveList"></div>
+    </div>
+  </div>
+
+  <!-- RESET POPUP -->
+  <div id="resetPopup" style="display:none;">
+    <div class="popupCard glass">
+      <div class="popupHeader">
+        <div class="popupTitle">Reset app?</div>
+      </div>
+
+      <div style="font-size:13px;color:var(--text-soft);margin-top:4px;">
+        Tutte le note, archivio, impostazioni e PIN verranno eliminati.
+      </div>
+
+      <div class="popupActions">
+        <button id="resetCancelBtn" class="btnGhost">Annulla</button>
+        <button id="resetConfirmBtn" class="btnDanger">Sì, elimina</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BANNER -->
+  <div id="bannerMsg"></div>
 <script>
 /* ============================================================
-   APP PREMIUM COMPLETA — PIN + NOTE + SETTINGS
+   PIN SYSTEM
    ============================================================ */
-
-/* ------------------------------------------------------------
-   PIN SYSTEM — PIN iniziale 4618 + PIN personalizzabile
-   ------------------------------------------------------------ */
 let savedPIN = localStorage.getItem("appPIN") || "4618";
 let enteredPIN = "";
 
@@ -14,76 +411,41 @@ const pinCircles = document.querySelectorAll(".pinCircle");
 const pinError = document.getElementById("pinError");
 
 function updatePinCircles() {
-  pinCircles.forEach((c, i) => {
-    c.classList.toggle("filled", i < enteredPIN.length);
-  });
+  pinCircles.forEach((c, i) => c.classList.toggle("filled", i < enteredPIN.length));
 }
 
 function checkPIN() {
   if (enteredPIN === savedPIN) {
     pinOverlay.style.display = "none";
-    enteredPIN = "";
-    updatePinCircles();
   } else {
-    pinError.textContent = "Falscher PIN";
     pinError.style.opacity = 1;
-    setTimeout(() => {
-      pinError.style.opacity = 0;
-      enteredPIN = "";
-      updatePinCircles();
-    }, 900);
+    setTimeout(() => pinError.style.opacity = 0, 900);
   }
+  enteredPIN = "";
+  updatePinCircles();
 }
 
 document.querySelectorAll(".pinKey").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const digit = btn.dataset.digit;
-    if (digit) {
-      if (enteredPIN.length < 4) {
-        enteredPIN += digit;
-        updatePinCircles();
-        if (enteredPIN.length === 4) checkPIN();
-      }
+  btn.onclick = () => {
+    const d = btn.dataset.digit;
+    if (!d) return;
+    if (enteredPIN.length < 4) {
+      enteredPIN += d;
+      updatePinCircles();
+      if (enteredPIN.length === 4) checkPIN();
     }
-  });
+  };
 });
 
-document.getElementById("pinBackspace").addEventListener("click", () => {
+document.getElementById("pinBackspace").onclick = () => {
   enteredPIN = enteredPIN.slice(0, -1);
   updatePinCircles();
-});
+};
 
-function changePIN(newPIN) {
-  savedPIN = newPIN;
-  localStorage.setItem("appPIN", newPIN);
-}
-
-/* ------------------------------------------------------------
-   TRADUZIONI MULTILINGUE (DE / IT / EN)
-   ------------------------------------------------------------ */
+/* ============================================================
+   TRADUZIONI
+   ============================================================ */
 const translations = {
-  de: {
-    title: "Notizen",
-    premium: "Premium",
-    newNote: "Neue Notiz",
-    save: "Speichern",
-    cancel: "Abbrechen",
-    delete: "Löschen",
-    archive: "Archiv",
-    info: "Info",
-    reset: "App zurücksetzen",
-    theme: "Thema",
-    amoled: "AMOLED",
-    font: "Schriftart",
-    textSize: "Textgröße",
-    accent: "Akzentfarbe",
-    blur: "Hintergrund-Blur",
-    animations: "Animationen",
-    haptics: "Haptik",
-    export: "Exportieren",
-    import: "Importieren",
-    changePin: "PIN ändern"
-  },
   it: {
     title: "Note",
     premium: "Premium",
@@ -92,19 +454,39 @@ const translations = {
     cancel: "Annulla",
     delete: "Elimina",
     archive: "Archivio",
-    info: "Info",
     reset: "Reset app",
     theme: "Tema",
     amoled: "AMOLED",
     font: "Font",
     textSize: "Dimensione testo",
     accent: "Colore accento",
-    blur: "Sfocatura sfondo",
+    blur: "Sfocatura",
     animations: "Animazioni",
-    haptics: "Feedback aptico",
+    haptics: "Haptics",
     export: "Esporta",
     import: "Importa",
     changePin: "Cambia PIN"
+  },
+  de: {
+    title: "Notizen",
+    premium: "Premium",
+    newNote: "Neue Notiz",
+    save: "Speichern",
+    cancel: "Abbrechen",
+    delete: "Löschen",
+    archive: "Archiv",
+    reset: "App zurücksetzen",
+    theme: "Thema",
+    amoled: "AMOLED",
+    font: "Schriftart",
+    textSize: "Textgröße",
+    accent: "Akzentfarbe",
+    blur: "Hintergrund‑Blur",
+    animations: "Animationen",
+    haptics: "Haptik",
+    export: "Exportieren",
+    import: "Importieren",
+    changePin: "PIN ändern"
   },
   en: {
     title: "Notes",
@@ -114,7 +496,6 @@ const translations = {
     cancel: "Cancel",
     delete: "Delete",
     archive: "Archive",
-    info: "Info",
     reset: "Reset App",
     theme: "Theme",
     amoled: "AMOLED",
@@ -130,80 +511,69 @@ const translations = {
   }
 };
 
-let currentLang = localStorage.getItem("appLang") || "de";
+let currentLang = localStorage.getItem("appLang") || "it";
 
 function applyTranslations() {
   const t = translations[currentLang];
-
-  const appTitle = document.getElementById("appTitle");
-  if (appTitle && appTitle.childNodes[0]) {
-    appTitle.childNodes[0].textContent = t.title;
-  }
-  const sub = document.querySelector("#appTitle .sub");
-  if (sub) sub.textContent = t.premium;
-
+  document.querySelector("#appTitle").childNodes[0].textContent = t.title;
+  document.querySelector("#appTitle .sub").textContent = t.premium;
   document.getElementById("editorTitle").textContent = t.newNote;
   document.getElementById("saveBtn").textContent = t.save;
   document.getElementById("cancelBtn").textContent = t.cancel;
   document.getElementById("deleteNoteBtn").textContent = "🗑 " + t.delete;
 
-  document.getElementById("settingsTheme").textContent = t.theme;
-  document.getElementById("settingsAmoled").textContent = t.amoled;
-  document.getElementById("settingsFont").textContent = t.font;
-  document.getElementById("settingsTextSize").textContent = t.textSize;
-  document.getElementById("settingsAccent").textContent = t.accent;
-  document.getElementById("settingsBlur").textContent = t.blur;
-  document.getElementById("settingsAnimations").textContent = t.animations;
-  document.getElementById("settingsHaptics").textContent = t.haptics;
-  document.getElementById("settingsExport").textContent = t.export;
-  document.getElementById("settingsImport").textContent = t.import;
-  document.getElementById("settingsChangePin").textContent = t.changePin;
-  document.getElementById("settingsArchive").textContent = t.archive;
-  document.getElementById("settingsInfo").textContent = t.info;
-  document.getElementById("settingsResetApp").textContent = t.reset;
+  document.getElementById("settingsTheme").querySelector(".label").textContent = t.theme;
+  document.getElementById("settingsAmoled").querySelector(".label").textContent = t.amoled;
+  document.getElementById("settingsFont").querySelector(".label").textContent = t.font;
+  document.getElementById("settingsTextSize").querySelector(".label").textContent = t.textSize;
+  document.getElementById("settingsAccent").querySelector(".label").textContent = t.accent;
+  document.getElementById("settingsBlur").querySelector(".label").textContent = t.blur;
+  document.getElementById("settingsAnimations").querySelector(".label").textContent = t.animations;
+  document.getElementById("settingsHaptics").querySelector(".label").textContent = t.haptics;
+  document.getElementById("settingsExport").querySelector(".label").textContent = t.export;
+  document.getElementById("settingsImport").querySelector(".label").textContent = t.import;
+  document.getElementById("settingsArchive").querySelector(".label").textContent = t.archive;
+  document.getElementById("settingsResetApp").querySelector(".label").textContent = t.reset;
 }
 
-document.getElementById("langBtn").addEventListener("click", () => {
-  currentLang = currentLang === "de" ? "it" : currentLang === "it" ? "en" : "de";
+document.getElementById("langBtn").onclick = () => {
+  currentLang = currentLang === "it" ? "de" : currentLang === "de" ? "en" : "it";
   localStorage.setItem("appLang", currentLang);
   applyTranslations();
-});
+};
 
-/* ------------------------------------------------------------
-   TEMA (CHIARO / SCURO) + AMOLED
-   ------------------------------------------------------------ */
+/* ============================================================
+   TEMA + AMOLED
+   ============================================================ */
 let theme = localStorage.getItem("theme") || "light";
 let amoled = localStorage.getItem("amoled") === "true";
 
 function applyTheme() {
   document.body.classList.remove("dark", "amoled");
-  if (amoled) {
-    document.body.classList.add("amoled");
-  } else if (theme === "dark") {
-    document.body.classList.add("dark");
-  }
+  if (amoled) document.body.classList.add("amoled");
+  else if (theme === "dark") document.body.classList.add("dark");
 }
 
-document.getElementById("themeBtn").addEventListener("click", () => {
+document.getElementById("themeBtn").onclick = () => {
   theme = theme === "light" ? "dark" : "light";
   localStorage.setItem("theme", theme);
   applyTheme();
-});
+};
 
-document.getElementById("settingsAmoled").addEventListener("click", () => {
+document.getElementById("settingsAmoled").onclick = () => {
   amoled = !amoled;
   localStorage.setItem("amoled", amoled);
   applyTheme();
-});
+};
 
-/* ------------------------------------------------------------
-   NOTE + EDITOR + PALETTE + ARCHIVIO
-   ------------------------------------------------------------ */
+/* ============================================================
+   NOTE SYSTEM
+   ============================================================ */
 let notes = JSON.parse(localStorage.getItem("notes") || "[]");
 let archive = JSON.parse(localStorage.getItem("archive") || "[]");
 
 let editingNoteId = null;
-let selectedColor = "#007aff";
+let selectedColor = "#4f8cff";
 
 const palettes = {
   warm: ["#ff6b6b", "#ff9f43", "#ffa502", "#ff4757", "#eccc68"],
@@ -212,105 +582,92 @@ const palettes = {
   mix: ["#ff6b6b", "#1e90ff", "#2ed573", "#ffa502", "#a55eea"]
 };
 
-function loadPalette(pal) {
+function loadPalette(p) {
   const row = document.getElementById("colorRow");
   row.innerHTML = "";
-
-  palettes[pal].forEach(color => {
+  palettes[p].forEach(c => {
     const dot = document.createElement("div");
     dot.className = "colorDot";
-    dot.style.background = color;
-
-    dot.addEventListener("click", () => {
-      selectedColor = color;
+    dot.style.background = c;
+    dot.onclick = () => {
+      selectedColor = c;
       document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
       dot.classList.add("selected");
-    });
-
+    };
     row.appendChild(dot);
   });
 }
 
 document.querySelectorAll(".paletteBtn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    loadPalette(btn.dataset.pal);
-  });
+  btn.onclick = () => loadPalette(btn.dataset.pal);
 });
 
 function renderNotes() {
   const list = document.getElementById("notesList");
   list.innerHTML = "";
 
-  const activeCatEl = document.querySelector(".cat.active");
-  const activeCat = activeCatEl ? activeCatEl.dataset.cat : "all";
+  const activeCat = document.querySelector(".cat.active").dataset.cat;
 
-  notes.forEach(note => {
-    if (activeCat !== "all" && note.category !== activeCat) return;
+  notes.forEach(n => {
+    if (activeCat !== "all" && n.category !== activeCat) return;
 
     const item = document.createElement("div");
     item.className = "noteItem";
-    item.style.borderLeftColor = note.color;
-
+    item.style.borderLeftColor = n.color;
     item.innerHTML = `
       <div class="noteTitleRow">
-        <div class="noteTitle">${note.title || "Ohne Titel"}</div>
-        <div class="noteMeta">${note.date}</div>
+        <div class="noteTitle">${n.title || "Senza titolo"}</div>
+        <div class="noteMeta">${n.date}</div>
       </div>
-      <div class="noteTextPreview">${note.text.slice(0, 120)}</div>
+      <div class="noteTextPreview">${n.text.slice(0, 120)}</div>
     `;
-
-    item.addEventListener("click", () => openEditor(note.id));
+    item.onclick = () => openEditor(n.id);
     list.appendChild(item);
   });
 }
 
 document.querySelectorAll(".cat").forEach(cat => {
-  cat.addEventListener("click", () => {
+  cat.onclick = () => {
     document.querySelectorAll(".cat").forEach(c => c.classList.remove("active"));
     cat.classList.add("active");
     renderNotes();
-  });
+  };
 });
 
 function openEditor(id = null) {
   editingNoteId = id;
 
   if (id) {
-    const note = notes.find(n => n.id === id);
-    if (!note) return;
-    document.getElementById("noteTitleInput").value = note.title;
-    document.getElementById("noteText").value = note.text;
-    selectedColor = note.color;
+    const n = notes.find(x => x.id === id);
+    document.getElementById("noteTitleInput").value = n.title;
+    document.getElementById("noteText").value = n.text;
+    selectedColor = n.color;
   } else {
     document.getElementById("noteTitleInput").value = "";
     document.getElementById("noteText").value = "";
-    selectedColor = "#007aff";
+    selectedColor = "#4f8cff";
   }
 
   loadPalette("mix");
   document.getElementById("noteEditor").style.display = "flex";
 }
 
-document.getElementById("saveBtn").addEventListener("click", () => {
+document.getElementById("addNoteBtn").onclick = () => openEditor(null);
+
+document.getElementById("saveBtn").onclick = () => {
   const title = document.getElementById("noteTitleInput").value.trim();
   const text = document.getElementById("noteText").value.trim();
 
-  if (!text) {
-    showBanner("Notiz ist leer");
-    return;
-  }
+  if (!text) return showBanner("Nota vuota");
 
   if (editingNoteId) {
-    const note = notes.find(n => n.id === editingNoteId);
-    if (!note) return;
-    note.title = title;
-    note.text = text;
-    note.color = selectedColor;
-    note.date = new Date().toLocaleDateString();
+    const n = notes.find(x => x.id === editingNoteId);
+    n.title = title;
+    n.text = text;
+    n.color = selectedColor;
+    n.date = new Date().toLocaleDateString();
   } else {
-    const activeCatEl = document.querySelector(".cat.active");
-    const cat = activeCatEl ? activeCatEl.dataset.cat : "all";
-
+    const cat = document.querySelector(".cat.active").dataset.cat;
     notes.push({
       id: Date.now(),
       title,
@@ -324,49 +681,45 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   localStorage.setItem("notes", JSON.stringify(notes));
   document.getElementById("noteEditor").style.display = "none";
   renderNotes();
-});
+};
 
-document.getElementById("deleteNoteBtn").addEventListener("click", () => {
+document.getElementById("deleteNoteBtn").onclick = () => {
   if (!editingNoteId) return;
-
-  const note = notes.find(n => n.id === editingNoteId);
-  if (note) archive.push(note);
-
-  notes = notes.filter(n => n.id !== editingNoteId);
-
+  const n = notes.find(x => x.id === editingNoteId);
+  archive.push(n);
+  notes = notes.filter(x => x.id !== editingNoteId);
   localStorage.setItem("notes", JSON.stringify(notes));
   localStorage.setItem("archive", JSON.stringify(archive));
-
   document.getElementById("noteEditor").style.display = "none";
   renderNotes();
-});
+};
 
-document.getElementById("cancelBtn").addEventListener("click", () => {
+document.getElementById("cancelBtn").onclick = () => {
   document.getElementById("noteEditor").style.display = "none";
-});
+};
 
-document.getElementById("settingsArchive").addEventListener("click", () => {
+/* ============================================================
+   ARCHIVIO
+   ============================================================ */
+document.getElementById("settingsArchive").onclick = () => {
   const list = document.getElementById("archiveList");
   list.innerHTML = "";
-
   archive.forEach(n => {
     const div = document.createElement("div");
+    div.innerHTML = `<b>${n.title}</b><br>${n.text.slice(0, 100)}...`;
     div.style.marginBottom = "10px";
-    div.innerHTML = `<b>${n.title || "Ohne Titel"}</b><br>${n.text.slice(0, 100)}...`;
     list.appendChild(div);
   });
-
   document.getElementById("archivePopup").style.display = "flex";
-});
+};
 
-document.getElementById("archiveCloseBtn").addEventListener("click", () => {
+document.getElementById("archiveCloseBtn").onclick = () => {
   document.getElementById("archivePopup").style.display = "none";
-});
+};
 
-document.getElementById("addNoteBtn").addEventListener("click", () => {
-  openEditor(null);
-});
-
+/* ============================================================
+   BANNER
+   ============================================================ */
 function showBanner(msg) {
   const b = document.getElementById("bannerMsg");
   b.textContent = msg;
@@ -374,9 +727,9 @@ function showBanner(msg) {
   setTimeout(() => b.classList.remove("show"), 1500);
 }
 
-/* ------------------------------------------------------------
-   BACKUP AUTOMATICO + EXPORT
-   ------------------------------------------------------------ */
+/* ============================================================
+   BACKUP + EXPORT
+   ============================================================ */
 function autoBackup() {
   const data = {
     notes,
@@ -390,7 +743,7 @@ function autoBackup() {
 }
 setInterval(autoBackup, 5000);
 
-document.getElementById("settingsExport").addEventListener("click", () => {
+document.getElementById("settingsExport").onclick = () => {
   const data = {
     notes,
     archive,
@@ -400,24 +753,20 @@ document.getElementById("settingsExport").addEventListener("click", () => {
     amoled
   };
 
-  const blob = new Blob([JSON.stringify(data, null, 2)], {
-    type: "application/json"
-  });
-
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "notizen_backup.json";
+  a.download = "backup.json";
   a.click();
   URL.revokeObjectURL(url);
+  showBanner("Esportato");
+};
 
-  showBanner("Export erfolgreich");
-});
-
-/* ------------------------------------------------------------
-   IMPORT + RESET APP
-   ------------------------------------------------------------ */
-document.getElementById("settingsImport").addEventListener("click", () => {
+/* ============================================================
+   IMPORT
+   ============================================================ */
+document.getElementById("settingsImport").onclick = () => {
   const input = document.createElement("input");
   input.type = "file";
   input.accept = "application/json";
@@ -427,195 +776,122 @@ document.getElementById("settingsImport").addEventListener("click", () => {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = event => {
+    reader.onload = ev => {
       try {
-        const data = JSON.parse(event.target.result);
-
-        if (data.notes) notes = data.notes;
-        if (data.archive) archive = data.archive;
-        if (data.pin) {
-          savedPIN = data.pin;
-          localStorage.setItem("appPIN", savedPIN);
-        }
-        if (data.lang) {
-          currentLang = data.lang;
-          localStorage.setItem("appLang", currentLang);
-        }
-        if (data.theme) {
-          theme = data.theme;
-          localStorage.setItem("theme", theme);
-        }
-        if (typeof data.amoled !== "undefined") {
-          amoled = data.amoled;
-          localStorage.setItem("amoled", amoled);
-        }
+        const data = JSON.parse(ev.target.result);
+        notes = data.notes || [];
+        archive = data.archive || [];
+        savedPIN = data.pin || "4618";
+        currentLang = data.lang || "it";
+        theme = data.theme || "light";
+        amoled = data.amoled || false;
 
         localStorage.setItem("notes", JSON.stringify(notes));
         localStorage.setItem("archive", JSON.stringify(archive));
+        localStorage.setItem("appPIN", savedPIN);
+        localStorage.setItem("appLang", currentLang);
+        localStorage.setItem("theme", theme);
+        localStorage.setItem("amoled", amoled);
 
         applyTranslations();
         applyTheme();
         renderNotes();
-
-        showBanner("Import erfolgreich");
-      } catch (err) {
-        showBanner("Fehler beim Import");
+        showBanner("Import riuscito");
+      } catch {
+        showBanner("Errore import");
       }
     };
-
     reader.readAsText(file);
   };
 
   input.click();
-});
+};
 
-document.getElementById("settingsResetApp").addEventListener("click", () => {
+/* ============================================================
+   RESET APP
+   ============================================================ */
+document.getElementById("settingsResetApp").onclick = () => {
   document.getElementById("resetPopup").style.display = "flex";
-});
+};
 
-document.getElementById("resetCancelBtn").addEventListener("click", () => {
+document.getElementById("resetCancelBtn").onclick = () => {
   document.getElementById("resetPopup").style.display = "none";
-});
+};
 
-document.getElementById("resetConfirmBtn").addEventListener("click", () => {
+document.getElementById("resetConfirmBtn").onclick = () => {
   localStorage.clear();
-
   notes = [];
   archive = [];
   savedPIN = "4618";
-  currentLang = "de";
+  currentLang = "it";
   theme = "light";
   amoled = false;
-
-  localStorage.setItem("appPIN", "4618");
-  localStorage.setItem("appLang", "de");
-  localStorage.setItem("theme", "light");
-  localStorage.setItem("amoled", "false");
 
   applyTranslations();
   applyTheme();
   renderNotes();
 
   document.getElementById("resetPopup").style.display = "none";
-  showBanner("App zurückgesetzt");
-});
+  showBanner("Reset completato");
+};
 
-/* ------------------------------------------------------------
+/* ============================================================
    IMPOSTAZIONI AVANZATE
-   ------------------------------------------------------------ */
+   ============================================================ */
 let currentFont = localStorage.getItem("font") || "-apple-system";
-
 function applyFont() {
   document.body.style.fontFamily = currentFont;
 }
-
-document.getElementById("settingsFont").addEventListener("click", () => {
-  const fonts = [
-    "-apple-system",
-    "Helvetica Neue",
-    "Arial",
-    "Georgia",
-    "Courier New"
-  ];
-
-  const next = (fonts.indexOf(currentFont) + 1) % fonts.length;
-  currentFont = fonts[next];
-
+document.getElementById("settingsFont").onclick = () => {
+  const fonts = ["-apple-system", "Helvetica Neue", "Arial", "Georgia", "Courier New"];
+  currentFont = fonts[(fonts.indexOf(currentFont) + 1) % fonts.length];
   localStorage.setItem("font", currentFont);
   applyFont();
-  showBanner("Font geändert");
-});
+  showBanner("Font cambiato");
+};
 
 let textSize = parseInt(localStorage.getItem("textSize") || "16");
-
 function applyTextSize() {
-  document.documentElement.style.setProperty("--text-size", textSize + "px");
+  document.body.style.fontSize = textSize + "px";
 }
-
-document.getElementById("settingsTextSize").addEventListener("click", () => {
-  textSize += 1;
-  if (textSize > 22) textSize = 14;
-
+document.getElementById("settingsTextSize").onclick = () => {
+  textSize = textSize >= 22 ? 14 : textSize + 1;
   localStorage.setItem("textSize", textSize);
   applyTextSize();
-  showBanner("Textgröße: " + textSize);
-});
+  showBanner("Dimensione: " + textSize);
+};
 
-let accentColors = ["#007aff", "#ff3b30", "#ff9500", "#34c759", "#5856d6"];
+let accentColors = ["#4f8cff", "#ff3b30", "#ff9500", "#34c759", "#5856d6"];
 let accentIndex = parseInt(localStorage.getItem("accentIndex") || "0");
-
 function applyAccent() {
   document.documentElement.style.setProperty("--accent", accentColors[accentIndex]);
   document.documentElement.style.setProperty("--accent-light", accentColors[accentIndex] + "55");
   document.documentElement.style.setProperty("--accent-glow", accentColors[accentIndex] + "55");
 }
-
-document.getElementById("settingsAccent").addEventListener("click", () => {
+document.getElementById("settingsAccent").onclick = () => {
   accentIndex = (accentIndex + 1) % accentColors.length;
   localStorage.setItem("accentIndex", accentIndex);
   applyAccent();
-  showBanner("Akzentfarbe geändert");
-});
+  showBanner("Colore cambiato");
+};
 
 let blurAmount = parseInt(localStorage.getItem("blur") || "18");
-
 function applyBlur() {
   document.documentElement.style.setProperty("--blur-amount", blurAmount + "px");
 }
-
-document.getElementById("settingsBlur").addEventListener("click", () => {
-  blurAmount += 2;
-  if (blurAmount > 30) blurAmount = 6;
-
+document.getElementById("settingsBlur").onclick = () => {
+  blurAmount = blurAmount >= 30 ? 6 : blurAmount + 2;
   localStorage.setItem("blur", blurAmount);
   applyBlur();
   showBanner("Blur: " + blurAmount);
-});
+};
 
 let animationsEnabled = localStorage.getItem("animations") !== "false";
-
 function applyAnimations() {
   document.body.style.setProperty("--anim", animationsEnabled ? "1" : "0");
 }
-
-document.getElementById("settingsAnimations").addEventListener("click", () => {
+document.getElementById("settingsAnimations").onclick = () => {
   animationsEnabled = !animationsEnabled;
   localStorage.setItem("animations", animationsEnabled);
   applyAnimations();
-  showBanner(animationsEnabled ? "Animationen an" : "Animationen aus");
-});
-
-let hapticsEnabled = localStorage.getItem("haptics") !== "false";
-
-function vibrate(ms = 30) {
-  if (hapticsEnabled && navigator.vibrate) {
-    navigator.vibrate(ms);
-  }
-}
-
-document.getElementById("settingsHaptics").addEventListener("click", () => {
-  hapticsEnabled = !hapticsEnabled;
-  localStorage.setItem("haptics", hapticsEnabled);
-  showBanner(hapticsEnabled ? "Haptik an" : "Haptik aus");
-});
-
-document.querySelector(".settingsClose").addEventListener("click", () => {
-  document.getElementById("settingsPanel").style.display = "none";
-});
-
-document.getElementById("settingsBtn").addEventListener("click", () => {
-  document.getElementById("settingsPanel").style.display = "flex";
-});
-
-/* ------------------------------------------------------------
-   AVVIO INIZIALE
-   ------------------------------------------------------------ */
-applyTranslations();
-applyTheme();
-applyFont();
-applyTextSize();
-applyAccent();
-applyBlur();
-applyAnimations();
-renderNotes();
-</script>
+  showBanner(animationsEnabled ? "Animazioni ON" : "Anim
