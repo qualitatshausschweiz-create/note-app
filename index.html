@@ -1,2587 +1,2713 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="de">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notizen</title>
 
-  <!-- ============================================================
-       TITOLO + RESPONSIVE
-       ============================================================ -->
-  <title>Sandro Premium Notes</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- ============================================================
-       STILI BASE (CSS verrà completato nel BLOCCO 2/4)
-       ============================================================ -->
   <style>
-    /* Placeholder: il CSS completo arriva nel BLOCCO 2/4 */
+    :root {
+      --bg: #f2f2f7;
+      --text: #000;
+      --card: #fff;
+    }
+    .dark {
+      --bg: #1c1c1e;
+      --text: #fff;
+      --card: #2c2c2e;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      transition: 0.3s;
+    }
+
+    header {
+      padding: 12px 18px 16px 18px;
+      background: var(--card);
+      border-bottom: 1px solid #444;
+    }
+    #headerTitleRow {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    #headerControlsRow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #themeToggle, #addNoteBtn, #langBtn {
+      font-size: 20px;
+      padding: 6px 12px;
+      border-radius: 12px;
+      background: #007aff;
+      color: white;
+      border: none;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 22px;
+      padding: 20px;
+    }
+    .cat {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+    .circle {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+    }
+    .arbeit { background: #007aff; }
+    .einkauf { background: #ffcc00; }
+    .zuhause { background: #ff9500; }
+    .ideen { background: #34c759; }
+    .personlich { background: #ffffff; border: 2px solid #ccc; }
+
+    #notesList {
+      display: none;
+      padding: 20px;
+    }
+    .noteItem {
+      padding: 15px;
+      margin-bottom: 12px;
+      border-radius: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+      white-space: pre-wrap;
+    }
+
+    #noteEditor {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 900;
+    }
+    #editorBox {
+      background: var(--card);
+      width: 90%;
+      padding: 20px;
+      border-radius: 16px;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      font-size: 18px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    #colorPicker {
+      display: flex;
+      gap: 12px;
+      margin: 15px 0;
+      justify-content: center;
+    }
+    .colorDot {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .colorDot.selected {
+      border: 3px solid #007aff;
+      transform: scale(1.15);
+    }
+
+    #backupBtn {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: white;
+      color: black;
+      font-size: 32px;
+      border: none;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      cursor: pointer;
+      z-index: 950;
+    }
+
+    #backupPopup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #backupBox {
+      background: var(--card);
+      width: 90%;
+      max-width: 420px;
+      padding: 22px;
+      border-radius: 18px;
+    }
+    .backupBtn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      margin-top: 12px;
+      font-size: 17px;
+      cursor: pointer;
+    }
+    .greenBtn { background: #34c759; color: white; }
+    .blueBtn { background: #007aff; color: white; }
+    .orangeBtn { background: #ff9500; color: white; }
+    .grayBtn { background: #ccc; color: black; }
+
+    #langPopup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #langBox {
+      background: var(--card);
+      width: 90%;
+      max-width: 360px;
+      padding: 22px;
+      border-radius: 18px;
+      text-align: center;
+    }
+    .langChoice {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 12px;
+      font-size: 17px;
+      border: none;
+      border-radius: 12px;
+      background: #007aff;
+      color: white;
+      cursor: pointer;
+    }
+    .langChoice:last-child {
+      background: #ccc;
+      color: black;
+    }
   </style>
 </head>
-
 <body>
 
-<!-- ============================================================
-     OVERLAY PIN (schermata iniziale di sicurezza)
-     ============================================================ -->
-<div id="pinOverlay">
-  <div class="pinCard glass">
+<header>
+  <div id="headerTitleRow">
+    <span id="appTitle">Notizen</span>
+  </div>
 
-    <!-- Titolo PIN -->
-    <div class="pinTitle">PIN</div>
+  <div id="headerControlsRow">
+    <button id="themeToggle">🌙</button>
+    <button id="addNoteBtn">+ Notiz</button>
+    <button id="langBtn">🌐</button>
+  </div>
+</header>
 
-    <!-- Cerchi che si riempiono quando digiti -->
-    <div class="pinCircles">
-      <div class="pinCircle"></div>
-      <div class="pinCircle"></div>
-      <div class="pinCircle"></div>
-      <div class="pinCircle"></div>
-    </div>
-
-    <!-- Errore PIN -->
-    <div id="pinError" class="pinError"></div>
-
-    <!-- Tastierino numerico -->
-    <div class="pinPad">
-      <button class="pinKey" data-digit="1">1</button>
-      <button class="pinKey" data-digit="2">2</button>
-      <button class="pinKey" data-digit="3">3</button>
-      <button class="pinKey" data-digit="4">4</button>
-      <button class="pinKey" data-digit="5">5</button>
-      <button class="pinKey" data-digit="6">6</button>
-      <button class="pinKey" data-digit="7">7</button>
-      <button class="pinKey" data-digit="8">8</button>
-      <button class="pinKey" data-digit="9">9</button>
-      <div></div>
-      <button class="pinKey" data-digit="0">0</button>
-      <button id="pinBackspace">⌫</button>
-    </div>
-
+<!-- Popup Lingua -->
+<div id="langPopup">
+  <div id="langBox">
+    <h2>Sprache / Language / Lingua / Idioma</h2>
+    <button class="langChoice" onclick="setLang('de')">Deutsch</button>
+    <button class="langChoice" onclick="setLang('it')">Italiano</button>
+    <button class="langChoice" onclick="setLang('en')">English</button>
+    <button class="langChoice" onclick="setLang('es')">Español</button>
+    <button class="langChoice" onclick="closeLangPopup()">❌</button>
   </div>
 </div>
 
-<!-- ============================================================
-     APP SHELL (contenitore principale dell’app)
-     ============================================================ -->
-<div class="appShell">
+<!-- Categorie -->
+<div class="grid" id="categories">
 
-  <!-- ============================================================
-       HEADER MODERNO CON 4 ICONE A DESTRA
-       ============================================================ -->
-  <div class="glass">
-    <div class="header">
+  <div class="cat" data-cat="alle">
+    <div class="circle" style="background:#ccc;"></div>
+    <span class="catLabel" data-key="alle">Alle</span>
+  </div>
 
-      <!-- Titolo dell’app -->
-      <div id="appTitle">
-        Note
-        <span class="sub">Premium</span>
-      </div>
+  <div class="cat" data-cat="arbeit">
+    <div class="circle arbeit"></div>
+    <span class="catLabel" data-key="arbeit">Arbeit</span>
+  </div>
 
-      <!-- Pulsanti header -->
-      <div class="headerButtons">
+  <div class="cat" data-cat="einkauf">
+    <div class="circle einkauf"></div>
+    <span class="catLabel" data-key="einkauf">Einkauf</span>
+  </div>
 
-        <!-- Lingua -->
+  <div class="cat" data-cat="zuhause">
+    <div class="circle zuhause"></div>
+    <span class="catLabel" data-key="zuhause">Zuhause</span>
+  </div>
+
+  <div class="cat" data-cat="ideen">
+    <div class="circle ideen"></div>
+    <span class="catLabel" data-key="ideen">Ideen</span>
+  </div>
+
+  <div class="cat" data-cat="personlich">
+    <div class="circle personlich"></div>
+    <span class="catLabel" data-key="personlich">Persönlich</span>
+  </div>
+
+</div>
+
+<!-- Lista Note -->
+<div id="notesList"></div>
+
+<!-- Editor -->
+<div id="noteEditor">
+  <div id="editorBox">
+    <h3 id="editorTitle">Neue Notiz</h3>
+
+    <textarea id="noteText"></textarea>
+
+    <div id="colorPicker">
+      <span class="colorDot" data-color="#ffffff" style="background:#ffffff;"></span>
+      <span class="colorDot" data-color="#ffeb3b" style="background:#ffeb3b;"></span>
+      <span class="colorDot" data-color="#ff9500" style="background:#ff9500;"></span>
+      <span class="colorDot" data-color="#34c759" style="background:#34c759;"></span>
+      <span class="colorDot" data-color="#007aff" style="background:#007aff;"></span>
+      <span class="colorDot" data-color="#e91e63" style="background:#e91e63;"></span>
+    </div>
+
+    <div class="editorButtons">
+      <button class="cancelBtn" id="cancelBtn">Abbrechen</button>
+      <button class="saveBtn" id="saveBtn">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pulsante Sicherung -->
+<button id="backupBtn">🛟</button>
+
+<!-- Popup Sicherung -->
+<div id="backupPopup">
+  <div id="backupBox">
+
+    <h2 id="backupTitle">Sicherung</h2>
+
+    <button id="backupExportBtn" class="backupBtn greenBtn">Exportieren</button>
+
+    <!-- Importieren come LABEL per iPhone -->
+    <label for="backupFile" id="backupImportBtn" class="backupBtn blueBtn">Importieren</label>
+
+    <button id="backupAutoRestoreBtn" class="backupBtn orangeBtn">Automatische Sicherung wiederherstellen</button>
+
+    <button id="backupManualBtn" class="backupBtn greenBtn">📦 Backup manuell speichern</button>
+    <button id="backupManualRestoreBtn" class="backupBtn blueBtn">📧 Manuellen Backup wiederherstellen</button>
+
+    <p id="autoBackupLabel">Letzte automatische Sicherung: –</p>
+
+    <button id="backupCloseBtn" class="backupBtn grayBtn">Schliessen</button>
+
+    <!-- input file invisibile ma cliccabile -->
+    <input type="file" id="backupFile" accept="application/json"
+           style="opacity:0; position:absolute; width:1px; height:1px;">
+
+  </div>
+</div>
+<script>
+let editingIndex = null;
+let currentCategory = "alle";
+let currentLang = localStorage.getItem("lang") || "de";
+let selectedColor = "#ffffff";
+
+const appTitle = document.getElementById("appTitle");
+const addNoteBtn = document.getElementById("addNoteBtn");
+const themeToggle = document.getElementById("themeToggle");
+const langBtn = document.getElementById("langBtn");
+const langPopup = document.getElementById("langPopup");
+const noteEditor = document.getElementById("noteEditor");
+const editorTitle = document.getElementById("editorTitle");
+const noteText = document.getElementById("noteText");
+const cancelBtn = document.getElementById("cancelBtn");
+const saveBtn = document.getElementById("saveBtn");
+const notesList = document.getElementById("notesList");
+const categoriesDiv = document.getElementById("categories");
+
+const backupBtn = document.getElementById("backupBtn");
+const backupPopup = document.getElementById("backupPopup");
+const backupTitle = document.getElementById("backupTitle");
+const backupExportBtn = document.getElementById("backupExportBtn");
+const backupAutoRestoreBtn = document.getElementById("backupAutoRestoreBtn");
+const backupManualBtn = document.getElementById("backupManualBtn");
+const backupManualRestoreBtn = document.getElementById("backupManualRestoreBtn");
+const backupCloseBtn = document.getElementById("backupCloseBtn");
+const backupFile = document.getElementById("backupFile");
+const autoBackupLabel = document.getElementById("autoBackupLabel");
+
+/* Traduzioni categorie */
+const catNames = {
+  de:{alle:"Alle",arbeit:"Arbeit",einkauf:"Einkauf",zuhause:"Zuhause",ideen:"Ideen",personlich:"Persönlich"},
+  it:{alle:"Tutte",arbeit:"Lavoro",einkauf:"Spesa",zuhause:"Casa",ideen:"Idee",personlich:"Personale"},
+  en:{alle:"All",arbeit:"Work",einkauf:"Shopping",zuhause:"Home",ideen:"Ideas",personlich:"Personal"},
+  es:{alle:"Todas",arbeit:"Trabajo",einkauf:"Compra",zuhause:"Casa",ideen:"Ideas",personlich:"Personal"}
+};
+
+/* Traduzioni UI */
+const tr = {
+  de:{
+    appTitle:"Notizen",
+    addNoteBtn:"+ Notiz",
+    newNote:"Neue Notiz",
+    editNote:"Notiz bearbeiten",
+    cancelBtn:"Abbrechen",
+    saveBtn:"Speichern",
+    autoBackupLabel:"Letzte automatische Sicherung:",
+    sicherung:"Sicherung",
+    export:"Exportieren",
+    import:"Importieren",
+    autoRestore:"Automatische Sicherung wiederherstellen",
+    manualSave:"📦 Backup manuell speichern",
+    manualRestore:"📧 Manuellen Backup wiederherstellen",
+    close:"Schliessen"
+  },
+  it:{
+    appTitle:"Note",
+    addNoteBtn:"+ Nota",
+    newNote:"Nuova Nota",
+    editNote:"Modifica Nota",
+    cancelBtn:"Annulla",
+    saveBtn:"Salva",
+    autoBackupLabel:"Ultimo backup automatico:",
+    sicherung:"Backup",
+    export:"Esporta",
+    import:"Importa",
+    autoRestore:"Ripristina backup automatico",
+    manualSave:"📦 Salva backup manuale",
+    manualRestore:"📧 Ripristina backup manuale",
+    close:"Chiudi"
+  },
+  en:{
+    appTitle:"Notes",
+    addNoteBtn:"+ Note",
+    newNote:"New Note",
+    editNote:"Edit Note",
+    cancelBtn:"Cancel",
+    saveBtn:"Save",
+    autoBackupLabel:"Last automatic backup:",
+    sicherung:"Backup",
+    export:"Export",
+    import:"Import",
+    autoRestore:"Restore automatic backup",
+    manualSave:"📦 Save manual backup",
+    manualRestore:"📧 Restore manual backup",
+    close:"Close"
+  },
+  es:{
+    appTitle:"Notas",
+    addNoteBtn:"+ Nota",
+    newNote:"Nueva nota",
+    editNote:"Editar nota",
+    cancelBtn:"Cancelar",
+    saveBtn:"Guardar",
+    autoBackupLabel:"Último backup automático:",
+    sicherung:"Copia de seguridad",
+    export:"Exportar",
+    import:"Importar",
+    autoRestore:"Restaurar copia automática",
+    manualSave:"📦 Guardar copia manual",
+    manualRestore:"📧 Restaurar copia manual",
+    close:"Cerrar"
+  }
+};
+
+/* Gestione note */
+function loadNotes() {
+  try {
+    return JSON.parse(localStorage.getItem("notes") || "[]");
+  } catch(e) {
+    return [];
+  }
+}
+function saveNotes(arr) {
+  localStorage.setItem("notes", JSON.stringify(arr));
+  saveAutoBackup();
+}
+
+/* Timestamp */
+function getTimestamp() {
+  const d = new Date();
+  const pad = n => (n < 10 ? "0" + n : n);
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+/* Backup automatico */
+function saveAutoBackup() {
+  const notes = loadNotes();
+  const data = { timestamp: getTimestamp(), notes };
+  localStorage.setItem("autoBackup", JSON.stringify(data));
+  updateAutoBackupLabel();
+}
+
+function updateAutoBackupLabel() {
+  const t = tr[currentLang];
+  const auto = localStorage.getItem("autoBackup");
+  if (!auto) {
+    autoBackupLabel.textContent = t.autoBackupLabel + " –";
+    return;
+  }
+  try {
+    const parsed = JSON.parse(auto);
+    autoBackupLabel.textContent = t.autoBackupLabel + " " + (parsed.timestamp || "–");
+  } catch(e) {
+    autoBackupLabel.textContent = t.autoBackupLabel + " –";
+  }
+}
+
+/* Applica traduzioni */
+function applyTranslations() {
+  const t = tr[currentLang];
+
+  appTitle.textContent = t.appTitle;
+  addNoteBtn.textContent = t.addNoteBtn;
+  cancelBtn.textContent = t.cancelBtn;
+  saveBtn.textContent = t.saveBtn;
+
+  backupTitle.textContent = t.sicherung;
+  backupExportBtn.textContent = t.export;
+  document.getElementById("backupImportBtn").textContent = t.import;
+  backupAutoRestoreBtn.textContent = t.autoRestore;
+  backupManualBtn.textContent = t.manualSave;
+  backupManualRestoreBtn.textContent = t.manualRestore;
+  backupCloseBtn.textContent = t.close;
+
+  document.querySelectorAll(".catLabel").forEach(label => {
+    const key = label.dataset.key;
+    label.textContent = catNames[currentLang][key];
+  });
+
+  updateAutoBackupLabel();
+  showNotes(currentCategory);
+}
+
+/* Popup lingua */
+langBtn.onclick = () => langPopup.style.display = "flex";
+function closeLangPopup() { langPopup.style.display = "none"; }
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem("lang", lang);
+  applyTranslations();
+  closeLangPopup();
+}
+
+/* Tema */
+function applyTheme() {
+  const theme = localStorage.getItem("theme") || "light";
+  if (theme === "dark") {
+    document.body.classList.add("dark");
+    themeToggle.textContent = "☀️";
+  } else {
+    document.body.classList.remove("dark");
+    themeToggle.textContent = "🌙";
+  }
+}
+themeToggle.onclick = () => {
+  const theme = localStorage.getItem("theme") === "dark" ? "light" : "dark";
+  localStorage.setItem("theme", theme);
+  applyTheme();
+};
+
+/* Editor */
+function openEditor(isNew, index) {
+  noteEditor.style.display = "flex";
+  if (isNew) {
+    editorTitle.textContent = tr[currentLang].newNote;
+    noteText.value = "";
+    selectedColor = "#ffffff";
+    editingIndex = null;
+  } else {
+    editorTitle.textContent = tr[currentLang].editNote;
+    const notes = loadNotes();
+    const n = notes[index];
+    noteText.value = n.text;
+    selectedColor = n.color || "#ffffff";
+    editingIndex = index;
+  }
+  updateColorDots();
+}
+function closeEditor() {
+  noteEditor.style.display = "none";
+  editingIndex = null;
+}
+cancelBtn.onclick = closeEditor;
+
+saveBtn.onclick = () => {
+  const text = noteText.value.trim();
+  if (!text) {
+    closeEditor();
+    return;
+  }
+  const notes = loadNotes();
+  if (editingIndex === null) {
+    notes.push({
+      text,
+      color: selectedColor,
+      category: currentCategory || "alle",
+      createdAt: getTimestamp()
+    });
+  } else {
+    notes[editingIndex].text = text;
+    notes[editingIndex].color = selectedColor;
+  }
+  saveNotes(notes);
+  closeEditor();
+  showNotes(currentCategory);
+};
+
+function updateColorDots() {
+  document.querySelectorAll(".colorDot").forEach(dot => {
+    dot.classList.toggle("selected", dot.dataset.color === selectedColor);
+  });
+}
+document.querySelectorAll(".colorDot").forEach(dot => {
+  dot.addEventListener("click", () => {
+    selectedColor = dot.dataset.color;
+    updateColorDots();
+  });
+});
+
+/* Categorie */
+document.querySelectorAll(".cat").forEach(cat => {
+  cat.addEventListener("click", () => {
+    currentCategory = cat.dataset.cat;
+    showNotes(currentCategory);
+  });
+});
+
+/* Mostra note */
+function showNotes(cat) {
+  const notes = loadNotes();
+  const filtered = cat === "alle" ? notes : notes.filter(n => n.category === cat);
+  notesList.innerHTML = "";
+  if (filtered.length === 0) {
+    notesList.style.display = "none";
+    return;
+  }
+  notesList.style.display = "block";
+  filtered.forEach((n, idx) => {
+    const div = document.createElement("div");
+    div.className = "noteItem";
+    div.style.background = n.color || "#ffffff";
+    div.textContent = n.text;
+    div.addEventListener("click", () => {
+      const realIndex = notes.indexOf(filtered[idx]);
+      openEditor(false, realIndex);
+    });
+    notesList.appendChild(div);
+  });
+}
+
+/* Pulsanti backup */
+backupBtn.onclick = () => backupPopup.style.display = "flex";
+backupCloseBtn.onclick = () => backupPopup.style.display = "none";
+
+/* Export */
+backupExportBtn.onclick = () => {
+  const notes = localStorage.getItem("notes") || "[]";
+  const blob = new Blob([notes], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "backup-notes.json";
+  a.click();
+};
+
+/* Import (via input file, label compatibile iPhone) */
+backupFile.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (Array.isArray(data)) {
+        saveNotes(data);
+        showNotes(currentCategory);
+      }
+    } catch(err) {
+      console.error("Backup non valido", err);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = "";
+});
+
+/* Backup automatico: ripristina */
+backupAutoRestoreBtn.onclick = () => {
+  const auto = localStorage.getItem("autoBackup");
+  if (!auto) return;
+  try {
+    const parsed = JSON.parse(auto);
+    if (Array.isArray(parsed.notes)) {
+      saveNotes(parsed.notes);
+      showNotes(currentCategory);
+    }
+  } catch(e) {
+    console.error(e);
+  }
+};
+
+/* Backup manuale: salva con nome diverso */
+backupManualBtn.onclick = () => {
+  const notes = localStorage.getItem("notes") || "[]";
+  const blob = new Blob([notes], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "manual-backup-" + Date.now() + ".json";
+  a.click();
+};
+
+/* Backup manuale: usa lo stesso input file */
+backupManualRestoreBtn.onclick = () => {
+  backupFile.click();
+};
+
+/* Aggiungi nota */
+addNoteBtn.onclick = () => {
+  if (!currentCategory) currentCategory = "alle";
+  openEditor(true, null);
+};
+
+/* Init */
+document.addEventListener("DOMContentLoaded", () => {
+  applyTheme();
+  applyTranslations();
+  showNotes(currentCategory);
+});
+</script>
+</body>
+</html>
+
+
+
+
+
+
+Codice di default perfetto 
+
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notizen</title>
+
+  <!-- PARTE A — CSS -->
+  <style>
+    :root {
+      --bg: #f2f2f7;
+      --card: #ffffff;
+      --text: #000000;
+
+      --banner-bg: rgba(0,0,0,0.85);
+      --banner-text: #ffffff;
+    }
+
+    body.dark {
+      --bg: #000000;
+      --card: #1c1c1e;
+      --text: #ffffff;
+
+      --banner-bg: rgba(255,255,255,0.85);
+      --banner-text: #000000;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    #app {
+      max-width: 760px; /* adattato per iPhone grandi */
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* HEADER */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    #appTitle {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .iconBtn {
+      border: none;
+      background: none;
+      font-size: 22px;
+      cursor: pointer;
+      margin-left: 8px;
+      color: var(--text);
+    }
+
+    /* BANNER */
+    #bannerMsg {
+      position: fixed;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--banner-bg);
+      color: var(--banner-text);
+      padding: 10px 18px;
+      border-radius: 14px;
+      font-size: 15px;
+      z-index: 2000;
+      opacity: 0;
+      transition: all 0.35s ease;
+    }
+    #bannerMsg.show {
+      top: 20px;
+      opacity: 1;
+    }
+
+    /* CATEGORIE */
+    #categories {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin-bottom: 12px;
+    }
+    .cat {
+      flex: 0 0 auto;
+      padding: 8px 12px;
+      border-radius: 16px;
+      background: var(--card);
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    .catLabel {
+      font-size: 14px;
+    }
+
+    /* LISTA NOTE */
+    #notesList {
+      display: block;
+    }
+    .noteItem {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      cursor: pointer;
+    }
+
+    /* BOTTONE + */
+    #addNoteBtn {
+      position: fixed;
+      right: 20px;
+      bottom: 30px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: none;
+      background: #007aff;
+      color: #fff;
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      cursor: pointer;
+      z-index: 1100;
+    }
+
+    /* EDITOR */
+    #noteEditor {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1400;
+    }
+    #noteEditorBox {
+      width: 90%;
+      max-width: 500px;
+      background: var(--card);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+    }
+
+    /* ICONA 🗑 */
+    #deleteNoteBtn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 22px;
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      display: none;
+      z-index: 9999;
+    }
+
+    #editorTitle {
+      margin: 0 0 4px 0;
+      font-size: 18px;
+    }
+
+    #noteText {
+      width: 100%;
+      min-height: 120px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      padding: 8px;
+      font-size: 16px;
+      resize: vertical;
+      background: transparent;
+      color: inherit;
+    }
+
+    #editorButtons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    #editorButtons button {
+      border-radius: 12px;
+      border: none;
+      padding: 8px 14px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    #cancelBtn {
+      background: #ccc;
+      color: #000;
+    }
+    #saveBtn {
+      background: #007aff;
+      color: #fff;
+    }
+
+    /* SELETTORE PALETTE + COLORI */
+    #paletteSelector {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+    .paletteBtn {
+      padding: 4px 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      background: var(--card);
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.25s ease, transform 0.2s ease, color 0.2s ease;
+    }
+    .paletteBtn.active {
+      background: #007aff;
+      color: #fff;
+      transform: scale(1.05);
+    }
+    .paletteBtn:active {
+      transform: scale(0.9);
+    }
+
+    #colorRow {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .colorDot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.25s ease, opacity 0.25s ease, box-shadow 0.25s ease;
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    .colorDot.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .colorDot.selected {
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.4);
+      transform: scale(1.15);
+    }
+    .colorDot:active {
+      transform: scale(0.85);
+      opacity: 0.7;
+    }
+
+    /* POPUP LINGUA / BACKUP */
+    #langPopup,
+    #backupPopup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1500;
+    }
+    #langBox,
+    #backupBox {
+      width: 80%;
+      max-width: 360px;
+      background: var(--card);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .langChoice {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      background: transparent;
+      color: inherit;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .backupBtnRow {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .backupAction {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: #000;
+    }
+
+    #autoBackupBtn { background: #007aff; color: white; }
+    #manualBackupBtn { background: #ffcc00; color: black; }
+    #autoRestoreBtn { background: #ff9500; color: white; }
+    #manualRestoreBtn { background: #34c759; color: white; }
+    #backupCloseBtn { background: #ccc; color: black; }
+  </style>
+</head>
+<body>
+  <!-- PARTE B — HTML -->
+  <div id="app">
+
+    <div id="bannerMsg"></div>
+
+    <header>
+      <div id="appTitle">Notizen</div>
+      <div>
+        <button id="themeBtn" class="iconBtn">🌙</button>
         <button id="langBtn" class="iconBtn">🌐</button>
-
-        <!-- Tema chiaro/scuro -->
-        <button id="themeBtn" class="iconBtn">☾</button>
-
-        <!-- Backup manuale -->
         <button id="backupBtn" class="iconBtn">🛟</button>
-
-        <!-- Impostazioni -->
-        <button id="settingsBtn" class="iconBtn">⚙︎</button>
-
       </div>
+    </header>
+
+    <div id="categories">
+      <div class="cat" data-cat="favorite"><span class="catLabel">Favoriten</span></div>
+      <div class="cat" data-cat="alle"><span class="catLabel">Alle</span></div>
+      <div class="cat" data-cat="arbeit"><span class="catLabel">Arbeit</span></div>
+      <div class="cat" data-cat="einkauf"><span class="catLabel">Einkauf</span></div>
+      <div class="cat" data-cat="zuhause"><span class="catLabel">Zuhause</span></div>
+      <div class="cat" data-cat="ideen"><span class="catLabel">Ideen</span></div>
+      <div class="cat" data-cat="personlich"><span class="catLabel">Persönlich</span></div>
     </div>
 
-    <!-- ============================================================
-         CATEGORIE ORIZZONTALI (scrollabili)
-         ============================================================ -->
-    <div class="categories">
-      <div class="cat active" data-cat="all">All</div>
-      <div class="cat" data-cat="work">Work</div>
-      <div class="cat" data-cat="personal">Personal</div>
-      <div class="cat" data-cat="ideas">Ideas</div>
-      <div class="cat" data-cat="todo">To‑Do</div>
-    </div>
+    <div id="notesList"></div>
 
-    <!-- ============================================================
-         LISTA NOTE
-         ============================================================ -->
-    <div class="notesCard">
-      <div id="notesList"></div>
+    <button id="addNoteBtn">+</button>
+  </div>
 
-      <!-- Pulsante per aggiungere una nuova nota -->
-      <div class="addNoteBar">
-        <button id="addNoteBtn">＋ Nuova</button>
-      </div>
-    </div>
+  <!-- Editor -->
+  <div id="noteEditor">
+    <div id="noteEditorBox">
 
-  </div> <!-- fine glass header+lista -->
+      <button id="deleteNoteBtn">🗑</button>
 
-</div> <!-- fine appShell -->
-<!-- ============================================================
-     EDITOR NOTE (creazione e modifica)
-     ============================================================ -->
-<div id="noteEditor" style="display:none;">
-  <div class="editorCard glass">
+      <h2 id="editorTitle">Neue Notiz</h2>
 
-    <!-- Titolo dinamico: "Nuova nota" oppure "Modifica nota" -->
-    <div id="editorTitle">Nuova nota</div>
+      <textarea id="noteText"></textarea>
 
-    <!-- Campi di input -->
-    <div class="editorInputs">
-      <input id="noteTitleInput" type="text" placeholder="Titolo" />
-      <textarea id="noteText" placeholder="Scrivi qui..."></textarea>
-    </div>
-
-    <!-- Palette colori -->
-    <div class="paletteRow">
-
-      <!-- Pulsanti per scegliere la palette -->
-      <div class="paletteBtns">
-        <button class="paletteBtn" data-pal="warm">Warm</button>
-        <button class="paletteBtn" data-pal="cool">Cool</button>
-        <button class="paletteBtn" data-pal="pastel">Pastel</button>
+      <div id="paletteSelector">
+        <span style="font-size:14px; opacity:0.7;">Palette:</span>
+        <button class="paletteBtn" data-pal="warm">Caldi</button>
+        <button class="paletteBtn" data-pal="cool">Freddi</button>
+        <button class="paletteBtn" data-pal="pastel">Pastello</button>
         <button class="paletteBtn" data-pal="mix">Mix</button>
       </div>
 
-      <!-- Colori generati dinamicamente -->
       <div id="colorRow"></div>
-    </div>
 
-    <!-- Pulsanti azione -->
-    <div class="editorActions">
-
-      <!-- A sinistra: elimina -->
-      <div class="editorLeft">
-        <button id="deleteNoteBtn" class="btnDanger">🗑 Elimina</button>
-      </div>
-
-      <!-- A destra: annulla + salva -->
-      <div class="editorRight">
-        <button id="cancelBtn" class="btnGhost">Annulla</button>
-        <button id="saveBtn" class="btnPrimary">Salva</button>
-      </div>
-
-    </div>
-
-  </div>
-</div>
-
-<!-- ============================================================
-     PANNELLO IMPOSTAZIONI
-     ============================================================ -->
-<div id="settingsPanel" style="display:none;">
-  <div class="settingsCard glass">
-
-    <!-- Header impostazioni -->
-    <div class="settingsHeader">
-      <div class="settingsTitle">Impostazioni</div>
-      <div class="settingsClose">✕</div>
-    </div>
-
-    <!-- Lista impostazioni -->
-    <div class="settingsList">
-
-      <!-- Tema -->
-      <div id="settingsTheme" class="settingsItem">
-        <span class="label">Tema</span><span class="value">Toggle</span>
-      </div>
-
-      <!-- AMOLED -->
-      <div id="settingsAmoled" class="settingsItem">
-        <span class="label">AMOLED</span><span class="value">On/Off</span>
-      </div>
-
-      <!-- Font -->
-      <div id="settingsFont" class="settingsItem">
-        <span class="label">Font</span><span class="value">Cycle</span>
-      </div>
-
-      <!-- Dimensione testo -->
-      <div id="settingsTextSize" class="settingsItem">
-        <span class="label">Dimensione testo</span><span class="value">Cycle</span>
-      </div>
-
-      <!-- Colore accento -->
-      <div id="settingsAccent" class="settingsItem">
-        <span class="label">Colore accento</span><span class="value">Cycle</span>
-      </div>
-
-      <!-- Sfocatura -->
-      <div id="settingsBlur" class="settingsItem">
-        <span class="label">Sfocatura</span><span class="value">Cycle</span>
-      </div>
-
-      <!-- Animazioni -->
-      <div id="settingsAnimations" class="settingsItem">
-        <span class="label">Animazioni</span><span class="value">On/Off</span>
-      </div>
-
-      <!-- Haptics -->
-      <div id="settingsHaptics" class="settingsItem">
-        <span class="label">Haptics</span><span class="value">On/Off</span>
-      </div>
-
-      <!-- Esporta -->
-      <div id="settingsExport" class="settingsItem">
-        <span class="label">Esporta</span><span class="value">JSON</span>
-      </div>
-
-      <!-- Importa -->
-      <div id="settingsImport" class="settingsItem">
-        <span class="label">Importa</span><span class="value">JSON</span>
-      </div>
-
-      <!-- Archivio -->
-      <div id="settingsArchive" class="settingsItem">
-        <span class="label">Archivio</span><span class="value">Apri</span>
-      </div>
-
-      <!-- Cambia PIN -->
-      <div id="settingsChangePin" class="settingsItem">
-        <span class="label">Cambia PIN</span><span class="value">Manuale</span>
-      </div>
-
-      <!-- Reset app -->
-      <div id="settingsResetApp" class="settingsItem settingsDanger">
-        <span class="label">Reset app</span><span class="value">Danger</span>
+      <div id="editorButtons">
+        <button id="cancelBtn">Abbrechen</button>
+        <button id="saveBtn">Speichern</button>
       </div>
 
     </div>
   </div>
-</div>
 
-<!-- ============================================================
-     POPUP ARCHIVIO
-     ============================================================ -->
-<div id="archivePopup" style="display:none;">
-  <div class="popupCard glass">
-
-    <div class="popupHeader">
-      <div class="popupTitle">Archivio</div>
-      <div id="archiveCloseBtn" class="popupClose">✕</div>
+  <!-- Popup lingua -->
+  <div id="langPopup">
+    <div id="langBox">
+      <h2>Sprache</h2>
+      <button class="langChoice" data-lang="de">Deutsch</button>
+      <button class="langChoice" data-lang="it">Italiano</button>
+      <button class="langChoice" data-lang="en">English</button>
+      <button class="langChoice" data-lang="es">Español</button>
     </div>
-
-    <!-- Lista note archiviate -->
-    <div id="archiveList"></div>
-
   </div>
-</div>
 
-<!-- ============================================================
-     POPUP RESET APP
-     ============================================================ -->
-<div id="resetPopup" style="display:none;">
-  <div class="popupCard glass">
+  <!-- Popup backup -->
+  <div id="backupPopup">
+    <div id="backupBox">
+      <h2>Sicherung</h2>
 
-    <div class="popupHeader">
-      <div class="popupTitle">Reset app?</div>
+      <div class="backupBtnRow">
+        <button id="autoBackupBtn" class="backupAction"><span>Backup automatisch</span></button>
+        <button id="manualBackupBtn" class="backupAction"><span>Backup manuell</span></button>
+        <button id="autoRestoreBtn" class="backupAction"><span>Wiederherstellung automatisch</span></button>
+        <button id="manualRestoreBtn" class="backupAction"><span>Wiederherstellung manuell</span></button>
+        <button id="backupCloseBtn" class="backupAction"><span>Schliessen</span></button>
+      </div>
+
     </div>
-
-    <div style="font-size:13px;color:var(--text-soft);margin-top:4px;">
-      Tutte le note, archivio, impostazioni e PIN verranno eliminati.
-    </div>
-
-    <div class="popupActions">
-      <button id="resetCancelBtn" class="btnGhost">Annulla</button>
-      <button id="resetConfirmBtn" class="btnDanger">Sì, elimina</button>
-    </div>
-
   </div>
-</div>
 
-<!-- ============================================================
-     BANNER (notifiche brevi)
-     ============================================================ -->
-<div id="bannerMsg"></div>
+  <!-- PARTE C + D — LOGICA NOTE, LINGUE, PALETTE, TEMA -->
+  <script>
+    let notes = [];
+    let currentNoteId = null;
+    let currentLang = localStorage.getItem("lang") || "de";
 
-<!-- ============================================================
-     JAVASCRIPT (verrà inserito nel BLOCCO 3/4)
-     ============================================================ -->
-<script>
-  /* Il tuo JavaScript completo arriverà nel BLOCCO 3/4 */
-</script>
+    /* PALETTE */
+    const PALETTES = {
+      warm: ["#FFE4E1", "#FFD166", "#FF8C42", "#FFB5A7", "#F4A261", "#E76F51", "#E63946"],
+      cool: ["#DDE7F2", "#CDE7F0", "#A8DADC", "#457B9D", "#3A86FF", "#2A9D8F", "#264653"],
+      pastel: ["#FDE2E4", "#E2F0CB", "#DDE7F2", "#FFF1C1", "#E0F7FA", "#E8F5E9", "#F7EDE2"],
+      mix: ["#FDE2E4", "#E2F0CB", "#DDE7F2", "#FFD166", "#FF8C42", "#3A86FF", "#E63946"]
+    };
 
+    /* BANNER */
+    function showBanner(msg) {
+      const b = document.getElementById("bannerMsg");
+      b.textContent = msg;
+      b.classList.add("show");
+      setTimeout(() => b.classList.remove("show"), 1800);
+    }
+
+    /* BACKUP AUTO */
+    function autoBackup() {
+      localStorage.setItem("notes_backup_auto", JSON.stringify(notes));
+    }
+
+    function autoRestore() {
+      const saved = localStorage.getItem("notes_backup_auto");
+      if (saved) {
+        notes = JSON.parse(saved);
+        saveNotes();
+      }
+    }
+
+    /* STORAGE */
+    function saveNotes() {
+      localStorage.setItem("notes", JSON.stringify(notes));
+      autoBackup();
+    }
+
+    function loadNotes() {
+      return JSON.parse(localStorage.getItem("notes") || "[]");
+    }
+
+    /* MOSTRA NOTE */
+    function showNotes(filter = "alle") {
+      const list = document.getElementById("notesList");
+      list.innerHTML = "";
+
+      let filtered = notes;
+
+      if (filter === "favorite") {
+        filtered = notes.filter(n => n.favorite);
+      } else if (filter !== "alle") {
+        filtered = notes.filter(n => n.category === filter);
+      }
+
+      filtered.forEach(note => {
+        const div = document.createElement("div");
+        div.className = "noteItem";
+        div.style.background = note.color || "#ffffff";
+
+        div.innerHTML = `
+          <div>${note.text.substring(0, 80)}</div>
+          <div class="favBtn" style="font-size:18px;margin-top:6px;cursor:pointer;">
+            ${note.favorite ? "⭐" : "☆"}
+          </div>
+        `;
+
+        div.querySelector(".favBtn").onclick = (e) => {
+          e.stopPropagation();
+          toggleFavorite(note.id);
+        };
+
+        div.onclick = () => openEditor(note.id);
+
+        list.appendChild(div);
+      });
+    }
+
+    /* EDITOR */
+    function openEditor(id = null) {
+      currentNoteId = id;
+
+      const editor = document.getElementById("noteEditor");
+      const title = document.getElementById("editorTitle");
+      const delBtn = document.getElementById("deleteNoteBtn");
+
+      if (id === null) {
+        title.textContent = LANG[currentLang].newNote;
+        document.getElementById("noteText").value = "";
+        delBtn.style.display = "none";
+        document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
+      } else {
+        const note = notes.find(n => n.id === id);
+        if (!note) return;
+        title.textContent = LANG[currentLang].editNote;
+        document.getElementById("noteText").value = note.text;
+        delBtn.style.display = "block";
+
+        document.querySelectorAll(".colorDot").forEach(d => {
+          d.classList.toggle("selected", d.dataset.color === note.color);
+        });
+      }
+
+      editor.style.display = "flex";
+    }
+
+    function saveNote() {
+      const text = document.getElementById("noteText").value.trim();
+      if (!text) {
+        closeEditor();
+        return;
+      }
+
+      let selectedColor = "#ffffff";
+      const selectedDot = document.querySelector(".colorDot.selected");
+      if (selectedDot) selectedColor = selectedDot.dataset.color;
+
+      if (currentNoteId === null) {
+        notes.push({
+          id: Date.now(),
+          text,
+          color: selectedColor,
+          category: "alle",
+          favorite: false
+        });
+      } else {
+        const note = notes.find(n => n.id === currentNoteId);
+        if (note) {
+          note.text = text;
+          note.color = selectedColor;
+        }
+      }
+
+      saveNotes();
+      showNotes();
+      closeEditor();
+    }
+
+    function deleteNote() {
+      if (!confirm("Sei sicuro?")) return;
+
+      notes = notes.filter(n => n.id !== currentNoteId);
+      saveNotes();
+      showNotes();
+      closeEditor();
+
+      showBanner(LANG[currentLang].msg.deleted);
+    }
+
+    function toggleFavorite(id) {
+      const note = notes.find(n => n.id === id);
+      if (!note) return;
+
+      note.favorite = !note.favorite;
+
+      saveNotes();
+      showNotes();
+
+      showBanner(note.favorite ? LANG[currentLang].msg.favAdd : LANG[currentLang].msg.favRemove);
+    }
+
+    function closeEditor() {
+      document.getElementById("noteEditor").style.display = "none";
+      currentNoteId = null;
+    }
+
+    /* PALETTE + ANIMAZIONI */
+    function applyPalette(name) {
+      const row = document.getElementById("colorRow");
+      row.innerHTML = "";
+
+      PALETTES[name].forEach((color, index) => {
+        const dot = document.createElement("div");
+        dot.className = "colorDot";
+        dot.dataset.color = color;
+        dot.style.background = color;
+
+        row.appendChild(dot);
+
+        setTimeout(() => {
+          dot.classList.add("show");
+        }, index * 60);
+      });
+
+      document.querySelectorAll(".colorDot").forEach(dot => {
+        dot.onclick = () => {
+          const color = dot.dataset.color;
+
+          document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
+          dot.classList.add("selected");
+
+          if (currentNoteId !== null) {
+            const note = notes.find(n => n.id === currentNoteId);
+            if (note) {
+              note.color = color;
+              saveNotes();
+              showNotes();
+            }
+          }
+        };
+      });
+
+      document.querySelectorAll(".paletteBtn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.pal === name);
+      });
+
+      localStorage.setItem("palette", name);
+    }
+
+    /* LINGUE */
+    const LANG = {
+      de: {
+        appTitle: "Notizen",
+        newNote: "Neue Notiz",
+        editNote: "Notiz bearbeiten",
+        cancel: "Abbrechen",
+        save: "Speichern",
+        categories: {
+          favorite: "Favoriten",
+          alle: "Alle",
+          arbeit: "Arbeit",
+          einkauf: "Einkauf",
+          zuhause: "Zuhause",
+          ideen: "Ideen",
+          personlich: "Persönlich"
+        },
+        backup: {
+          title: "Sicherung",
+          autoBackup: "Backup automatisch",
+          manualBackup: "Backup manuell",
+          autoRestore: "Wiederherstellung automatisch",
+          manualRestore: "Wiederherstellung manuell",
+          close: "Schliessen"
+        },
+        msg: {
+          favAdd: "Zu Favoriten hinzugefügt",
+          favRemove: "Aus Favoriten entfernt",
+          deleted: "Notiz gelöscht"
+        }
+      },
+      it: {
+        appTitle: "Note",
+        newNote: "Nuova nota",
+        editNote: "Modifica nota",
+        cancel: "Annulla",
+        save: "Salva",
+        categories: {
+          favorite: "Preferiti",
+          alle: "Tutte",
+          arbeit: "Lavoro",
+          einkauf: "Spesa",
+          zuhause: "Casa",
+          ideen: "Idee",
+          personlich: "Personale"
+        },
+        backup: {
+          title: "Backup",
+          autoBackup: "Backup automatico",
+          manualBackup: "Backup manuale",
+          autoRestore: "Ripristino automatico",
+          manualRestore: "Ripristino manuale",
+          close: "Chiudi"
+        },
+        msg: {
+          favAdd: "Aggiunto ai preferiti",
+          favRemove: "Rimosso dai preferiti",
+          deleted: "Nota eliminata"
+        }
+      },
+      en: {
+        appTitle: "Notes",
+        newNote: "New Note",
+        editNote: "Edit Note",
+        cancel: "Cancel",
+        save: "Save",
+        categories: {
+          favorite: "Favorites",
+          alle: "All",
+          arbeit: "Work",
+          einkauf: "Shopping",
+          zuhause: "Home",
+          ideen: "Ideas",
+          personlich: "Personal"
+        },
+        backup: {
+          title: "Backup",
+          autoBackup: "Automatic Backup",
+          manualBackup: "Manual Backup",
+          autoRestore: "Automatic Restore",
+          manualRestore: "Manual Restore",
+          close: "Close"
+        },
+        msg: {
+          favAdd: "Added to favorites",
+          favRemove: "Removed from favorites",
+          deleted: "Note deleted"
+        }
+      },
+      es: {
+        appTitle: "Notas",
+        newNote: "Nueva nota",
+        editNote: "Editar nota",
+        cancel: "Cancelar",
+        save: "Guardar",
+        categories: {
+          favorite: "Favoritos",
+          alle: "Todas",
+          arbeit: "Trabajo",
+          einkauf: "Compras",
+          zuhause: "Casa",
+          ideen: "Ideas",
+          personlich: "Personal"
+        },
+        backup: {
+          title: "Copia de seguridad",
+          autoBackup: "Copia automática",
+          manualBackup: "Copia manual",
+          autoRestore: "Restauración automática",
+          manualRestore: "Restauración manual",
+          close: "Cerrar"
+        },
+        msg: {
+          favAdd: "Añadido a favoritos",
+          favRemove: "Eliminado de favoritos",
+          deleted: "Nota eliminada"
+        }
+      }
+    };
+
+    function applyLanguage(lang) {
+      currentLang = lang;
+      const L = LANG[lang];
+
+      document.getElementById("appTitle").textContent = L.appTitle;
+      document.getElementById("cancelBtn").textContent = L.cancel;
+      document.getElementById("saveBtn").textContent = L.save;
+
+      document.querySelectorAll(".cat").forEach(btn => {
+        const key = btn.dataset.cat;
+        btn.querySelector(".catLabel").textContent = L.categories[key];
+      });
+
+      document.querySelector("#backupBox h2").textContent = L.backup.title;
+      document.querySelector("#autoBackupBtn span").textContent = L.backup.autoBackup;
+      document.querySelector("#manualBackupBtn span").textContent = L.backup.manualBackup;
+      document.querySelector("#autoRestoreBtn span").textContent = L.backup.autoRestore;
+      document.querySelector("#manualRestoreBtn span").textContent = L.backup.manualRestore;
+      document.querySelector("#backupCloseBtn span").textContent = L.backup.close;
+
+      localStorage.setItem("lang", lang);
+      showNotes();
+    }
+
+    /* TEMA CHIARO/SCURO */
+    function toggleTheme() {
+      const body = document.body;
+      const isDark = body.classList.toggle("dark");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+      document.getElementById("themeBtn").textContent = isDark ? "☀️" : "🌙";
+    }
+
+    /* EVENTI */
+    document.getElementById("addNoteBtn").onclick = () => openEditor();
+    document.getElementById("cancelBtn").onclick = closeEditor;
+    document.getElementById("saveBtn").onclick = saveNote;
+    document.getElementById("deleteNoteBtn").onclick = deleteNote;
+
+    document.querySelectorAll(".cat").forEach(btn => {
+      btn.onclick = () => showNotes(btn.dataset.cat);
+    });
+
+    document.getElementById("langBtn").onclick = () => {
+      document.getElementById("langPopup").style.display = "flex";
+    };
+    document.querySelectorAll(".langChoice").forEach(btn => {
+      btn.onclick = () => {
+        applyLanguage(btn.dataset.lang);
+        document.getElementById("langPopup").style.display = "none";
+      };
+    });
+    document.getElementById("langPopup").onclick = e => {
+      if (e.target.id === "langPopup") {
+        document.getElementById("langPopup").style.display = "none";
+      }
+    };
+
+    document.getElementById("backupBtn").onclick = () => {
+      document.getElementById("backupPopup").style.display = "flex";
+    };
+    document.getElementById("backupCloseBtn").onclick = () => {
+      document.getElementById("backupPopup").style.display = "none";
+    };
+    document.getElementById("backupPopup").onclick = e => {
+      if (e.target.id === "backupPopup") {
+        document.getElementById("backupPopup").style.display = "none";
+      }
+    };
+
+    document.getElementById("manualBackupBtn").onclick = () => {
+      localStorage.setItem("notes_backup_manual", JSON.stringify(notes));
+      showBanner("Backup salvato");
+    };
+    document.getElementById("manualRestoreBtn").onclick = () => {
+      const saved = localStorage.getItem("notes_backup_manual");
+      if (saved) {
+        notes = JSON.parse(saved);
+        saveNotes();
+        showNotes();
+        showBanner("Backup ripristinato");
+      }
+    };
+    document.getElementById("autoBackupBtn").onclick = () => {
+      showBanner("Backup automatico attivo");
+    };
+    document.getElementById("autoRestoreBtn").onclick = () => {
+      autoRestore();
+      showNotes();
+      showBanner("Ripristino automatico eseguito");
+    };
+
+    document.getElementById("themeBtn").onclick = toggleTheme;
+
+    document.querySelectorAll(".paletteBtn").forEach(btn => {
+      btn.onclick = () => {
+        applyPalette(btn.dataset.pal);
+      };
+    });
+
+    /* AVVIO APP */
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark");
+      document.getElementById("themeBtn").textContent = "☀️";
+    }
+
+    notes = loadNotes();
+    autoRestore();
+
+    const savedPalette = localStorage.getItem("palette") || "mix";
+    applyPalette(savedPalette);
+
+    applyLanguage(currentLang);
+    showNotes();
+  </script>
 </body>
 </html>
-/* ============================================================
-   VARIABILI GLOBALI (colori, blur, animazioni)
-   ============================================================ */
-:root {
-  --bg: #050814;
-  --bg-soft: rgba(10, 14, 30, 0.9);
-  --card: rgba(18, 24, 48, 0.9);
-  --border: rgba(255, 255, 255, 0.06);
-  --text: #f7f9ff;
-  --text-soft: #a5b0d0;
-  --accent: #4f8cff;
-  --accent-light: #4f8cff55;
-  --accent-glow: #4f8cff55;
-  --danger: #ff4b5c;
-  --blur-amount: 18px;
-  --text-size: 16px;
-  --anim: 1;
-}
 
-/* ============================================================
-   RESET + BASE
-   ============================================================ */
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
 
-body {
-  margin: 0;
-  font-family: -apple-system, system-ui, sans-serif;
-  background: radial-gradient(circle at top, #1b2a4a 0, #050814 55%, #000 100%);
-  color: var(--text);
-  min-height: 100vh;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  font-size: var(--text-size);
-  transition: background 0.3s ease;
-}
 
-/* Tema scuro */
-body.dark {
-  background: radial-gradient(circle at top, #0f172a 0, #020617 60%, #000 100%);
-}
 
-/* AMOLED puro */
-body.amoled {
-  background: #000;
-}
 
-/* ============================================================
-   CONTENITORE PRINCIPALE
-   ============================================================ */
-.appShell {
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 18px 14px 26px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
 
-/* ============================================================
-   EFFETTO VETRO (glassmorphism)
-   ============================================================ */
-.glass {
-  background: var(--bg-soft);
-  border-radius: 22px;
-  border: 1px solid var(--border);
-  backdrop-filter: blur(var(--blur-amount));
-  -webkit-backdrop-filter: blur(var(--blur-amount));
-  box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(255, 255, 255, 0.02);
-}
 
-/* ============================================================
-   HEADER
-   ============================================================ */
-.header {
-  padding: 14px 16px 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
 
-#appTitle {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  display: flex;
-  flex-direction: column;
-}
+Head
 
-#appTitle .sub {
-  font-size: 11px;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  margin-top: 2px;
-}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notizen</title>
 
-/* Pulsanti icona header */
-.headerButtons {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
+  <style>
+    :root {
+      --bg: #f2f2f7;
+      --card: #ffffff;
+      --text: #000000;
 
-.iconBtn {
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: radial-gradient(circle at top, #1f2937 0, #020617 80%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-soft);
-  font-size: 15px;
-  cursor: pointer;
-  transition: transform 0.18s ease;
-}
-
-.iconBtn:active {
-  transform: scale(0.94);
-}
-
-/* ============================================================
-   CATEGORIE
-   ============================================================ */
-.categories {
-  padding: 0 10px 10px;
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.categories::-webkit-scrollbar {
-  display: none;
-}
-
-.cat {
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  font-size: 12px;
-  color: var(--text-soft);
-  cursor: pointer;
-  white-space: nowrap;
-  background: rgba(15, 23, 42, 0.9);
-  transition: background 0.2s ease;
-}
-
-.cat.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent-light);
-}
-
-/* ============================================================
-   LISTA NOTE
-   ============================================================ */
-.notesCard {
-  padding: 10px 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-#notesList {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 55vh;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.noteItem {
-  border-radius: 18px;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid var(--border);
-  padding: 10px 11px 9px;
-  cursor: pointer;
-  border-left: 3px solid var(--accent);
-  transition: transform 0.15s ease;
-}
-
-.noteItem:active {
-  transform: scale(0.97);
-}
-
-.noteTitleRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.noteTitle {
-  font-size: 15px;
-  font-weight: 600;
-  color: #e5edff;
-}
-
-.noteMeta {
-  font-size: 11px;
-  color: var(--text-soft);
-}
-
-.noteTextPreview {
-  font-size: 13px;
-  color: var(--text-soft);
-  margin-top: 4px;
-}
-
-/* ============================================================
-   PULSANTE NUOVA NOTA
-   ============================================================ */
-.addNoteBar {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0 2px 2px;
-}
-
-#addNoteBtn {
-  border-radius: 999px;
-  padding: 7px 14px;
-  border: none;
-  background: linear-gradient(135deg, var(--accent), #7c5cff);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* ============================================================
-   EDITOR NOTE
-   ============================================================ */
-#noteEditor {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.editorCard {
-  width: 100%;
-  max-width: 480px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.editorInputs input,
-.editorInputs textarea {
-  width: 100%;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  background: rgba(15, 23, 42, 0.9);
-  padding: 10px 12px;
-  color: var(--text);
-  font-size: 15px;
-}
-
-.editorInputs textarea {
-  height: 160px;
-  resize: none;
-}
-
-/* Palette */
-.paletteRow {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.paletteBtns {
-  display: flex;
-  gap: 6px;
-}
-
-.paletteBtn {
-  padding: 6px 10px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: rgba(15, 23, 42, 0.9);
-  color: var(--text-soft);
-  font-size: 12px;
-  cursor: pointer;
-}
-
-#colorRow {
-  display: flex;
-  gap: 8px;
-}
-
-.colorDot {
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  cursor: pointer;
-  border: 2px solid transparent;
-}
-
-.colorDot.selected {
-  border-color: #fff;
-}
-
-/* Pulsanti editor */
-.editorActions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.btnDanger {
-  background: var(--danger);
-  color: #fff;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.btnGhost {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-soft);
-  padding: 8px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.btnPrimary {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-/* ============================================================
-   PANNELLO IMPOSTAZIONI
-   ============================================================ */
-#settingsPanel {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.settingsCard {
-  width: 100%;
-  max-width: 480px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.settingsHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.settingsTitle {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.settingsClose {
-  cursor: pointer;
-  font-size: 18px;
-  color: var(--text-soft);
-}
-
-.settingsList {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.settingsItem {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 12px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  background: rgba(15, 23, 42, 0.9);
-  cursor: pointer;
-}
-
-.settingsDanger {
-  border-color: var(--danger);
-  color: var(--danger);
-}
-
-/* ============================================================
-   POPUP ARCHIVIO + RESET
-   ============================================================ */
-#archivePopup,
-#resetPopup {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.popupCard {
-  width: 100%;
-  max-width: 480px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.popupHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.popupClose {
-  cursor: pointer;
-  font-size: 18px;
-  color: var(--text-soft);
-}
-
-.popupActions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-/* ============================================================
-   BANNER
-   ============================================================ */
-#bannerMsg {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
-  background: var(--accent);
-  color: #fff;
-  padding: 10px 18px;
-  border-radius: 12px;
-  font-size: 14px;
-  opacity: 0;
-  transition: 0.4s ease;
-}
-
-#bannerMsg.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-/* ============================================================
-   PIN OVERLAY
-   ============================================================ */
-#pinOverlay {
-  position: fixed;
-  inset: 0;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pinCard {
-  width: 260px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.pinTitle {
-  font-size: 20px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.pinCircles {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.pinCircle {
-  width: 14px;
-  height: 14px;
-  border-radius: 999px;
-  border: 2px solid var(--text-soft);
-}
-
-.pinCircle.filled {
-  background: var(--accent);
-  border-color: var(--accent);
-}
-
-.pinError {
-  text-align: center;
-  color: var(--danger);
-  font-size: 13px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.pinPad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.pinKey,
-#pinBackspace {
-  padding: 12px 0;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: rgba(15, 23, 42, 0.9);
-  color: var(--text);
-  font-size: 18px;
-  cursor: pointer;
-}
-/* ============================================================
-   PIN SYSTEM
-   ============================================================ */
-let savedPIN = localStorage.getItem("appPIN") || "4618";
-let enteredPIN = "";
-
-const pinOverlay = document.getElementById("pinOverlay");
-const pinCircles = document.querySelectorAll(".pinCircle");
-const pinError = document.getElementById("pinError");
-
-function updatePinCircles() {
-  pinCircles.forEach((c, i) => c.classList.toggle("filled", i < enteredPIN.length));
-}
-
-function checkPIN() {
-  if (enteredPIN === savedPIN) {
-    pinOverlay.style.display = "none";
-  } else {
-    pinError.textContent = "PIN errato";
-    pinError.style.opacity = 1;
-    setTimeout(() => pinError.style.opacity = 0, 900);
-  }
-  enteredPIN = "";
-  updatePinCircles();
-}
-
-document.querySelectorAll(".pinKey").forEach(btn => {
-  btn.onclick = () => {
-    const d = btn.dataset.digit;
-    if (!d) return;
-    if (enteredPIN.length < 4) {
-      enteredPIN += d;
-      updatePinCircles();
-      if (enteredPIN.length === 4) checkPIN();
+      --banner-bg: rgba(0,0,0,0.85);
+      --banner-text: #ffffff;
     }
-  };
-});
 
-document.getElementById("pinBackspace").onclick = () => {
-  enteredPIN = enteredPIN.slice(0, -1);
-  updatePinCircles();
-};
+    body.dark {
+      --bg: #000000;
+      --card: #1c1c1e;
+      --text: #ffffff;
 
-/* ============================================================
-   TRADUZIONI
-   ============================================================ */
-const translations = {
-  it: {
-    title: "Note",
-    premium: "Premium",
-    newNote: "Nuova nota",
-    save: "Salva",
-    cancel: "Annulla",
-    delete: "Elimina",
-    archive: "Archivio",
-    reset: "Reset app",
-    theme: "Tema",
-    amoled: "AMOLED",
-    font: "Font",
-    textSize: "Dimensione testo",
-    accent: "Colore accento",
-    blur: "Sfocatura",
-    animations: "Animazioni",
-    haptics: "Haptics",
-    export: "Esporta",
-    import: "Importa",
-    changePin: "Cambia PIN"
-  },
-  de: {
-    title: "Notizen",
-    premium: "Premium",
-    newNote: "Neue Notiz",
-    save: "Speichern",
-    cancel: "Abbrechen",
-    delete: "Löschen",
-    archive: "Archiv",
-    reset: "App zurücksetzen",
-    theme: "Thema",
-    amoled: "AMOLED",
-    font: "Schriftart",
-    textSize: "Textgröße",
-    accent: "Akzentfarbe",
-    blur: "Hintergrund‑Blur",
-    animations: "Animationen",
-    haptics: "Haptik",
-    export: "Exportieren",
-    import: "Importieren",
-    changePin: "PIN ändern"
-  },
-  en: {
-    title: "Notes",
-    premium: "Premium",
-    newNote: "New Note",
-    save: "Save",
-    cancel: "Cancel",
-    delete: "Delete",
-    archive: "Archive",
-    reset: "Reset App",
-    theme: "Theme",
-    amoled: "AMOLED",
-    font: "Font",
-    textSize: "Text Size",
-    accent: "Accent Color",
-    blur: "Background Blur",
-    animations: "Animations",
-    haptics: "Haptics",
-    export: "Export",
-    import: "Import",
-    changePin: "Change PIN"
-  }
-};
+      --banner-bg: rgba(255,255,255,0.85);
+      --banner-text: #000000;
+    }
 
-let currentLang = localStorage.getItem("appLang") || "it";
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
 
-function applyTranslations() {
-  const t = translations[currentLang];
+    #app {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 16px;
+    }
 
-  document.querySelector("#appTitle").childNodes[0].textContent = t.title;
-  document.querySelector("#appTitle .sub").textContent = t.premium;
+    /* HEADER */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    #appTitle {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .iconBtn {
+      border: none;
+      background: none;
+      font-size: 22px;
+      cursor: pointer;
+      margin-left: 8px;
+      color: var(--text);
+    }
 
-  document.getElementById("editorTitle").textContent = t.newNote;
-  document.getElementById("saveBtn").textContent = t.save;
-  document.getElementById("cancelBtn").textContent = t.cancel;
-  document.getElementById("deleteNoteBtn").textContent = "🗑 " + t.delete;
+    /* BANNER */
+    #bannerMsg {
+      position: fixed;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--banner-bg);
+      color: var(--banner-text);
+      padding: 10px 18px;
+      border-radius: 14px;
+      font-size: 15px;
+      z-index: 2000;
+      opacity: 0;
+      transition: all 0.35s ease;
+    }
+    #bannerMsg.show {
+      top: 20px;
+      opacity: 1;
+    }
 
-  document.getElementById("settingsTheme").querySelector(".label").textContent = t.theme;
-  document.getElementById("settingsAmoled").querySelector(".label").textContent = t.amoled;
-  document.getElementById("settingsFont").querySelector(".label").textContent = t.font;
-  document.getElementById("settingsTextSize").querySelector(".label").textContent = t.textSize;
-  document.getElementById("settingsAccent").querySelector(".label").textContent = t.accent;
-  document.getElementById("settingsBlur").querySelector(".label").textContent = t.blur;
-  document.getElementById("settingsAnimations").querySelector(".label").textContent = t.animations;
-  document.getElementById("settingsHaptics").querySelector(".label").textContent = t.haptics;
-  document.getElementById("settingsExport").querySelector(".label").textContent = t.export;
-  document.getElementById("settingsImport").querySelector(".label").textContent = t.import;
-  document.getElementById("settingsArchive").querySelector(".label").textContent = t.archive;
-  document.getElementById("settingsResetApp").querySelector(".label").textContent = t.reset;
-}
+    /* CATEGORIE */
+    #categories {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin-bottom: 12px;
+    }
+    .cat {
+      flex: 0 0 auto;
+      padding: 8px 12px;
+      border-radius: 16px;
+      background: var(--card);
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    .catLabel {
+      font-size: 14px;
+    }
 
-document.getElementById("langBtn").onclick = () => {
-  currentLang = currentLang === "it" ? "de" : currentLang === "de" ? "en" : "it";
-  localStorage.setItem("appLang", currentLang);
-  applyTranslations();
-};
+    /* LISTA NOTE */
+    #notesList {
+      display: block;
+    }
+    .noteItem {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      cursor: pointer;
+    }
 
-/* ============================================================
-   TEMA + AMOLED
-   ============================================================ */
-let theme = localStorage.getItem("theme") || "light";
-let amoled = localStorage.getItem("amoled") === "true";
+    /* BOTTONE + */
+    #addNoteBtn {
+      position: fixed;
+      right: 20px;
+      bottom: 30px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: none;
+      background: #007aff;
+      color: #fff;
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      cursor: pointer;
+      z-index: 1100;
+    }
 
-function applyTheme() {
-  document.body.classList.remove("dark", "amoled");
-  if (amoled) document.body.classList.add("amoled");
-  else if (theme === "dark") document.body.classList.add("dark");
-}
+    /* EDITOR */
+    #noteEditor {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1400;
+    }
+    #noteEditorBox {
+      width: 90%;
+      max-width: 500px;
+      background: var(--card);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+    }
 
-document.getElementById("themeBtn").onclick = () => {
-  theme = theme === "light" ? "dark" : "light";
-  localStorage.setItem("theme", theme);
-  applyTheme();
-};
+    #deleteNoteBtn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 22px;
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      display: none;
+      z-index: 9999;
+    }
 
-document.getElementById("settingsAmoled").onclick = () => {
-  amoled = !amoled;
-  localStorage.setItem("amoled", amoled);
-  applyTheme();
-};
+    #editorTitle {
+      margin: 0 0 4px 0;
+      font-size: 18px;
+    }
 
-/* ============================================================
-   BACKUP MANUALE (🛟)
-   ============================================================ */
-document.getElementById("backupBtn").onclick = () => {
-  const data = {
-    notes,
-    archive,
-    pin: savedPIN,
-    lang: currentLang,
-    theme,
-    amoled
-  };
+    #noteText {
+      width: 100%;
+      min-height: 120px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      padding: 8px;
+      font-size: 16px;
+      resize: vertical;
+      background: transparent;
+      color: inherit;
+    }
 
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
+    #editorButtons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    #cancelBtn {
+      background: #ccc;
+      color: #000;
+    }
+    #saveBtn {
+      background: #007aff;
+      color: #fff;
+    }
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "backup.json";
-  a.click();
+    /* PALETTE */
+    #paletteSelector {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+    .paletteBtn {
+      padding: 4px 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      background: var(--card);
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.25s ease, transform 0.2s ease, color 0.2s ease;
+    }
+    .paletteBtn.active {
+      background: #007aff;
+      color: #fff;
+      transform: scale(1.05);
+    }
 
-  URL.revokeObjectURL(url);
-  showBanner("Backup salvato");
-};
-/* ============================================================
-   NOTE SYSTEM
-   ============================================================ */
-let notes = JSON.parse(localStorage.getItem("notes") || "[]");
-let archive = JSON.parse(localStorage.getItem("archive") || "[]");
+    #colorRow {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
 
-let editingNoteId = null;
-let selectedColor = "#4f8cff";
+    .colorDot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.25s ease, opacity 0.25s ease, box-shadow 0.25s ease;
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    .colorDot.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .colorDot.selected {
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.4);
+      transform: scale(1.15);
+    }
 
-const palettes = {
-  warm: ["#ff6b6b", "#ff9f43", "#ffa502", "#ff4757", "#eccc68"],
-  cool: ["#1e90ff", "#3742fa", "#2ed573", "#70a1ff", "#5352ed"],
-  pastel: ["#ffcccc", "#ffd3b6", "#dcedc1", "#a8e6cf", "#d4a5a5"],
-  mix: ["#ff6b6b", "#1e90ff", "#2ed573", "#ffa502", "#a55eea"]
-};
+    /* POPUP LINGUA / BACKUP */
+    #langPopup,
+    #backupPopup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1500;
+    }
 
-/* ============================================================
-   PALETTE COLORI
-   ============================================================ */
-function loadPalette(p) {
-  const row = document.getElementById("colorRow");
-  row.innerHTML = "";
-  palettes[p].forEach(c => {
-    const dot = document.createElement("div");
-    dot.className = "colorDot";
-    dot.style.background = c;
-    dot.onclick = () => {
-      selectedColor = c;
-      document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
-      dot.classList.add("selected");
-    };
-    row.appendChild(dot);
-  });
-}
+    #langBox,
+    #backupBox {
+      width: 80%;
+      max-width: 360px;
+      background: var(--card);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
 
-document.querySelectorAll(".paletteBtn").forEach(btn => {
-  btn.onclick = () => loadPalette(btn.dataset.pal);
-});
+    .langChoice {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      background: transparent;
+      color: inherit;
+      font-size: 16px;
+      cursor: pointer;
+    }
 
-/* ============================================================
-   RENDER NOTE
-   ============================================================ */
-function renderNotes() {
-  const list = document.getElementById("notesList");
-  list.innerHTML = "";
+    .backupBtnRow {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
 
-  const activeCat = document.querySelector(".cat.active").dataset.cat;
+    .backupAction {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: #000;
+    }
 
-  notes.forEach(n => {
-    if (activeCat !== "all" && n.category !== activeCat) return;
+    #autoBackupBtn { background: #007aff; color: white; }
+    #manualBackupBtn { background: #ffcc00; color: black; }
+    #autoRestoreBtn { background: #ff9500; color: white; }
+    #manualRestoreBtn { background: #34c759; color: white; }
+    #backupCloseBtn { background: #ccc; color: black; }
 
-    const item = document.createElement("div");
-    item.className = "noteItem";
-    item.style.borderLeftColor = n.color;
-    item.innerHTML = `
-      <div class="noteTitleRow">
-        <div class="noteTitle">${n.title || "Senza titolo"}</div>
-        <div class="noteMeta">${n.date}</div>
+    /* PIN OVERLAY */
+    #pinOverlay {
+      position: fixed;
+      inset: 0;
+      backdrop-filter: blur(18px);
+      background: rgba(0,0,0,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+    }
+    #pinBox {
+      width: 80%;
+      max-width: 360px;
+      background: rgba(28,28,30,0.95);
+      color: #fff;
+      border-radius: 22px;
+      padding: 20px 18px 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+    #pinTitle {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    #pinCircles {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .pinCircle {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #007aff;
+      background: transparent;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .pinCircle.filled {
+      background: #007aff;
+      transform: scale(1.1);
+    }
+    #pinPad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      justify-items: center;
+    }
+    .pinKey {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #007aff;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      transition: transform 0.1s ease, opacity 0.1s ease, box-shadow 0.1s ease;
+    }
+    .pinKey.backspace {
+      background: #3a3a3c;
+      font-size: 20px;
+    }
+    #pinError {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #ff453a;
+      min-height: 16px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    /* SETTINGS PANEL (NUOVO) */
+    #settingsPanel {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 2600;
+    }
+
+    #settingsSheet {
+      width: 100%;
+      max-width: 760px;
+      background: var(--card);
+      border-radius: 22px 22px 0 0;
+      padding: 20px;
+      box-shadow: 0 -6px 20px rgba(0,0,0,0.25);
+      transform: translateY(100%);
+      transition: transform 0.35s ease;
+    }
+
+    #settingsPanel.show #settingsSheet {
+      transform: translateY(0);
+    }
+
+    .settingsTitle {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .settingsItem {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 10px;
+      border-radius: 14px;
+      border: 1px solid #ccc;
+      background: var(--card);
+      color: var(--text);
+      font-size: 16px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .settingsClose {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      background: #ccc;
+      color: #000;
+      font-size: 16px;
+      border: none;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+
+
+
+Box 2 Body 
+
+<body>
+
+  <!-- PIN OVERLAY -->
+  <div id="pinOverlay">
+    <div id="pinBox">
+      <div id="pinTitle">Inserisci PIN</div>
+
+      <div id="pinCircles">
+        <div class="pinCircle"></div>
+        <div class="pinCircle"></div>
+        <div class="pinCircle"></div>
+        <div class="pinCircle"></div>
       </div>
-      <div class="noteTextPreview">${n.text.slice(0, 120)}</div>
-    `;
-    item.onclick = () => openEditor(n.id);
-    list.appendChild(item);
-  });
-}
 
-/* ============================================================
-   CATEGORIE
-   ============================================================ */
-document.querySelectorAll(".cat").forEach(cat => {
-  cat.onclick = () => {
-    document.querySelectorAll(".cat").forEach(c => c.classList.remove("active"));
-    cat.classList.add("active");
-    renderNotes();
+      <div id="pinPad">
+        <button class="pinKey" data-digit="1">1</button>
+        <button class="pinKey" data-digit="2">2</button>
+        <button class="pinKey" data-digit="3">3</button>
+
+        <button class="pinKey" data-digit="4">4</button>
+        <button class="pinKey" data-digit="5">5</button>
+        <button class="pinKey" data-digit="6">6</button>
+
+        <button class="pinKey" data-digit="7">7</button>
+        <button class="pinKey" data-digit="8">8</button>
+        <button class="pinKey" data-digit="9">9</button>
+
+        <button class="pinKey empty"></button>
+        <button class="pinKey" data-digit="0">0</button>
+        <button class="pinKey backspace" id="pinBackspace">⌫</button>
+      </div>
+
+      <div id="pinError"></div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app">
+
+    <div id="bannerMsg"></div>
+
+    <header>
+      <div id="appTitle">Notizen</div>
+      <div>
+        <button id="themeBtn" class="iconBtn">🌙</button>
+        <button id="langBtn" class="iconBtn">🌐</button>
+        <button id="backupBtn" class="iconBtn">🛟</button>
+        <button id="settingsBtn" class="iconBtn">⚙️</button>
+      </div>
+    </header>
+
+    <!-- CATEGORIE -->
+    <div id="categories">
+      <div class="cat" data-cat="favorite"><span class="catLabel">Favoriten</span></div>
+      <div class="cat" data-cat="alle"><span class="catLabel">Alle</span></div>
+      <div class="cat" data-cat="arbeit"><span class="catLabel">Arbeit</span></div>
+      <div class="cat" data-cat="einkauf"><span class="catLabel">Einkauf</span></div>
+      <div class="cat" data-cat="zuhause"><span class="catLabel">Zuhause</span></div>
+      <div class="cat" data-cat="ideen"><span class="catLabel">Ideen</span></div>
+      <div class="cat" data-cat="personlich"><span class="catLabel">Persönlich</span></div>
+    </div>
+
+    <!-- LISTA NOTE -->
+    <div id="notesList"></div>
+
+    <!-- BOTTONE + -->
+    <button id="addNoteBtn">+</button>
+
+  </div>
+
+  <!-- EDITOR -->
+  <div id="noteEditor">
+    <div id="noteEditorBox">
+
+      <button id="deleteNoteBtn">🗑</button>
+
+      <h2 id="editorTitle">Neue Notiz</h2>
+
+      <textarea id="noteText"></textarea>
+
+      <div id="paletteSelector">
+        <span style="font-size:14px; opacity:0.7;">Palette:</span>
+        <button class="paletteBtn" data-pal="warm">Caldi</button>
+        <button class="paletteBtn" data-pal="cool">Freddi</button>
+        <button class="paletteBtn" data-pal="pastel">Pastello</button>
+        <button class="paletteBtn" data-pal="mix">Mix</button>
+      </div>
+
+      <div id="colorRow"></div>
+
+      <div id="editorButtons">
+        <button id="cancelBtn">Abbrechen</button>
+        <button id="saveBtn">Speichern</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- POPUP LINGUA -->
+  <div id="langPopup">
+    <div id="langBox">
+      <h2>Sprache</h2>
+      <button class="langChoice" data-lang="de">Deutsch</button>
+      <button class="langChoice" data-lang="it">Italiano</button>
+      <button class="langChoice" data-lang="en">English</button>
+      <button class="langChoice" data-lang="es">Español</button>
+    </div>
+  </div>
+
+  <!-- POPUP BACKUP -->
+  <div id="backupPopup">
+    <div id="backupBox">
+      <h2>Sicherung</h2>
+
+      <div class="backupBtnRow">
+        <button id="autoBackupBtn" class="backupAction"><span>Backup automatisch</span></button>
+        <button id="manualBackupBtn" class="backupAction"><span>Backup manuell</span></button>
+        <button id="autoRestoreBtn" class="backupAction"><span>Wiederherstellung automatisch</span></button>
+        <button id="manualRestoreBtn" class="backupAction"><span>Wiederherstellung manuell</span></button>
+        <button id="backupCloseBtn" class="backupAction"><span>Schliessen</span></button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- IMPOSTAZIONI (pannello iOS) -->
+  <div id="settingsPanel">
+    <div id="settingsSheet">
+
+      <div class="settingsTitle">Impostazioni</div>
+
+      <button class="settingsItem" id="settingsLang">🌐 Lingua</button>
+      <button class="settingsItem" id="settingsTheme">🌙 Tema</button>
+      <button class="settingsItem" id="settingsBackup">🛟 Backup</button>
+      <button class="settingsItem" id="settingsChangePin">🔐 Cambia PIN</button>
+      <button class="settingsItem" id="settingsResetPin">♻️ Ripristina PIN</button>
+
+      <button class="settingsClose">Chiudi</button>
+
+    </div>
+  </div>
+
+
+
+Box 3 Javascript 
+
+<script>
+  let notes = [];
+  let currentNoteId = null;
+  let currentLang = localStorage.getItem("lang") || "de";
+
+  /* PALETTE */
+  const PALETTES = {
+    warm: ["#FFE4E1", "#FFD166", "#FF8C42", "#FFB5A7", "#F4A261", "#E76F51", "#E63946"],
+    cool: ["#DDE7F2", "#CDE7F0", "#A8DADC", "#457B9D", "#3A86FF", "#2A9D8F", "#264653"],
+    pastel: ["#FDE2E4", "#E2F0CB", "#DDE7F2", "#FFF1C1", "#E0F7FA", "#E8F5E9", "#F7EDE2"],
+    mix: ["#FDE2E4", "#E2F0CB", "#DDE7F2", "#FFD166", "#FF8C42", "#3A86FF", "#E63946"]
   };
-});
 
-/* ============================================================
-   EDITOR NOTE
-   ============================================================ */
-function openEditor(id = null) {
-  editingNoteId = id;
-
-  if (id) {
-    const n = notes.find(x => x.id === id);
-    document.getElementById("noteTitleInput").value = n.title;
-    document.getElementById("noteText").value = n.text;
-    selectedColor = n.color;
-  } else {
-    document.getElementById("noteTitleInput").value = "";
-    document.getElementById("noteText").value = "";
-    selectedColor = "#4f8cff";
+  /* BANNER */
+  function showBanner(msg) {
+    const b = document.getElementById("bannerMsg");
+    b.textContent = msg;
+    b.classList.add("show");
+    setTimeout(() => b.classList.remove("show"), 1800);
   }
 
-  loadPalette("mix");
-  document.getElementById("noteEditor").style.display = "flex";
-}
+  /* BACKUP AUTO */
+  function autoBackup() {
+    localStorage.setItem("notes_backup_auto", JSON.stringify(notes));
+  }
 
-document.getElementById("addNoteBtn").onclick = () => openEditor(null);
+  function autoRestore() {
+    const saved = localStorage.getItem("notes_backup_auto");
+    if (saved) {
+      notes = JSON.parse(saved);
+      saveNotes();
+    }
+  }
 
-/* ============================================================
-   SALVA NOTA
-   ============================================================ */
-document.getElementById("saveBtn").onclick = () => {
-  const title = document.getElementById("noteTitleInput").value.trim();
-  const text = document.getElementById("noteText").value.trim();
+  /* STORAGE */
+  function saveNotes() {
+    localStorage.setItem("notes", JSON.stringify(notes));
+    autoBackup();
+  }
 
-  if (!text) return showBanner("Nota vuota");
+  function loadNotes() {
+    return JSON.parse(localStorage.getItem("notes") || "[]");
+  }
 
-  if (editingNoteId) {
-    const n = notes.find(x => x.id === editingNoteId);
-    n.title = title;
-    n.text = text;
-    n.color = selectedColor;
-    n.date = new Date().toLocaleDateString();
-  } else {
-    const cat = document.querySelector(".cat.active").dataset.cat;
-    notes.push({
-      id: Date.now(),
-      title,
-      text,
-      color: selectedColor,
-      category: cat,
-      date: new Date().toLocaleDateString()
+  /* MOSTRA NOTE */
+  function showNotes(filter = "alle") {
+    const list = document.getElementById("notesList");
+    list.innerHTML = "";
+
+    let filtered = notes;
+
+    if (filter === "favorite") {
+      filtered = notes.filter(n => n.favorite);
+    } else if (filter !== "alle") {
+      filtered = notes.filter(n => n.category === filter);
+    }
+
+    filtered.forEach(note => {
+      const div = document.createElement("div");
+      div.className = "noteItem";
+      div.style.background = note.color || "#ffffff";
+
+      div.innerHTML = `
+        <div>${note.text.substring(0, 80)}</div>
+        <div class="favBtn" style="font-size:18px;margin-top:6px;cursor:pointer;">
+          ${note.favorite ? "⭐" : "☆"}
+        </div>
+      `;
+
+      div.querySelector(".favBtn").onclick = (e) => {
+        e.stopPropagation();
+        toggleFavorite(note.id);
+      };
+
+      div.onclick = () => openEditor(note.id);
+
+      list.appendChild(div);
     });
   }
 
-  localStorage.setItem("notes", JSON.stringify(notes));
-  document.getElementById("noteEditor").style.display = "none";
-  renderNotes();
-};
+  /* EDITOR */
+  function openEditor(id = null) {
+    currentNoteId = id;
 
-/* ============================================================
-   ELIMINA (ARCHIVIA) NOTA
-   ============================================================ */
-document.getElementById("deleteNoteBtn").onclick = () => {
-  if (!editingNoteId) return;
-  const n = notes.find(x => x.id === editingNoteId);
-  archive.push(n);
-  notes = notes.filter(x => x.id !== editingNoteId);
+    const editor = document.getElementById("noteEditor");
+    const title = document.getElementById("editorTitle");
+    const delBtn = document.getElementById("deleteNoteBtn");
 
-  localStorage.setItem("notes", JSON.stringify(notes));
-  localStorage.setItem("archive", JSON.stringify(archive));
+    if (id === null) {
+      title.textContent = LANG[currentLang].newNote;
+      document.getElementById("noteText").value = "";
+      delBtn.style.display = "none";
+      document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
+    } else {
+      const note = notes.find(n => n.id === id);
+      if (!note) return;
+      title.textContent = LANG[currentLang].editNote;
+      document.getElementById("noteText").value = note.text;
+      delBtn.style.display = "block";
 
-  document.getElementById("noteEditor").style.display = "none";
-  renderNotes();
-};
+      document.querySelectorAll(".colorDot").forEach(d => {
+        d.classList.toggle("selected", d.dataset.color === note.color);
+      });
+    }
 
-/* ============================================================
-   ANNULLA EDITOR
-   ============================================================ */
-document.getElementById("cancelBtn").onclick = () => {
-  document.getElementById("noteEditor").style.display = "none";
-};
-
-/* ============================================================
-   ARCHIVIO
-   ============================================================ */
-document.getElementById("settingsArchive").onclick = () => {
-  const list = document.getElementById("archiveList");
-  list.innerHTML = "";
-  archive.forEach(n => {
-    const div = document.createElement("div");
-    div.innerHTML = `<b>${n.title}</b><br>${n.text.slice(0, 100)}...`;
-    div.style.marginBottom = "10px";
-    list.appendChild(div);
-  });
-  document.getElementById("archivePopup").style.display = "flex";
-};
-
-document.getElementById("archiveCloseBtn").onclick = () => {
-  document.getElementById("archivePopup").style.display = "none";
-};
-
-/* ============================================================
-   BANNER
-   ============================================================ */
-function showBanner(msg) {
-  const b = document.getElementById("bannerMsg");
-  b.textContent = msg;
-  b.classList.add("show");
-  setTimeout(() => b.classList.remove("show"), 1500);
-}
-/* ============================================================
-   IMPORT JSON
-   ============================================================ */
-document.getElementById("settingsImport").onclick = () => {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "application/json";
-
-  input.onchange = e => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = ev => {
-      try {
-        const data = JSON.parse(ev.target.result);
-
-        notes = data.notes || [];
-        archive = data.archive || [];
-        savedPIN = data.pin || "4618";
-        currentLang = data.lang || "it";
-        theme = data.theme || "light";
-        amoled = data.amoled || false;
-
-        localStorage.setItem("notes", JSON.stringify(notes));
-        localStorage.setItem("archive", JSON.stringify(archive));
-        localStorage.setItem("appPIN", savedPIN);
-        localStorage.setItem("appLang", currentLang);
-        localStorage.setItem("theme", theme);
-        localStorage.setItem("amoled", amoled);
-
-        applyTranslations();
-        applyTheme();
-        renderNotes();
-
-        showBanner("Import riuscito");
-      } catch {
-        showBanner("Errore import");
-      }
-    };
-
-    reader.readAsText(file);
-  };
-
-  input.click();
-};
-
-/* ============================================================
-   RESET APP
-   ============================================================ */
-document.getElementById("settingsResetApp").onclick = () => {
-  document.getElementById("resetPopup").style.display = "flex";
-};
-
-document.getElementById("resetCancelBtn").onclick = () => {
-  document.getElementById("resetPopup").style.display = "none";
-};
-
-document.getElementById("resetConfirmBtn").onclick = () => {
-  localStorage.clear();
-
-  notes = [];
-  archive = [];
-  savedPIN = "4618";
-  currentLang = "it";
-  theme = "light";
-  amoled = false;
-
-  applyTranslations();
-  applyTheme();
-  renderNotes();
-
-  document.getElementById("resetPopup").style.display = "none";
-  showBanner("Reset completato");
-};
-
-/* ============================================================
-   IMPOSTAZIONI AVANZATE
-   ============================================================ */
-
-/* FONT */
-let currentFont = localStorage.getItem("font") || "-apple-system";
-
-function applyFont() {
-  document.body.style.fontFamily = currentFont;
-}
-
-document.getElementById("settingsFont").onclick = () => {
-  const fonts = ["-apple-system", "Helvetica Neue", "Arial", "Georgia", "Courier New"];
-  currentFont = fonts[(fonts.indexOf(currentFont) + 1) % fonts.length];
-  localStorage.setItem("font", currentFont);
-  applyFont();
-  showBanner("Font cambiato");
-};
-
-/* DIMENSIONE TESTO */
-let textSize = parseInt(localStorage.getItem("textSize") || "16");
-
-function applyTextSize() {
-  document.body.style.fontSize = textSize + "px";
-}
-
-document.getElementById("settingsTextSize").onclick = () => {
-  textSize = textSize >= 22 ? 14 : textSize + 1;
-  localStorage.setItem("textSize", textSize);
-  applyTextSize();
-  showBanner("Dimensione: " + textSize);
-};
-
-/* COLORE ACCENTO */
-let accentColors = ["#4f8cff", "#ff3b30", "#ff9500", "#34c759", "#5856d6"];
-let accentIndex = parseInt(localStorage.getItem("accentIndex") || "0");
-
-function applyAccent() {
-  document.documentElement.style.setProperty("--accent", accentColors[accentIndex]);
-  document.documentElement.style.setProperty("--accent-light", accentColors[accentIndex] + "55");
-  document.documentElement.style.setProperty("--accent-glow", accentColors[accentIndex] + "55");
-}
-
-document.getElementById("settingsAccent").onclick = () => {
-  accentIndex = (accentIndex + 1) % accentColors.length;
-  localStorage.setItem("accentIndex", accentIndex);
-  applyAccent();
-  showBanner("Colore cambiato");
-};
-
-/* BLUR */
-let blurAmount = parseInt(localStorage.getItem("blur") || "18");
-
-function applyBlur() {
-  document.documentElement.style.setProperty("--blur-amount", blurAmount + "px");
-}
-
-document.getElementById("settingsBlur").onclick = () => {
-  blurAmount = blurAmount >= 30 ? 6 : blurAmount + 2;
-  localStorage.setItem("blur", blurAmount);
-  applyBlur();
-  showBanner("Blur: " + blurAmount);
-};
-
-/* ANIMAZIONI */
-let animationsEnabled = localStorage.getItem("animations") !== "false";
-
-function applyAnimations() {
-  document.body.style.setProperty("--anim", animationsEnabled ? "1" : "0");
-}
-
-document.getElementById("settingsAnimations").onclick = () => {
-  animationsEnabled = !animationsEnabled;
-  localStorage.setItem("animations", animationsEnabled);
-  applyAnimations();
-  showBanner(animationsEnabled ? "Animazioni ON" : "Animazioni OFF");
-};
-
-/* HAPTICS (placeholder, iOS Safari non supporta nativamente) */
-let hapticsEnabled = localStorage.getItem("haptics") !== "false";
-
-document.getElementById("settingsHaptics").onclick = () => {
-  hapticsEnabled = !hapticsEnabled;
-  localStorage.setItem("haptics", hapticsEnabled);
-  showBanner(hapticsEnabled ? "Haptics ON" : "Haptics OFF");
-};
-
-/* ============================================================
-   INIZIALIZZAZIONE FINALE
-   ============================================================ */
-applyTranslations();
-applyTheme();
-applyFont();
-applyTextSize();
-applyAccent();
-applyBlur();
-applyAnimations();
-renderNotes();
-/* ============================================================
-   NOTE + ARCHIVIO (prima, così esistono per backupBtn)
-   ============================================================ */
-let notes = JSON.parse(localStorage.getItem("notes") || "[]");
-let archive = JSON.parse(localStorage.getItem("archive") || "[]");
-
-/* ============================================================
-   PIN SYSTEM
-   ============================================================ */
-let savedPIN = localStorage.getItem("appPIN") || "4618";
-let enteredPIN = "";
-
-const pinOverlay = document.getElementById("pinOverlay");
-const pinCircles = document.querySelectorAll(".pinCircle");
-const pinError = document.getElementById("pinError");
-
-function updatePinCircles() {
-  pinCircles.forEach((c, i) => c.classList.toggle("filled", i < enteredPIN.length));
-}
-
-function checkPIN() {
-  if (enteredPIN === savedPIN) {
-    pinOverlay.style.display = "none";
-  } else {
-    pinError.textContent = "PIN errato";
-    pinError.style.opacity = 1;
-    setTimeout(() => pinError.style.opacity = 0, 900);
+    editor.style.display = "flex";
   }
-  enteredPIN = "";
-  updatePinCircles();
-}
 
-document.querySelectorAll(".pinKey").forEach(btn => {
-  btn.onclick = () => {
-    const d = btn.dataset.digit;
-    if (!d) return;
-    if (enteredPIN.length < 4) {
-      enteredPIN += d;
-      updatePinCircles();
-      if (enteredPIN.length === 4) checkPIN();
+  function saveNote() {
+    const text = document.getElementById("noteText").value.trim();
+    if (!text) {
+      closeEditor();
+      return;
+    }
+
+    let selectedColor = "#ffffff";
+    const selectedDot = document.querySelector(".colorDot.selected");
+    if (selectedDot) selectedColor = selectedDot.dataset.color;
+
+    if (currentNoteId === null) {
+      notes.push({
+        id: Date.now(),
+        text,
+        color: selectedColor,
+        category: "alle",
+        favorite: false
+      });
+    } else {
+      const note = notes.find(n => n.id === currentNoteId);
+      if (note) {
+        note.text = text;
+        note.color = selectedColor;
+      }
+    }
+
+    saveNotes();
+    showNotes();
+    closeEditor();
+  }
+
+  function deleteNote() {
+    if (!confirm("Sei sicuro?")) return;
+
+    notes = notes.filter(n => n.id !== currentNoteId);
+    saveNotes();
+    showNotes();
+    closeEditor();
+
+    showBanner(LANG[currentLang].msg.deleted);
+  }
+
+  function toggleFavorite(id) {
+    const note = notes.find(n => n.id === id);
+    if (!note) return;
+
+    note.favorite = !note.favorite;
+
+    saveNotes();
+    showNotes();
+
+    showBanner(note.favorite ? LANG[currentLang].msg.favAdd : LANG[currentLang].msg.favRemove);
+  }
+
+  function closeEditor() {
+    document.getElementById("noteEditor").style.display = "none";
+    currentNoteId = null;
+  }
+
+  /* PALETTE */
+  function applyPalette(name) {
+    const row = document.getElementById("colorRow");
+    row.innerHTML = "";
+
+    PALETTES[name].forEach((color, index) => {
+      const dot = document.createElement("div");
+      dot.className = "colorDot";
+      dot.dataset.color = color;
+      dot.style.background = color;
+
+      row.appendChild(dot);
+
+      setTimeout(() => {
+        dot.classList.add("show");
+      }, index * 60);
+    });
+
+    document.querySelectorAll(".colorDot").forEach(dot => {
+      dot.onclick = () => {
+        const color = dot.dataset.color;
+
+        document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
+        dot.classList.add("selected");
+
+        if (currentNoteId !== null) {
+          const note = notes.find(n => n.id === currentNoteId);
+          if (note) {
+            note.color = color;
+            saveNotes();
+            showNotes();
+          }
+        }
+      };
+    });
+
+    document.querySelectorAll(".paletteBtn").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.pal === name);
+    });
+
+    localStorage.setItem("palette", name);
+  }
+
+  /* LINGUE */
+  const LANG = {
+    de: {
+      appTitle: "Notizen",
+      newNote: "Neue Notiz",
+      editNote: "Notiz bearbeiten",
+      cancel: "Abbrechen",
+      save: "Speichern",
+      categories: {
+        favorite: "Favoriten",
+        alle: "Alle",
+        arbeit: "Arbeit",
+        einkauf: "Einkauf",
+        zuhause: "Zuhause",
+        ideen: "Ideen",
+        personlich: "Persönlich"
+      },
+      backup: {
+        title: "Sicherung",
+        autoBackup: "Backup automatisch",
+        manualBackup: "Backup manuell",
+        autoRestore: "Wiederherstellung automatisch",
+        manualRestore: "Wiederherstellung manuell",
+        close: "Schliessen"
+      },
+      msg: {
+        favAdd: "Zu Favoriten hinzugefügt",
+        favRemove: "Aus Favoriten entfernt",
+        deleted: "Notiz gelöscht"
+      }
+    },
+    it: {
+      appTitle: "Note",
+      newNote: "Nuova nota",
+      editNote: "Modifica nota",
+      cancel: "Annulla",
+      save: "Salva",
+      categories: {
+        favorite: "Preferiti",
+        alle: "Tutte",
+        arbeit: "Lavoro",
+        einkauf: "Spesa",
+        zuhause: "Casa",
+        ideen: "Idee",
+        personlich: "Personale"
+      },
+      backup: {
+        title: "Backup",
+        autoBackup: "Backup automatico",
+        manualBackup: "Backup manuale",
+        autoRestore: "Ripristino automatico",
+        manualRestore: "Ripristino manuale",
+        close: "Chiudi"
+      },
+      msg: {
+        favAdd: "Aggiunto ai preferiti",
+        favRemove: "Rimosso dai preferiti",
+        deleted: "Nota eliminata"
+      }
     }
   };
-});
 
-document.getElementById("pinBackspace").onclick = () => {
-  enteredPIN = enteredPIN.slice(0, -1);
-  updatePinCircles();
-};
+  function applyLanguage(lang) {
+    currentLang = lang;
+    const L = LANG[lang];
 
-/* ============================================================
-   TRADUZIONI
-   ============================================================ */
-const translations = {
-  it: {
-    title: "Note",
-    premium: "Premium",
-    newNote: "Nuova nota",
-    save: "Salva",
-    cancel: "Annulla",
-    delete: "Elimina",
-    archive: "Archivio",
-    reset: "Reset app",
-    theme: "Tema",
-    amoled: "AMOLED",
-    font: "Font",
-    textSize: "Dimensione testo",
-    accent: "Colore accento",
-    blur: "Sfocatura",
-    animations: "Animazioni",
-    haptics: "Haptics",
-    export: "Esporta",
-    import: "Importa",
-    changePin: "Cambia PIN"
-  },
-  de: {
-    title: "Notizen",
-    premium: "Premium",
-    newNote: "Neue Notiz",
-    save: "Speichern",
-    cancel: "Abbrechen",
-    delete: "Löschen",
-    archive: "Archiv",
-    reset: "App zurücksetzen",
-    theme: "Thema",
-    amoled: "AMOLED",
-    font: "Schriftart",
-    textSize: "Textgröße",
-    accent: "Akzentfarbe",
-    blur: "Hintergrund‑Blur",
-    animations: "Animationen",
-    haptics: "Haptik",
-    export: "Exportieren",
-    import: "Importieren",
-    changePin: "PIN ändern"
-  },
-  en: {
-    title: "Notes",
-    premium: "Premium",
-    newNote: "New Note",
-    save: "Save",
-    cancel: "Cancel",
-    delete: "Delete",
-    archive: "Archive",
-    reset: "Reset App",
-    theme: "Theme",
-    amoled: "AMOLED",
-    font: "Font",
-    textSize: "Text Size",
-    accent: "Accent Color",
-    blur: "Background Blur",
-    animations: "Animations",
-    haptics: "Haptics",
-    export: "Export",
-    import: "Import",
-    changePin: "Change PIN"
-  }
-};
+    document.getElementById("appTitle").textContent = L.appTitle;
+    document.getElementById("cancelBtn").textContent = L.cancel;
+    document.getElementById("saveBtn").textContent = L.save;
 
-let currentLang = localStorage.getItem("appLang") || "it";
+    document.querySelectorAll(".cat").forEach(btn => {
+      const key = btn.dataset.cat;
+      btn.querySelector(".catLabel").textContent = L.categories[key];
+    });
 
-function applyTranslations() {
-  const t = translations[currentLang];
+    document.querySelector("#backupBox h2").textContent = L.backup.title;
+    document.querySelector("#autoBackupBtn span").textContent = L.backup.autoBackup;
+    document.querySelector("#manualBackupBtn span").textContent = L.backup.manualBackup;
+    document.querySelector("#autoRestoreBtn span").textContent = L.backup.autoRestore;
+    document.querySelector("#manualRestoreBtn span").textContent = L.backup.manualRestore;
+    document.querySelector("#backupCloseBtn span").textContent = L.backup.close;
 
-  const appTitle = document.querySelector("#appTitle");
-  if (appTitle) {
-    appTitle.childNodes[0].textContent = t.title;
-    appTitle.querySelector(".sub").textContent = t.premium;
+    localStorage.setItem("lang", lang);
+    showNotes();
   }
 
-  const editorTitle = document.getElementById("editorTitle");
-  if (editorTitle) editorTitle.textContent = t.newNote;
+  /* TEMA */
+  function toggleTheme() {
+    const body = document.body;
+    const isDark = body.classList.toggle("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+    document.getElementById("themeBtn").textContent = isDark ? "☀️" : "🌙";
+  }
 
-  const saveBtn = document.getElementById("saveBtn");
-  if (saveBtn) saveBtn.textContent = t.save;
+  /* EVENTI BASE */
+  document.getElementById("addNoteBtn").onclick = () => openEditor();
+  document.getElementById("cancelBtn").onclick = closeEditor;
+  document.getElementById("saveBtn").onclick = saveNote;
+  document.getElementById("deleteNoteBtn").onclick = deleteNote;
 
-  const cancelBtn = document.getElementById("cancelBtn");
-  if (cancelBtn) cancelBtn.textContent = t.cancel;
-
-  const deleteNoteBtn = document.getElementById("deleteNoteBtn");
-  if (deleteNoteBtn) deleteNoteBtn.textContent = "🗑 " + t.delete;
-
-  const map = [
-    ["settingsTheme", "theme"],
-    ["settingsAmoled", "amoled"],
-    ["settingsFont", "font"],
-    ["settingsTextSize", "textSize"],
-    ["settingsAccent", "accent"],
-    ["settingsBlur", "blur"],
-    ["settingsAnimations", "animations"],
-    ["settingsHaptics", "haptics"],
-    ["settingsExport", "export"],
-    ["settingsImport", "import"],
-    ["settingsArchive", "archive"],
-    ["settingsResetApp", "reset"]
-  ];
-
-  map.forEach(([id, key]) => {
-    const el = document.getElementById(id);
-    if (el) el.querySelector(".label").textContent = t[key];
+  document.querySelectorAll(".cat").forEach(btn => {
+    btn.onclick = () => showNotes(btn.dataset.cat);
   });
-}
 
-document.getElementById("langBtn").onclick = () => {
-  currentLang = currentLang === "it" ? "de" : currentLang === "de" ? "en" : "it";
-  localStorage.setItem("appLang", currentLang);
-  applyTranslations();
-};
-
-/* ============================================================
-   TEMA + AMOLED
-   ============================================================ */
-let theme = localStorage.getItem("theme") || "light";
-let amoled = localStorage.getItem("amoled") === "true";
-
-function applyTheme() {
-  document.body.classList.remove("dark", "amoled");
-  if (amoled) document.body.classList.add("amoled");
-  else if (theme === "dark") document.body.classList.add("dark");
-}
-
-document.getElementById("themeBtn").onclick = () => {
-  theme = theme === "light" ? "dark" : "light";
-  localStorage.setItem("theme", theme);
-  applyTheme();
-};
-
-document.getElementById("settingsAmoled").onclick = () => {
-  amoled = !amoled;
-  localStorage.setItem("amoled", amoled);
-  applyTheme();
-};
-
-/* ============================================================
-   BACKUP MANUALE (🛟)
-   ============================================================ */
-document.getElementById("backupBtn").onclick = () => {
-  const data = {
-    notes,
-    archive,
-    pin: savedPIN,
-    lang: currentLang,
-    theme,
-    amoled
+  document.getElementById("langBtn").onclick = () => {
+    document.getElementById("langPopup").style.display = "flex";
   };
-
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "backup.json";
-  a.click();
-  URL.revokeObjectURL(url);
-  showBanner("Backup salvato");
-};
-
-/* ============================================================
-   PALETTE COLORI
-   ============================================================ */
-let editingNoteId = null;
-let selectedColor = "#4f8cff";
-
-const palettes = {
-  warm: ["#ff6b6b", "#ff9f43", "#ffa502", "#ff4757", "#eccc68"],
-  cool: ["#1e90ff", "#3742fa", "#2ed573", "#70a1ff", "#5352ed"],
-  pastel: ["#ffcccc", "#ffd3b6", "#dcedc1", "#a8e6cf", "#d4a5a5"],
-  mix: ["#ff6b6b", "#1e90ff", "#2ed573", "#ffa502", "#a55eea"]
-};
-
-function loadPalette(p) {
-  const row = document.getElementById("colorRow");
-  if (!row) return;
-  row.innerHTML = "";
-  palettes[p].forEach(c => {
-    const dot = document.createElement("div");
-    dot.className = "colorDot";
-    dot.style.background = c;
-    dot.onclick = () => {
-      selectedColor = c;
-      document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
-      dot.classList.add("selected");
+  document.querySelectorAll(".langChoice").forEach(btn => {
+    btn.onclick = () => {
+      applyLanguage(btn.dataset.lang);
+      document.getElementById("langPopup").style.display = "none";
     };
-    row.appendChild(dot);
   });
-}
-
-document.querySelectorAll(".paletteBtn").forEach(btn => {
-  btn.onclick = () => loadPalette(btn.dataset.pal);
-});
-
-/* ============================================================
-   RENDER NOTE
-   ============================================================ */
-function renderNotes() {
-  const list = document.getElementById("notesList");
-  if (!list) return;
-  list.innerHTML = "";
-
-  const activeCatEl = document.querySelector(".cat.active");
-  const activeCat = activeCatEl ? activeCatEl.dataset.cat : "all";
-
-  notes.forEach(n => {
-    if (activeCat !== "all" && n.category !== activeCat) return;
-
-    const item = document.createElement("div");
-    item.className = "noteItem";
-    item.style.borderLeftColor = n.color;
-    item.innerHTML = `
-      <div class="noteTitleRow">
-        <div class="noteTitle">${n.title || "Senza titolo"}</div>
-        <div class="noteMeta">${n.date}</div>
-      </div>
-      <div class="noteTextPreview">${n.text.slice(0, 120)}</div>
-    `;
-    item.onclick = () => openEditor(n.id);
-    list.appendChild(item);
-  });
-}
-
-/* ============================================================
-   CATEGORIE
-   ============================================================ */
-document.querySelectorAll(".cat").forEach(cat => {
-  cat.onclick = () => {
-    document.querySelectorAll(".cat").forEach(c => c.classList.remove("active"));
-    cat.classList.add("active");
-    renderNotes();
+  document.getElementById("langPopup").onclick = e => {
+    if (e.target.id === "langPopup") {
+      document.getElementById("langPopup").style.display = "none";
+    }
   };
-});
 
-/* ============================================================
-   EDITOR NOTE
-   ============================================================ */
-function openEditor(id = null) {
-  editingNoteId = id;
+  document.getElementById("backupBtn").onclick = () => {
+    document.getElementById("backupPopup").style.display = "flex";
+  };
+  document.getElementById("backupCloseBtn").onclick = () => {
+    document.getElementById("backupPopup").style.display = "none";
+  };
+  document.getElementById("backupPopup").onclick = e => {
+    if (e.target.id === "backupPopup") {
+      document.getElementById("backupPopup").style.display = "none";
+    }
+  };
 
-  const titleInput = document.getElementById("noteTitleInput");
-  const textInput = document.getElementById("noteText");
-  const editor = document.getElementById("noteEditor");
+  document.getElementById("manualBackupBtn").onclick = () => {
+    localStorage.setItem("notes_backup_manual", JSON.stringify(notes));
+    showBanner("Backup salvato");
+  };
+  document.getElementById("manualRestoreBtn").onclick = () => {
+    const saved = localStorage.getItem("notes_backup_manual");
+    if (saved) {
+      notes = JSON.parse(saved);
+      saveNotes();
+      showNotes();
+      showBanner("Backup ripristinato");
+    }
+  };
+  document.getElementById("autoBackupBtn").onclick = () => {
+    showBanner("Backup automatico attivo");
+  };
+  document.getElementById("autoRestoreBtn").onclick = () => {
+    autoRestore();
+    showNotes();
+    showBanner("Ripristino automatico eseguito");
+  };
 
-  if (!titleInput || !textInput || !editor) return;
+  document.getElementById("themeBtn").onclick = toggleTheme;
 
-  if (id) {
-    const n = notes.find(x => x.id === id);
-    if (!n) return;
-    titleInput.value = n.title;
-    textInput.value = n.text;
-    selectedColor = n.color;
-  } else {
-    titleInput.value = "";
-    textInput.value = "";
-    selectedColor = "#4f8cff";
+  document.querySelectorAll(".paletteBtn").forEach(btn => {
+    btn.onclick = () => {
+      applyPalette(btn.dataset.pal);
+    };
+  });
+
+  /* IMPOSTAZIONI - apertura/chiusura */
+  const settingsPanel = document.getElementById("settingsPanel");
+
+  document.getElementById("settingsBtn").onclick = () => {
+    settingsPanel.style.display = "flex";
+    setTimeout(() => settingsPanel.classList.add("show"), 10);
+  };
+
+  document.querySelector(".settingsClose").onclick = () => {
+    settingsPanel.classList.remove("show");
+    setTimeout(() => settingsPanel.style.display = "none", 300);
+  };
+
+  settingsPanel.onclick = (e) => {
+    if (e.target.id === "settingsPanel") {
+      settingsPanel.classList.remove("show");
+      setTimeout(() => settingsPanel.style.display = "none", 300);
+    }
+  };
+
+  /* IMPOSTAZIONI - collegamento funzioni */
+  document.getElementById("settingsLang").onclick = () => {
+    settingsPanel.classList.remove("show");
+    setTimeout(() => settingsPanel.style.display = "none", 300);
+    document.getElementById("langPopup").style.display = "flex";
+  };
+
+  document.getElementById("settingsTheme").onclick = () => {
+    toggleTheme();
+  };
+
+  document.getElementById("settingsBackup").onclick = () => {
+    settingsPanel.classList.remove("show");
+    setTimeout(() => settingsPanel.style.display = "none", 300);
+    document.getElementById("backupPopup").style.display = "flex";
+  };
+
+  /* CAMBIA PIN */
+  document.getElementById("settingsChangePin").onclick = () => {
+    const nuovo = prompt("Inserisci il nuovo PIN (4 cifre):");
+    if (!nuovo || nuovo.length !== 4 || isNaN(nuovo)) {
+      alert("PIN non valido");
+      return;
+    }
+    localStorage.setItem("pinCode", nuovo);
+    alert("PIN aggiornato");
+  };
+
+  /* RIPRISTINA PIN */
+  document.getElementById("settingsResetPin").onclick = () => {
+    localStorage.setItem("pinCode", "4618");
+    alert("PIN ripristinato a 4618");
+  };
+
+  /* PIN SYSTEM */
+  let pinCode = null;
+  let enteredPin = "";
+
+  function initPin() {
+    let savedPin = localStorage.getItem("pinCode");
+    if (!savedPin) {
+      savedPin = "4618";
+      localStorage.setItem("pinCode", savedPin);
+    }
+    pinCode = savedPin;
+    showPinOverlay();
   }
 
-  loadPalette("mix");
-  editor.style.display = "flex";
-}
+  function showPinOverlay() {
+    enteredPin = "";
+    updatePinCircles();
+    const overlay = document.getElementById("pinOverlay");
+    const error = document.getElementById("pinError");
+    error.style.opacity = 0;
+    error.textContent = "";
+    overlay.style.display = "flex";
+  }
 
-document.getElementById("addNoteBtn").onclick = () => openEditor(null);
+  function hidePinOverlay() {
+    const overlay = document.getElementById("pinOverlay");
+    overlay.style.display = "none";
+  }
 
-/* ============================================================
-   SALVA NOTA
-   ============================================================ */
-document.getElementById("saveBtn").onclick = () => {
-  const title = document.getElementById("noteTitleInput").value.trim();
-  const text = document.getElementById("noteText").value.trim();
-
-  if (!text) return showBanner("Nota vuota");
-
-  if (editingNoteId) {
-    const n = notes.find(x => x.id === editingNoteId);
-    if (!n) return;
-    n.title = title;
-    n.text = text;
-    n.color = selectedColor;
-    n.date = new Date().toLocaleDateString();
-  } else {
-    const activeCatEl = document.querySelector(".cat.active");
-    const cat = activeCatEl ? activeCatEl.dataset.cat : "all";
-    notes.push({
-      id: Date.now(),
-      title,
-      text,
-      color: selectedColor,
-      category: cat,
-      date: new Date().toLocaleDateString()
+  function updatePinCircles() {
+    const circles = document.querySelectorAll(".pinCircle");
+    circles.forEach((c, i) => {
+      c.classList.toggle("filled", i < enteredPin.length);
     });
   }
 
-  localStorage.setItem("notes", JSON.stringify(notes));
-  document.getElementById("noteEditor").style.display = "none";
-  renderNotes();
-};
-
-/* ============================================================
-   ELIMINA (ARCHIVIA) NOTA
-   ============================================================ */
-document.getElementById("deleteNoteBtn").onclick = () => {
-  if (!editingNoteId) return;
-  const n = notes.find(x => x.id === editingNoteId);
-  if (!n) return;
-
-  archive.push(n);
-  notes = notes.filter(x => x.id !== editingNoteId);
-
-  localStorage.setItem("notes", JSON.stringify(notes));
-  localStorage.setItem("archive", JSON.stringify(archive));
-
-  document.getElementById("noteEditor").style.display = "none";
-  renderNotes();
-};
-
-/* ============================================================
-   ANNULLA EDITOR
-   ============================================================ */
-document.getElementById("cancelBtn").onclick = () => {
-  document.getElementById("noteEditor").style.display = "none";
-};
-
-/* ============================================================
-   ARCHIVIO
-   ============================================================ */
-document.getElementById("settingsArchive").onclick = () => {
-  const list = document.getElementById("archiveList");
-  if (!list) return;
-  list.innerHTML = "";
-  archive.forEach(n => {
-    const div = document.createElement("div");
-    div.innerHTML = `<b>${n.title}</b><br>${n.text.slice(0, 100)}...`;
-    div.style.marginBottom = "10px";
-    list.appendChild(div);
-  });
-  document.getElementById("archivePopup").style.display = "flex";
-};
-
-document.getElementById("archiveCloseBtn").onclick = () => {
-  document.getElementById("archivePopup").style.display = "none";
-};
-
-/* ============================================================
-   BANNER
-   ============================================================ */
-function showBanner(msg) {
-  const b = document.getElementById("bannerMsg");
-  if (!b) return;
-  b.textContent = msg;
-  b.classList.add("show");
-  setTimeout(() => b.classList.remove("show"), 1500);
-}
-
-/* ============================================================
-   IMPORT JSON
-   ============================================================ */
-document.getElementById("settingsImport").onclick = () => {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "application/json";
-
-  input.onchange = e => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = ev => {
-      try {
-        const data = JSON.parse(ev.target.result);
-
-        notes = data.notes || [];
-        archive = data.archive || [];
-        savedPIN = data.pin || "4618";
-        currentLang = data.lang || "it";
-        theme = data.theme || "light";
-        amoled = data.amoled || false;
-
-        localStorage.setItem("notes", JSON.stringify(notes));
-        localStorage.setItem("archive", JSON.stringify(archive));
-        localStorage.setItem("appPIN", savedPIN);
-        localStorage.setItem("appLang", currentLang);
-        localStorage.setItem("theme", theme);
-        localStorage.setItem("amoled", amoled);
-
-        applyTranslations();
-        applyTheme();
-        renderNotes();
-
-        showBanner("Import riuscito");
-      } catch {
-        showBanner("Errore import");
-      }
-    };
-
-    reader.readAsText(file);
-  };
-
-  input.click();
-};
-
-/* ============================================================
-   RESET APP
-   ============================================================ */
-document.getElementById("settingsResetApp").onclick = () => {
-  document.getElementById("resetPopup").style.display = "flex";
-};
-
-document.getElementById("resetCancelBtn").onclick = () => {
-  document.getElementById("resetPopup").style.display = "none";
-};
-
-document.getElementById("resetConfirmBtn").onclick = () => {
-  localStorage.clear();
-
-  notes = [];
-  archive = [];
-  savedPIN = "4618";
-  currentLang = "it";
-  theme = "light";
-  amoled = false;
-
-  applyTranslations();
-  applyTheme();
-  renderNotes();
-
-  document.getElementById("resetPopup").style.display = "none";
-  showBanner("Reset completato");
-};
-
-/* ============================================================
-   IMPOSTAZIONI AVANZATE
-   ============================================================ */
-
-/* FONT */
-let currentFont = localStorage.getItem("font") || "-apple-system";
-
-function applyFont() {
-  document.body.style.fontFamily = currentFont;
-}
-
-document.getElementById("settingsFont").onclick = () => {
-  const fonts = ["-apple-system", "Helvetica Neue", "Arial", "Georgia", "Courier New"];
-  currentFont = fonts[(fonts.indexOf(currentFont) + 1) % fonts.length];
-  localStorage.setItem("font", currentFont);
-  applyFont();
-  showBanner("Font cambiato");
-};
-
-/* DIMENSIONE TESTO */
-let textSize = parseInt(localStorage.getItem("textSize") || "16");
-
-function applyTextSize() {
-  document.body.style.fontSize = textSize + "px";
-}
-
-document.getElementById("settingsTextSize").onclick = () => {
-  textSize = textSize >= 22 ? 14 : textSize + 1;
-  localStorage.setItem("textSize", textSize);
-  applyTextSize();
-  showBanner("Dimensione: " + textSize);
-};
-
-/* COLORE ACCENTO */
-let accentColors = ["#4f8cff", "#ff3b30", "#ff9500", "#34c759", "#5856d6"];
-let accentIndex = parseInt(localStorage.getItem("accentIndex") || "0");
-
-function applyAccent() {
-  document.documentElement.style.setProperty("--accent", accentColors[accentIndex]);
-  document.documentElement.style.setProperty("--accent-light", accentColors[accentIndex] + "55");
-  document.documentElement.style.setProperty("--accent-glow", accentColors[accentIndex] + "55");
-}
-
-document.getElementById("settingsAccent").onclick = () => {
-  accentIndex = (accentIndex + 1) % accentColors.length;
-  localStorage.setItem("accentIndex", accentIndex);
-  applyAccent();
-  showBanner("Colore cambiato");
-};
-
-/* BLUR */
-let blurAmount = parseInt(localStorage.getItem("blur") || "18");
-
-function applyBlur() {
-  document.documentElement.style.setProperty("--blur-amount", blurAmount + "px");
-}
-
-document.getElementById("settingsBlur").onclick = () => {
-  blurAmount = blurAmount >= 30 ? 6 : blurAmount + 2;
-  localStorage.setItem("blur", blurAmount);
-  applyBlur();
-  showBanner("Blur: " + blurAmount);
-};
-
-/* ANIMAZIONI */
-let animationsEnabled = localStorage.getItem("animations") !== "false";
-
-function applyAnimations() {
-  document.body.style.setProperty("--anim", animationsEnabled ? "1" : "0");
-}
-
-document.getElementById("settingsAnimations").onclick = () => {
-  animationsEnabled = !animationsEnabled;
-  localStorage.setItem("animations", animationsEnabled);
-  applyAnimations();
-  showBanner(animationsEnabled ? "Animazioni ON" : "Animazioni OFF");
-};
-
-/* HAPTICS (placeholder) */
-let hapticsEnabled = localStorage.getItem("haptics") !== "false";
-
-document.getElementById("settingsHaptics").onclick = () => {
-  hapticsEnabled = !hapticsEnabled;
-  localStorage.setItem("haptics", hapticsEnabled);
-  showBanner(hapticsEnabled ? "Haptics ON" : "Haptics OFF");
-};
-
-/* ============================================================
-   PANNELLO IMPOSTAZIONI (⚙️)
-   ============================================================ */
-document.getElementById("settingsBtn").onclick = () => {
-  document.getElementById("settingsPanel").style.display = "flex";
-};
-
-document.querySelector("#settingsPanel .settingsClose").onclick = () => {
-  document.getElementById("settingsPanel").style.display = "none";
-};
-
-/* ============================================================
-   INIZIALIZZAZIONE FINALE
-   ============================================================ */
-applyTranslations();
-applyTheme();
-applyFont();
-applyTextSize();
-applyAccent();
-applyBlur();
-applyAnimations();
-renderNotes();
-   /* ============================================================
-   NOTE + ARCHIVIO (prima, così esistono per backupBtn)
-   ============================================================ */
-let notes = JSON.parse(localStorage.getItem("notes") || "[]");
-let archive = JSON.parse(localStorage.getItem("archive") || "[]");
-
-/* ============================================================
-   PIN SYSTEM
-   ============================================================ */
-let savedPIN = localStorage.getItem("appPIN") || "4618";
-let enteredPIN = "";
-
-const pinOverlay = document.getElementById("pinOverlay");
-const pinCircles = document.querySelectorAll(".pinCircle");
-const pinError = document.getElementById("pinError");
-
-function updatePinCircles() {
-  pinCircles.forEach((c, i) => c.classList.toggle("filled", i < enteredPIN.length));
-}
-
-function checkPIN() {
-  if (enteredPIN === savedPIN) {
-    pinOverlay.style.display = "none";
-  } else {
-    pinError.textContent = "PIN errato";
-    pinError.style.opacity = 1;
-    setTimeout(() => pinError.style.opacity = 0, 900);
-  }
-  enteredPIN = "";
-  updatePinCircles();
-}
-
-document.querySelectorAll(".pinKey").forEach(btn => {
-  btn.onclick = () => {
-    const d = btn.dataset.digit;
-    if (!d) return;
-    if (enteredPIN.length < 4) {
-      enteredPIN += d;
-      updatePinCircles();
-      if (enteredPIN.length === 4) checkPIN();
+  function handlePinDigit(d) {
+    if (enteredPin.length >= 4) return;
+    enteredPin += d;
+    updatePinCircles();
+    if (enteredPin.length === 4) {
+      checkPin();
     }
-  };
-});
-
-document.getElementById("pinBackspace").onclick = () => {
-  enteredPIN = enteredPIN.slice(0, -1);
-  updatePinCircles();
-};
-
-/* ============================================================
-   TRADUZIONI
-   ============================================================ */
-const translations = {
-  it: {
-    title: "Note",
-    premium: "Premium",
-    newNote: "Nuova nota",
-    save: "Salva",
-    cancel: "Annulla",
-    delete: "Elimina",
-    archive: "Archivio",
-    reset: "Reset app",
-    theme: "Tema",
-    amoled: "AMOLED",
-    font: "Font",
-    textSize: "Dimensione testo",
-    accent: "Colore accento",
-    blur: "Sfocatura",
-    animations: "Animazioni",
-    haptics: "Haptics",
-    export: "Esporta",
-    import: "Importa",
-    changePin: "Cambia PIN"
-  },
-  de: {
-    title: "Notizen",
-    premium: "Premium",
-    newNote: "Neue Notiz",
-    save: "Speichern",
-    cancel: "Abbrechen",
-    delete: "Löschen",
-    archive: "Archiv",
-    reset: "App zurücksetzen",
-    theme: "Thema",
-    amoled: "AMOLED",
-    font: "Schriftart",
-    textSize: "Textgröße",
-    accent: "Akzentfarbe",
-    blur: "Hintergrund‑Blur",
-    animations: "Animationen",
-    haptics: "Haptik",
-    export: "Exportieren",
-    import: "Importieren",
-    changePin: "PIN ändern"
-  },
-  en: {
-    title: "Notes",
-    premium: "Premium",
-    newNote: "New Note",
-    save: "Save",
-    cancel: "Cancel",
-    delete: "Delete",
-    archive: "Archive",
-    reset: "Reset App",
-    theme: "Theme",
-    amoled: "AMOLED",
-    font: "Font",
-    textSize: "Text Size",
-    accent: "Accent Color",
-    blur: "Background Blur",
-    animations: "Animations",
-    haptics: "Haptics",
-    export: "Export",
-    import: "Import",
-    changePin: "Change PIN"
-  }
-};
-
-let currentLang = localStorage.getItem("appLang") || "it";
-
-function applyTranslations() {
-  const t = translations[currentLang];
-
-  const appTitle = document.querySelector("#appTitle");
-  if (appTitle) {
-    appTitle.childNodes[0].textContent = t.title;
-    appTitle.querySelector(".sub").textContent = t.premium;
   }
 
-  const editorTitle = document.getElementById("editorTitle");
-  if (editorTitle) editorTitle.textContent = t.newNote;
-
-  const saveBtn = document.getElementById("saveBtn");
-  if (saveBtn) saveBtn.textContent = t.save;
-
-  const cancelBtn = document.getElementById("cancelBtn");
-  if (cancelBtn) cancelBtn.textContent = t.cancel;
-
-  const deleteNoteBtn = document.getElementById("deleteNoteBtn");
-  if (deleteNoteBtn) deleteNoteBtn.textContent = "🗑 " + t.delete;
-
-  const map = [
-    ["settingsTheme", "theme"],
-    ["settingsAmoled", "amoled"],
-    ["settingsFont", "font"],
-    ["settingsTextSize", "textSize"],
-    ["settingsAccent", "accent"],
-    ["settingsBlur", "blur"],
-    ["settingsAnimations", "animations"],
-    ["settingsHaptics", "haptics"],
-    ["settingsExport", "export"],
-    ["settingsImport", "import"],
-    ["settingsArchive", "archive"],
-    ["settingsResetApp", "reset"]
-  ];
-
-  map.forEach(([id, key]) => {
-    const el = document.getElementById(id);
-    if (el) el.querySelector(".label").textContent = t[key];
-  });
-}
-
-document.getElementById("langBtn").onclick = () => {
-  currentLang = currentLang === "it" ? "de" : currentLang === "de" ? "en" : "it";
-  localStorage.setItem("appLang", currentLang);
-  applyTranslations();
-};
-
-/* ============================================================
-   TEMA + AMOLED
-   ============================================================ */
-let theme = localStorage.getItem("theme") || "light";
-let amoled = localStorage.getItem("amoled") === "true";
-
-function applyTheme() {
-  document.body.classList.remove("dark", "amoled");
-  if (amoled) document.body.classList.add("amoled");
-  else if (theme === "dark") document.body.classList.add("dark");
-}
-
-document.getElementById("themeBtn").onclick = () => {
-  theme = theme === "light" ? "dark" : "light";
-  localStorage.setItem("theme", theme);
-  applyTheme();
-};
-
-document.getElementById("settingsAmoled").onclick = () => {
-  amoled = !amoled;
-  localStorage.setItem("amoled", amoled);
-  applyTheme();
-};
-
-/* ============================================================
-   BACKUP MANUALE (🛟)
-   ============================================================ */
-document.getElementById("backupBtn").onclick = () => {
-  const data = {
-    notes,
-    archive,
-    pin: savedPIN,
-    lang: currentLang,
-    theme,
-    amoled
-  };
-
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "backup.json";
-  a.click();
-  URL.revokeObjectURL(url);
-  showBanner("Backup salvato");
-};
-
-/* ============================================================
-   PALETTE COLORI
-   ============================================================ */
-let editingNoteId = null;
-let selectedColor = "#4f8cff";
-
-const palettes = {
-  warm: ["#ff6b6b", "#ff9f43", "#ffa502", "#ff4757", "#eccc68"],
-  cool: ["#1e90ff", "#3742fa", "#2ed573", "#70a1ff", "#5352ed"],
-  pastel: ["#ffcccc", "#ffd3b6", "#dcedc1", "#a8e6cf", "#d4a5a5"],
-  mix: ["#ff6b6b", "#1e90ff", "#2ed573", "#ffa502", "#a55eea"]
-};
-
-function loadPalette(p) {
-  const row = document.getElementById("colorRow");
-  if (!row) return;
-  row.innerHTML = "";
-  palettes[p].forEach(c => {
-    const dot = document.createElement("div");
-    dot.className = "colorDot";
-    dot.style.background = c;
-    dot.onclick = () => {
-      selectedColor = c;
-      document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
-      dot.classList.add("selected");
-    };
-    row.appendChild(dot);
-  });
-}
-
-document.querySelectorAll(".paletteBtn").forEach(btn => {
-  btn.onclick = () => loadPalette(btn.dataset.pal);
-});
-
-/* ============================================================
-   RENDER NOTE
-   ============================================================ */
-function renderNotes() {
-  const list = document.getElementById("notesList");
-  if (!list) return;
-  list.innerHTML = "";
-
-  const activeCatEl = document.querySelector(".cat.active");
-  const activeCat = activeCatEl ? activeCatEl.dataset.cat : "all";
-
-  notes.forEach(n => {
-    if (activeCat !== "all" && n.category !== activeCat) return;
-
-    const item = document.createElement("div");
-    item.className = "noteItem";
-    item.style.borderLeftColor = n.color;
-    item.innerHTML = `
-      <div class="noteTitleRow">
-        <div class="noteTitle">${n.title || "Senza titolo"}</div>
-        <div class="noteMeta">${n.date}</div>
-      </div>
-      <div class="noteTextPreview">${n.text.slice(0, 120)}</div>
-    `;
-    item.onclick = () => openEditor(n.id);
-    list.appendChild(item);
-  });
-}
-
-/* ============================================================
-   CATEGORIE
-   ============================================================ */
-document.querySelectorAll(".cat").forEach(cat => {
-  cat.onclick = () => {
-    document.querySelectorAll(".cat").forEach(c => c.classList.remove("active"));
-    cat.classList.add("active");
-    renderNotes();
-  };
-});
-
-/* ============================================================
-   EDITOR NOTE
-   ============================================================ */
-function openEditor(id = null) {
-  editingNoteId = id;
-
-  const titleInput = document.getElementById("noteTitleInput");
-  const textInput = document.getElementById("noteText");
-  const editor = document.getElementById("noteEditor");
-
-  if (!titleInput || !textInput || !editor) return;
-
-  if (id) {
-    const n = notes.find(x => x.id === id);
-    if (!n) return;
-    titleInput.value = n.title;
-    textInput.value = n.text;
-    selectedColor = n.color;
-  } else {
-    titleInput.value = "";
-    textInput.value = "";
-    selectedColor = "#4f8cff";
+  function handlePinBackspace() {
+    if (!enteredPin.length) return;
+    enteredPin = enteredPin.slice(0, -1);
+    updatePinCircles();
   }
 
-  loadPalette("mix");
-  editor.style.display = "flex";
-}
-
-document.getElementById("addNoteBtn").onclick = () => openEditor(null);
-
-/* ============================================================
-   SALVA NOTA
-   ============================================================ */
-document.getElementById("saveBtn").onclick = () => {
-  const title = document.getElementById("noteTitleInput").value.trim();
-  const text = document.getElementById("noteText").value.trim();
-
-  if (!text) return showBanner("Nota vuota");
-
-  if (editingNoteId) {
-    const n = notes.find(x => x.id === editingNoteId);
-    if (!n) return;
-    n.title = title;
-    n.text = text;
-    n.color = selectedColor;
-    n.date = new Date().toLocaleDateString();
-  } else {
-    const activeCatEl = document.querySelector(".cat.active");
-    const cat = activeCatEl ? activeCatEl.dataset.cat : "all";
-    notes.push({
-      id: Date.now(),
-      title,
-      text,
-      color: selectedColor,
-      category: cat,
-      date: new Date().toLocaleDateString()
-    });
+  function vibrateShort() {
+    if (navigator.vibrate) {
+      navigator.vibrate(120);
+    }
   }
 
-  localStorage.setItem("notes", JSON.stringify(notes));
-  document.getElementById("noteEditor").style.display = "none";
-  renderNotes();
-};
+  function checkPin() {
+    if (enteredPin === pinCode) {
+      hidePinOverlay();
+      enteredPin = "";
+      updatePinCircles();
+    } else {
+      enteredPin = "";
+      updatePinCircles();
+      vibrateShort();
+      const box = document.getElementById("pinBox");
+      const error = document.getElementById("pinError");
+      error.textContent = "PIN errato";
+      error.style.opacity = 1;
+      box.classList.remove("shake");
+      void box.offsetWidth;
+      box.classList.add("shake");
+      setTimeout(() => {
+        box.classList.remove("shake");
+      }, 400);
+    }
+  }
 
-/* ============================================================
-   ELIMINA (ARCHIVIA) NOTA
-   ============================================================ */
-document.getElementById("deleteNoteBtn").onclick = () => {
-  if (!editingNoteId) return;
-  const n = notes.find(x => x.id === editingNoteId);
-  if (!n) return;
-
-  archive.push(n);
-  notes = notes.filter(x => x.id !== editingNoteId);
-
-  localStorage.setItem("notes", JSON.stringify(notes));
-  localStorage.setItem("archive", JSON.stringify(archive));
-
-  document.getElementById("noteEditor").style.display = "none";
-  renderNotes();
-};
-
-/* ============================================================
-   ANNULLA EDITOR
-   ============================================================ */
-document.getElementById("cancelBtn").onclick = () => {
-  document.getElementById("noteEditor").style.display = "none";
-};
-
-/* ============================================================
-   ARCHIVIO
-   ============================================================ */
-document.getElementById("settingsArchive").onclick = () => {
-  const list = document.getElementById("archiveList");
-  if (!list) return;
-  list.innerHTML = "";
-  archive.forEach(n => {
-    const div = document.createElement("div");
-    div.innerHTML = `<b>${n.title}</b><br>${n.text.slice(0, 100)}...`;
-    div.style.marginBottom = "10px";
-    list.appendChild(div);
+  document.querySelectorAll(".pinKey").forEach(key => {
+    const d = key.dataset.digit;
+    if (d) {
+      key.onclick = () => handlePinDigit(d);
+    }
   });
-  document.getElementById("archivePopup").style.display = "flex";
-};
+  document.getElementById("pinBackspace").onclick = handlePinBackspace;
 
-document.getElementById("archiveCloseBtn").onclick = () => {
-  document.getElementById("archivePopup").style.display = "none";
-};
+  /* AVVIO APP */
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "dark") {
+    document.body.classList.add("dark");
+    document.getElementById("themeBtn").textContent = "☀️";
+  }
 
-/* ============================================================
-   BANNER
-   ============================================================ */
-function showBanner(msg) {
-  const b = document.getElementById("bannerMsg");
-  if (!b) return;
-  b.textContent = msg;
-  b.classList.add("show");
-  setTimeout(() => b.classList.remove("show"), 1500);
-}
+  notes = loadNotes();
+  autoRestore();
 
-/* ============================================================
-   IMPORT JSON
-   ============================================================ */
-document.getElementById("settingsImport").onclick = () => {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "application/json";
+  const savedPalette = localStorage.getItem("palette") || "mix";
+  applyPalette(savedPalette);
+  applyLanguage(currentLang);
 
-  input.onchange = e => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = ev => {
-      try {
-        const data = JSON.parse(ev.target.result);
-
-        notes = data.notes || [];
-        archive = data.archive || [];
-        savedPIN = data.pin || "4618";
-        currentLang = data.lang || "it";
-        theme = data.theme || "light";
-        amoled = data.amoled || false;
-
-        localStorage.setItem("notes", JSON.stringify(notes));
-        localStorage.setItem("archive", JSON.stringify(archive));
-        localStorage.setItem("appPIN", savedPIN);
-        localStorage.setItem("appLang", currentLang);
-        localStorage.setItem("theme", theme);
-        localStorage.setItem("amoled", amoled);
-
-        applyTranslations();
-        applyTheme();
-        renderNotes();
-
-        showBanner("Import riuscito");
-      } catch {
-        showBanner("Errore import");
-      }
-    };
-
-    reader.readAsText(file);
-  };
-
-  input.click();
-};
-
-/* ============================================================
-   RESET APP
-   ============================================================ */
-document.getElementById("settingsResetApp").onclick = () => {
-  document.getElementById("resetPopup").style.display = "flex";
-};
-
-document.getElementById("resetCancelBtn").onclick = () => {
-  document.getElementById("resetPopup").style.display = "none";
-};
-
-document.getElementById("resetConfirmBtn").onclick = () => {
-  localStorage.clear();
-
-  notes = [];
-  archive = [];
-  savedPIN = "4618";
-  currentLang = "it";
-  theme = "light";
-  amoled = false;
-
-  applyTranslations();
-  applyTheme();
-  renderNotes();
-
-  document.getElementById("resetPopup").style.display = "none";
-  showBanner("Reset completato");
-};
-
-/* ============================================================
-   IMPOSTAZIONI AVANZATE
-   ============================================================ */
-
-/* FONT */
-let currentFont = localStorage.getItem("font") || "-apple-system";
-
-function applyFont() {
-  document.body.style.fontFamily = currentFont;
-}
-
-document.getElementById("settingsFont").onclick = () => {
-  const fonts = ["-apple-system", "Helvetica Neue", "Arial", "Georgia", "Courier New"];
-  currentFont = fonts[(fonts.indexOf(currentFont) + 1) % fonts.length];
-  localStorage.setItem("font", currentFont);
-  applyFont();
-  showBanner("Font cambiato");
-};
-
-/* DIMENSIONE TESTO */
-let textSize = parseInt(localStorage.getItem("textSize") || "16");
-
-function applyTextSize() {
-  document.body.style.fontSize = textSize + "px";
-}
-
-document.getElementById("settingsTextSize").onclick = () => {
-  textSize = textSize >= 22 ? 14 : textSize + 1;
-  localStorage.setItem("textSize", textSize);
-  applyTextSize();
-  showBanner("Dimensione: " + textSize);
-};
-
-/* COLORE ACCENTO */
-let accentColors = ["#4f8cff", "#ff3b30", "#ff9500", "#34c759", "#5856d6"];
-let accentIndex = parseInt(localStorage.getItem("accentIndex") || "0");
-
-function applyAccent() {
-  document.documentElement.style.setProperty("--accent", accentColors[accentIndex]);
-  document.documentElement.style.setProperty("--accent-light", accentColors[accentIndex] + "55");
-  document.documentElement.style.setProperty("--accent-glow", accentColors[accentIndex] + "55");
-}
-
-document.getElementById("settingsAccent").onclick = () => {
-  accentIndex = (accentIndex + 1) % accentColors.length;
-  localStorage.setItem("accentIndex", accentIndex);
-  applyAccent();
-  showBanner("Colore cambiato");
-};
-
-/* BLUR */
-let blurAmount = parseInt(localStorage.getItem("blur") || "18");
-
-function applyBlur() {
-  document.documentElement.style.setProperty("--blur-amount", blurAmount + "px");
-}
-
-document.getElementById("settingsBlur").onclick = () => {
-  blurAmount = blurAmount >= 30 ? 6 : blurAmount + 2;
-  localStorage.setItem("blur", blurAmount);
-  applyBlur();
-  showBanner("Blur: " + blurAmount);
-};
-
-/* ANIMAZIONI */
-let animationsEnabled = localStorage.getItem("animations") !== "false";
-
-function applyAnimations() {
-  document.body.style.setProperty("--anim", animationsEnabled ? "1" : "0");
-}
-
-document.getElementById("settingsAnimations").onclick = () => {
-  animationsEnabled = !animationsEnabled;
-  localStorage.setItem("animations", animationsEnabled);
-  applyAnimations();
-  showBanner(animationsEnabled ? "Animazioni ON" : "Animazioni OFF");
-};
-
-/* HAPTICS (placeholder) */
-let hapticsEnabled = localStorage.getItem("haptics") !== "false";
-
-document.getElementById("settingsHaptics").onclick = () => {
-  hapticsEnabled = !hapticsEnabled;
-  localStorage.setItem("haptics", hapticsEnabled);
-  showBanner(hapticsEnabled ? "Haptics ON" : "Haptics OFF");
-};
-
-/* ============================================================
-   PANNELLO IMPOSTAZIONI (⚙️)
-   ============================================================ */
-document.getElementById("settingsBtn").onclick = () => {
-  document.getElementById("settingsPanel").style.display = "flex";
-};
-
-document.querySelector("#settingsPanel .settingsClose").onclick = () => {
-  document.getElementById("settingsPanel").style.display = "none";
-};
-
-/* ============================================================
-   INIZIALIZZAZIONE FINALE
-   ============================================================ */
-applyTranslations();
-applyTheme();
-applyFont();
-applyTextSize();
-applyAccent();
-applyBlur();
-applyAnimations();
-renderNotes();
-   
+  initPin();
+</script>
