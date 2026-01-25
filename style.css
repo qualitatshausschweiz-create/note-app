@@ -10,19 +10,140 @@ body {
   background: #f2f2f7;
   color: #111;
   padding: 20px;
+  transition: background 0.2s, color 0.2s;
 }
 
-/* HEADER */
+/* TEMA SCURO */
+body.dark {
+  background: #000000;
+  color: #f5f5f5;
+}
+
+body.dark .noteItem {
+  background: #1c1c1e;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+
+body.dark .editorBox {
+  background: #1c1c1e;
+}
+
+body.dark .pinBox {
+  background: #1c1c1e;
+  color: #f5f5f5;
+}
+
+body.dark #categoriesBar {
+  background: #1c1c1e;
+}
+
+/* TOP BAR */
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.topLeft h1 {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.langSelector {
+  margin-top: 4px;
+}
+
+.langBtn {
+  border: none;
+  background: #e5e5ea;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-right: 4px;
+  cursor: pointer;
+}
+
+.langBtn.active {
+  background: #007aff;
+  color: #fff;
+}
+
+body.dark .langBtn {
+  background: #2c2c2e;
+  color: #f5f5f5;
+}
+
+body.dark .langBtn.active {
+  background: #0a84ff;
+}
+
+.topRight button {
+  border: none;
+  background: #e5e5ea;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  margin-left: 6px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+body.dark .topRight button {
+  background: #2c2c2e;
+  color: #f5f5f5;
+}
+
+/* CATEGORIE */
+#categoriesBar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 6px;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+.catBtn {
+  border: none;
+  background: #e5e5ea;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.catBtn.active {
+  background: #007aff;
+  color: #fff;
+}
+
+body.dark #categoriesBar {
+  background: #1c1c1e;
+}
+
+body.dark .catBtn {
+  background: #2c2c2e;
+  color: #f5f5f5;
+}
+
+body.dark .catBtn.active {
+  background: #0a84ff;
+}
+
+/* HEADER NOTE */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
-header h1 {
-  font-size: 26px;
-  font-weight: 700;
+header h2 {
+  font-size: 20px;
+  font-weight: 600;
 }
 
 #addNoteBtn {
@@ -56,14 +177,36 @@ header h1 {
   transform: scale(0.97);
 }
 
+.noteHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
 .noteItem h3 {
   font-size: 17px;
-  margin-bottom: 6px;
+}
+
+.noteCategoryTag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e5e5ea;
+}
+
+body.dark .noteCategoryTag {
+  background: #2c2c2e;
+  color: #f5f5f5;
 }
 
 .noteItem p {
   font-size: 14px;
   color: #555;
+}
+
+body.dark .noteItem p {
+  color: #d1d1d6;
 }
 
 /* EDITOR */
@@ -86,6 +229,15 @@ header h1 {
   border-radius: 16px;
   width: 90%;
   max-width: 420px;
+}
+
+#noteCategory {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  font-size: 14px;
 }
 
 #editor input,
@@ -189,5 +341,83 @@ header h1 {
   border-radius: 10px;
   border: 1px solid #ccc;
   background: #f2f2f7;
+  cursor: pointer;
+}
+
+/* IMPOSTAZIONI */
+#settingsOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#settingsOverlay.hidden {
+  display: none;
+}
+
+.settingsBox {
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 420px;
+}
+
+body.dark .settingsBox {
+  background: #1c1c1e;
+  color: #f5f5f5;
+}
+
+.settingsGroup {
+  margin-top: 14px;
+}
+
+.settingsGroup h3 {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.settingsGroup label {
+  font-size: 14px;
+}
+
+.settingsGroup input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  margin-top: 4px;
+}
+
+.settingsGroup button {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: none;
+  background: #007aff;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.settingsHint {
+  font-size: 12px;
+  color: #666;
+}
+
+body.dark .settingsHint {
+  color: #a1a1a6;
+}
+
+.closeSettingsBtn {
+  margin-top: 16px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: #d1d1d6;
   cursor: pointer;
 }
