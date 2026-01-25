@@ -4,12 +4,13 @@
   <meta charset="UTF-8">
   <title>Note</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- PIN OVERLAY -->
+<!-- PIN -->
 <div id="pinOverlay">
   <div class="pinBox">
     <h2>Inserisci PIN</h2>
@@ -42,7 +43,7 @@
 
 <!-- HEADER -->
 <header>
-  <h1>Note</h1>
+  <h1>Le mie note</h1>
   <button id="addNoteBtn">＋</button>
 </header>
 
@@ -51,13 +52,15 @@
 
 <!-- EDITOR -->
 <div id="editor" class="hidden">
-  <input id="noteTitle" placeholder="Titolo">
-  <textarea id="noteText" placeholder="Scrivi..."></textarea>
+  <div class="editorBox">
+    <input id="noteTitle" placeholder="Titolo">
+    <textarea id="noteText" placeholder="Scrivi la tua nota..."></textarea>
 
-  <div class="editorButtons">
-    <button id="saveNote">Salva</button>
-    <button id="cancelEdit">Annulla</button>
-    <button id="deleteNote">Elimina</button>
+    <div class="editorButtons">
+      <button id="saveNote">Salva</button>
+      <button id="cancelEdit">Annulla</button>
+      <button id="deleteNote">Elimina</button>
+    </div>
   </div>
 </div>
 
