@@ -155,7 +155,6 @@
       position: relative;
     }
 
-    /* ICONA 🗑 */
     #deleteNoteBtn {
       position: absolute;
       top: 12px;
@@ -191,13 +190,6 @@
       justify-content: flex-end;
       gap: 8px;
     }
-    #editorButtons button {
-      border-radius: 12px;
-      border: none;
-      padding: 8px 14px;
-      font-size: 15px;
-      cursor: pointer;
-    }
     #cancelBtn {
       background: #ccc;
       color: #000;
@@ -228,9 +220,6 @@
       color: #fff;
       transform: scale(1.05);
     }
-    .paletteBtn:active {
-      transform: scale(0.9);
-    }
 
     #colorRow {
       display: flex;
@@ -257,10 +246,6 @@
       box-shadow: 0 0 0 3px rgba(0,0,0,0.4);
       transform: scale(1.15);
     }
-    .colorDot:active {
-      transform: scale(0.85);
-      opacity: 0.7;
-    }
 
     /* POPUP LINGUA / BACKUP */
     #langPopup,
@@ -274,6 +259,7 @@
       justify-content: center;
       z-index: 1500;
     }
+
     #langBox,
     #backupBox {
       width: 80%;
@@ -302,6 +288,7 @@
       gap: 8px;
       margin-top: 8px;
     }
+
     .backupAction {
       display: flex;
       align-items: center;
@@ -320,7 +307,7 @@
     #manualRestoreBtn { background: #34c759; color: white; }
     #backupCloseBtn { background: #ccc; color: black; }
 
-    /* PIN OVERLAY */
+    /* PIN OVERLAY (nuova funzionalità, non tocca il layout originale) */
     #pinOverlay {
       position: fixed;
       inset: 0;
@@ -385,19 +372,9 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.4);
       transition: transform 0.1s ease, opacity 0.1s ease, box-shadow 0.1s ease;
     }
-    .pinKey:active {
-      transform: scale(0.9);
-      opacity: 0.8;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    }
-    .pinKey.empty {
-      background: transparent;
-      box-shadow: none;
-      cursor: default;
-    }
     .pinKey.backspace {
-      font-size: 20px;
       background: #3a3a3c;
+      font-size: 20px;
     }
     #pinError {
       margin-top: 10px;
@@ -406,17 +383,6 @@
       min-height: 16px;
       opacity: 0;
       transition: opacity 0.2s ease;
-    }
-    #pinBox.shake {
-      animation: pinShake 0.35s;
-    }
-    @keyframes pinShake {
-      0% { transform: translateX(0); }
-      20% { transform: translateX(-8px); }
-      40% { transform: translateX(8px); }
-      60% { transform: translateX(-6px); }
-      80% { transform: translateX(6px); }
-      100% { transform: translateX(0); }
     }
   </style>
 </head>
@@ -544,537 +510,479 @@
     </div>
   </div>
 <script>
-    let notes = [];
-    let currentNoteId = null;
-    let currentLang = localStorage.getItem("lang") || "de";
+  let notes = [];
+  let currentNoteId = null;
+  let currentLang = localStorage.getItem("lang") || "de";
 
-    /* PALETTE */
-    const PALETTES = {
-      warm: ["#FFE4E1", "#FFD166", "#FF8C42", "#FFB5A7", "#F4A261", "#E76F51", "#E63946"],
-      cool: ["#DDE7F2", "#CDE7F0", "#A8DADC", "#457B9D", "#3A86FF", "#2A9D8F", "#264653"],
-      pastel: ["#FDE2E4", "#E2F0CB", "#DDE7F2", "#FFF1C1", "#E0F7FA", "#E8F5E9", "#F7EDE2"],
-      mix: ["#FDE2E4", "#E2F0CB", "#DDE7F2", "#FFD166", "#FF8C42", "#3A86FF", "#E63946"]
-    };
+  /* PALETTE */
+  const PALETTES = {
+    warm: ["#FFE4E1", "#FFD166", "#FF8C42", "#FFB5A7", "#F4A261", "#E76F51", "#E63946"],
+    cool: ["#DDE7F2", "#CDE7F0", "#A8DADC", "#457B9D", "#3A86FF", "#2A9D8F", "#264653"],
+    pastel: ["#FDE2E4", "#E2F0CB", "#DDE7F2", "#FFF1C1", "#E0F7FA", "#E8F5E9", "#F7EDE2"],
+    mix: ["#FDE2E4", "#E2F0CB", "#DDE7F2", "#FFD166", "#FF8C42", "#3A86FF", "#E63946"]
+  };
 
-    /* BANNER */
-    function showBanner(msg) {
-      const b = document.getElementById("bannerMsg");
-      b.textContent = msg;
-      b.classList.add("show");
-      setTimeout(() => b.classList.remove("show"), 1800);
-    }
+  /* BANNER */
+  function showBanner(msg) {
+    const b = document.getElementById("bannerMsg");
+    b.textContent = msg;
+    b.classList.add("show");
+    setTimeout(() => b.classList.remove("show"), 1800);
+  }
 
-    /* BACKUP AUTO */
-    function autoBackup() {
-      localStorage.setItem("notes_backup_auto", JSON.stringify(notes));
-    }
+  /* BACKUP AUTO */
+  function autoBackup() {
+    localStorage.setItem("notes_backup_auto", JSON.stringify(notes));
+  }
 
-    function autoRestore() {
-      const saved = localStorage.getItem("notes_backup_auto");
-      if (saved) {
-        notes = JSON.parse(saved);
-        saveNotes();
-      }
-    }
-
-    /* STORAGE */
-    function saveNotes() {
-      localStorage.setItem("notes", JSON.stringify(notes));
-      autoBackup();
-    }
-
-    function loadNotes() {
-      return JSON.parse(localStorage.getItem("notes") || "[]");
-    }
-
-    /* MOSTRA NOTE */
-    function showNotes(filter = "alle") {
-      const list = document.getElementById("notesList");
-      list.innerHTML = "";
-
-      let filtered = notes;
-
-      if (filter === "favorite") {
-        filtered = notes.filter(n => n.favorite);
-      } else if (filter !== "alle") {
-        filtered = notes.filter(n => n.category === filter);
-      }
-
-      filtered.forEach(note => {
-        const div = document.createElement("div");
-        div.className = "noteItem";
-        div.style.background = note.color || "#ffffff";
-
-        div.innerHTML = `
-          <div>${note.text.substring(0, 80)}</div>
-          <div class="favBtn" style="font-size:18px;margin-top:6px;cursor:pointer;">
-            ${note.favorite ? "⭐" : "☆"}
-          </div>
-        `;
-
-        div.querySelector(".favBtn").onclick = (e) => {
-          e.stopPropagation();
-          toggleFavorite(note.id);
-        };
-
-        div.onclick = () => openEditor(note.id);
-
-        list.appendChild(div);
-      });
-    }
-
-    /* EDITOR */
-    function openEditor(id = null) {
-      currentNoteId = id;
-
-      const editor = document.getElementById("noteEditor");
-      const title = document.getElementById("editorTitle");
-      const delBtn = document.getElementById("deleteNoteBtn");
-
-      if (id === null) {
-        title.textContent = LANG[currentLang].newNote;
-        document.getElementById("noteText").value = "";
-        delBtn.style.display = "none";
-        document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
-      } else {
-        const note = notes.find(n => n.id === id);
-        if (!note) return;
-        title.textContent = LANG[currentLang].editNote;
-        document.getElementById("noteText").value = note.text;
-        delBtn.style.display = "block";
-
-        document.querySelectorAll(".colorDot").forEach(d => {
-          d.classList.toggle("selected", d.dataset.color === note.color);
-        });
-      }
-
-      editor.style.display = "flex";
-    }
-
-    function saveNote() {
-      const text = document.getElementById("noteText").value.trim();
-      if (!text) {
-        closeEditor();
-        return;
-      }
-
-      let selectedColor = "#ffffff";
-      const selectedDot = document.querySelector(".colorDot.selected");
-      if (selectedDot) selectedColor = selectedDot.dataset.color;
-
-      if (currentNoteId === null) {
-        notes.push({
-          id: Date.now(),
-          text,
-          color: selectedColor,
-          category: "alle",
-          favorite: false
-        });
-      } else {
-        const note = notes.find(n => n.id === currentNoteId);
-        if (note) {
-          note.text = text;
-          note.color = selectedColor;
-        }
-      }
-
+  function autoRestore() {
+    const saved = localStorage.getItem("notes_backup_auto");
+    if (saved) {
+      notes = JSON.parse(saved);
       saveNotes();
-      showNotes();
-      closeEditor();
+    }
+  }
+
+  /* STORAGE */
+  function saveNotes() {
+    localStorage.setItem("notes", JSON.stringify(notes));
+    autoBackup();
+  }
+
+  function loadNotes() {
+    return JSON.parse(localStorage.getItem("notes") || "[]");
+  }
+
+  /* MOSTRA NOTE */
+  function showNotes(filter = "alle") {
+    const list = document.getElementById("notesList");
+    list.innerHTML = "";
+
+    let filtered = notes;
+
+    if (filter === "favorite") {
+      filtered = notes.filter(n => n.favorite);
+    } else if (filter !== "alle") {
+      filtered = notes.filter(n => n.category === filter);
     }
 
-    function deleteNote() {
-      if (!confirm("Sei sicuro?")) return;
+    filtered.forEach(note => {
+      const div = document.createElement("div");
+      div.className = "noteItem";
+      div.style.background = note.color || "#ffffff";
 
-      notes = notes.filter(n => n.id !== currentNoteId);
-      saveNotes();
-      showNotes();
-      closeEditor();
+      div.innerHTML = `
+        <div>${note.text.substring(0, 80)}</div>
+        <div class="favBtn" style="font-size:18px;margin-top:6px;cursor:pointer;">
+          ${note.favorite ? "⭐" : "☆"}
+        </div>
+      `;
 
-      showBanner(LANG[currentLang].msg.deleted);
-    }
+      div.querySelector(".favBtn").onclick = (e) => {
+        e.stopPropagation();
+        toggleFavorite(note.id);
+      };
 
-    function toggleFavorite(id) {
+      div.onclick = () => openEditor(note.id);
+
+      list.appendChild(div);
+    });
+  }
+
+  /* EDITOR */
+  function openEditor(id = null) {
+    currentNoteId = id;
+
+    const editor = document.getElementById("noteEditor");
+    const title = document.getElementById("editorTitle");
+    const delBtn = document.getElementById("deleteNoteBtn");
+
+    if (id === null) {
+      title.textContent = LANG[currentLang].newNote;
+      document.getElementById("noteText").value = "";
+      delBtn.style.display = "none";
+      document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
+    } else {
       const note = notes.find(n => n.id === id);
       if (!note) return;
+      title.textContent = LANG[currentLang].editNote;
+      document.getElementById("noteText").value = note.text;
+      delBtn.style.display = "block";
 
-      note.favorite = !note.favorite;
-
-      saveNotes();
-      showNotes();
-
-      showBanner(note.favorite ? LANG[currentLang].msg.favAdd : LANG[currentLang].msg.favRemove);
+      document.querySelectorAll(".colorDot").forEach(d => {
+        d.classList.toggle("selected", d.dataset.color === note.color);
+      });
     }
 
-    function closeEditor() {
-      document.getElementById("noteEditor").style.display = "none";
-      currentNoteId = null;
+    editor.style.display = "flex";
+  }
+
+  function saveNote() {
+    const text = document.getElementById("noteText").value.trim();
+    if (!text) {
+      closeEditor();
+      return;
     }
 
-    /* PALETTE */
-    function applyPalette(name) {
-      const row = document.getElementById("colorRow");
-      row.innerHTML = "";
+    let selectedColor = "#ffffff";
+    const selectedDot = document.querySelector(".colorDot.selected");
+    if (selectedDot) selectedColor = selectedDot.dataset.color;
 
-      PALETTES[name].forEach((color, index) => {
-        const dot = document.createElement("div");
-        dot.className = "colorDot";
-        dot.dataset.color = color;
-        dot.style.background = color;
-
-        row.appendChild(dot);
-
-        setTimeout(() => {
-          dot.classList.add("show");
-        }, index * 60);
+    if (currentNoteId === null) {
+      notes.push({
+        id: Date.now(),
+        text,
+        color: selectedColor,
+        category: "alle",
+        favorite: false
       });
-
-      document.querySelectorAll(".colorDot").forEach(dot => {
-        dot.onclick = () => {
-          const color = dot.dataset.color;
-
-          document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
-          dot.classList.add("selected");
-
-          if (currentNoteId !== null) {
-            const note = notes.find(n => n.id === currentNoteId);
-            if (note) {
-              note.color = color;
-              saveNotes();
-              showNotes();
-            }
-          }
-        };
-      });
-
-      document.querySelectorAll(".paletteBtn").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.pal === name);
-      });
-
-      localStorage.setItem("palette", name);
-    }
-
-    /* LINGUE */
-    const LANG = {
-      de: {
-        appTitle: "Notizen",
-        newNote: "Neue Notiz",
-        editNote: "Notiz bearbeiten",
-        cancel: "Abbrechen",
-        save: "Speichern",
-        categories: {
-          favorite: "Favoriten",
-          alle: "Alle",
-          arbeit: "Arbeit",
-          einkauf: "Einkauf",
-          zuhause: "Zuhause",
-          ideen: "Ideen",
-          personlich: "Persönlich"
-        },
-        backup: {
-          title: "Sicherung",
-          autoBackup: "Backup automatisch",
-          manualBackup: "Backup manuell",
-          autoRestore: "Wiederherstellung automatisch",
-          manualRestore: "Wiederherstellung manuell",
-          close: "Schliessen"
-        },
-        msg: {
-          favAdd: "Zu Favoriten hinzugefügt",
-          favRemove: "Aus Favoriten entfernt",
-          deleted: "Notiz gelöscht"
-        }
-      },
-      it: {
-        appTitle: "Note",
-        newNote: "Nuova nota",
-        editNote: "Modifica nota",
-        cancel: "Annulla",
-        save: "Salva",
-        categories: {
-          favorite: "Preferiti",
-          alle: "Tutte",
-          arbeit: "Lavoro",
-          einkauf: "Spesa",
-          zuhause: "Casa",
-          ideen: "Idee",
-          personlich: "Personale"
-        },
-        backup: {
-          title: "Backup",
-          autoBackup: "Backup automatico",
-          manualBackup: "Backup manuale",
-          autoRestore: "Ripristino automatico",
-          manualRestore: "Ripristino manuale",
-          close: "Chiudi"
-        },
-        msg: {
-          favAdd: "Aggiunto ai preferiti",
-          favRemove: "Rimosso dai preferiti",
-          deleted: "Nota eliminata"
-        }
-      },
-      en: {
-        appTitle: "Notes",
-        newNote: "New Note",
-        editNote: "Edit Note",
-        cancel: "Cancel",
-        save: "Save",
-        categories: {
-          favorite: "Favorites",
-          alle: "All",
-          arbeit: "Work",
-          einkauf: "Shopping",
-          zuhause: "Home",
-          ideen: "Ideas",
-          personlich: "Personal"
-        },
-        backup: {
-          title: "Backup",
-          autoBackup: "Automatic Backup",
-          manualBackup: "Manual Backup",
-          autoRestore: "Automatic Restore",
-          manualRestore: "Manual Restore",
-          close: "Close"
-        },
-        msg: {
-          favAdd: "Added to favorites",
-          favRemove: "Removed from favorites",
-          deleted: "Note deleted"
-        }
-      },
-      es: {
-        appTitle: "Notas",
-        newNote: "Nueva nota",
-        editNote: "Editar nota",
-        cancel: "Cancelar",
-        save: "Guardar",
-        categories: {
-          favorite: "Favoritos",
-          alle: "Todas",
-          arbeit: "Trabajo",
-          einkauf: "Compras",
-          zuhause: "Casa",
-          ideen: "Ideas",
-          personlich: "Personal"
-        },
-        backup: {
-          title: "Copia de seguridad",
-          autoBackup: "Copia automática",
-          manualBackup: "Copia manual",
-          autoRestore: "Restauración automática",
-          manualRestore: "Restauración manual",
-          close: "Cerrar"
-        },
-        msg: {
-          favAdd: "Añadido a favoritos",
-          favRemove: "Eliminado de favoritos",
-          deleted: "Nota eliminada"
-        }
+    } else {
+      const note = notes.find(n => n.id === currentNoteId);
+      if (note) {
+        note.text = text;
+        note.color = selectedColor;
       }
-    };
-
-    function applyLanguage(lang) {
-      currentLang = lang;
-      const L = LANG[lang];
-
-      document.getElementById("appTitle").textContent = L.appTitle;
-      document.getElementById("cancelBtn").textContent = L.cancel;
-      document.getElementById("saveBtn").textContent = L.save;
-
-      document.querySelectorAll(".cat").forEach(btn => {
-        const key = btn.dataset.cat;
-        btn.querySelector(".catLabel").textContent = L.categories[key];
-      });
-
-      document.querySelector("#backupBox h2").textContent = L.backup.title;
-      document.querySelector("#autoBackupBtn span").textContent = L.backup.autoBackup;
-      document.querySelector("#manualBackupBtn span").textContent = L.backup.manualBackup;
-      document.querySelector("#autoRestoreBtn span").textContent = L.backup.autoRestore;
-      document.querySelector("#manualRestoreBtn span").textContent = L.backup.manualRestore;
-      document.querySelector("#backupCloseBtn span").textContent = L.backup.close;
-
-      localStorage.setItem("lang", lang);
-      showNotes();
     }
 
-    /* TEMA */
-    function toggleTheme() {
-      const body = document.body;
-      const isDark = body.classList.toggle("dark");
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-      document.getElementById("themeBtn").textContent = isDark ? "☀️" : "🌙";
-    }
+    saveNotes();
+    showNotes();
+    closeEditor();
+  }
 
-    /* EVENTI BASE */
-    document.getElementById("addNoteBtn").onclick = () => openEditor();
-    document.getElementById("cancelBtn").onclick = closeEditor;
-    document.getElementById("saveBtn").onclick = saveNote;
-    document.getElementById("deleteNoteBtn").onclick = deleteNote;
+  function deleteNote() {
+    if (!confirm("Sei sicuro?")) return;
 
-    document.querySelectorAll(".cat").forEach(btn => {
-      btn.onclick = () => showNotes(btn.dataset.cat);
+    notes = notes.filter(n => n.id !== currentNoteId);
+    saveNotes();
+    showNotes();
+    closeEditor();
+
+    showBanner(LANG[currentLang].msg.deleted);
+  }
+
+  function toggleFavorite(id) {
+    const note = notes.find(n => n.id === id);
+    if (!note) return;
+
+    note.favorite = !note.favorite;
+
+    saveNotes();
+    showNotes();
+
+    showBanner(note.favorite ? LANG[currentLang].msg.favAdd : LANG[currentLang].msg.favRemove);
+  }
+
+  function closeEditor() {
+    document.getElementById("noteEditor").style.display = "none";
+    currentNoteId = null;
+  }
+
+  /* PALETTE */
+  function applyPalette(name) {
+    const row = document.getElementById("colorRow");
+    row.innerHTML = "";
+
+    PALETTES[name].forEach((color, index) => {
+      const dot = document.createElement("div");
+      dot.className = "colorDot";
+      dot.dataset.color = color;
+      dot.style.background = color;
+
+      row.appendChild(dot);
+
+      setTimeout(() => {
+        dot.classList.add("show");
+      }, index * 60);
     });
 
-    document.getElementById("langBtn").onclick = () => {
-      document.getElementById("langPopup").style.display = "flex";
-    };
-    document.querySelectorAll(".langChoice").forEach(btn => {
-      btn.onclick = () => {
-        applyLanguage(btn.dataset.lang);
-        document.getElementById("langPopup").style.display = "none";
+    document.querySelectorAll(".colorDot").forEach(dot => {
+      dot.onclick = () => {
+        const color = dot.dataset.color;
+
+        document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
+        dot.classList.add("selected");
+
+        if (currentNoteId !== null) {
+          const note = notes.find(n => n.id === currentNoteId);
+          if (note) {
+            note.color = color;
+            saveNotes();
+            showNotes();
+          }
+        }
       };
     });
-    document.getElementById("langPopup").onclick = e => {
-      if (e.target.id === "langPopup") {
-        document.getElementById("langPopup").style.display = "none";
-      }
-    };
-
-    document.getElementById("backupBtn").onclick = () => {
-      document.getElementById("backupPopup").style.display = "flex";
-    };
-    document.getElementById("backupCloseBtn").onclick = () => {
-      document.getElementById("backupPopup").style.display = "none";
-    };
-    document.getElementById("backupPopup").onclick = e => {
-      if (e.target.id === "backupPopup") {
-        document.getElementById("backupPopup").style.display = "none";
-      }
-    };
-
-    document.getElementById("manualBackupBtn").onclick = () => {
-      localStorage.setItem("notes_backup_manual", JSON.stringify(notes));
-      showBanner("Backup salvato");
-    };
-    document.getElementById("manualRestoreBtn").onclick = () => {
-      const saved = localStorage.getItem("notes_backup_manual");
-      if (saved) {
-        notes = JSON.parse(saved);
-        saveNotes();
-        showNotes();
-        showBanner("Backup ripristinato");
-      }
-    };
-    document.getElementById("autoBackupBtn").onclick = () => {
-      showBanner("Backup automatico attivo");
-    };
-    document.getElementById("autoRestoreBtn").onclick = () => {
-      autoRestore();
-      showNotes();
-      showBanner("Ripristino automatico eseguito");
-    };
-
-    document.getElementById("themeBtn").onclick = toggleTheme;
 
     document.querySelectorAll(".paletteBtn").forEach(btn => {
-      btn.onclick = () => {
-        applyPalette(btn.dataset.pal);
-      };
+      btn.classList.toggle("active", btn.dataset.pal === name);
     });
 
-    /* PIN SYSTEM */
-    let pinCode = null;
-    let enteredPin = "";
+    localStorage.setItem("palette", name);
+  }
 
-    function initPin() {
-      let savedPin = localStorage.getItem("pinCode");
-      if (!savedPin) {
-        savedPin = "4618"; 
-        localStorage.setItem("pinCode", savedPin);
+  /* LINGUE */
+  const LANG = {
+    de: {
+      appTitle: "Notizen",
+      newNote: "Neue Notiz",
+      editNote: "Notiz bearbeiten",
+      cancel: "Abbrechen",
+      save: "Speichern",
+      categories: {
+        favorite: "Favoriten",
+        alle: "Alle",
+        arbeit: "Arbeit",
+        einkauf: "Einkauf",
+        zuhause: "Zuhause",
+        ideen: "Ideen",
+        personlich: "Persönlich"
+      },
+      backup: {
+        title: "Sicherung",
+        autoBackup: "Backup automatisch",
+        manualBackup: "Backup manuell",
+        autoRestore: "Wiederherstellung automatisch",
+        manualRestore: "Wiederherstellung manuell",
+        close: "Schliessen"
+      },
+      msg: {
+        favAdd: "Zu Favoriten hinzugefügt",
+        favRemove: "Aus Favoriten entfernt",
+        deleted: "Notiz gelöscht"
       }
-      pinCode = savedPin;
-      showPinOverlay();
+    },
+    it: {
+      appTitle: "Note",
+      newNote: "Nuova nota",
+      editNote: "Modifica nota",
+      cancel: "Annulla",
+      save: "Salva",
+      categories: {
+        favorite: "Preferiti",
+        alle: "Tutte",
+        arbeit: "Lavoro",
+        einkauf: "Spesa",
+        zuhause: "Casa",
+        ideen: "Idee",
+        personlich: "Personale"
+      },
+      backup: {
+        title: "Backup",
+        autoBackup: "Backup automatico",
+        manualBackup: "Backup manuale",
+        autoRestore: "Ripristino automatico",
+        manualRestore: "Ripristino manuale",
+        close: "Chiudi"
+      },
+      msg: {
+        favAdd: "Aggiunto ai preferiti",
+        favRemove: "Rimosso dai preferiti",
+        deleted: "Nota eliminata"
+      }
     }
+  };
 
-    function showPinOverlay() {
+  function applyLanguage(lang) {
+    currentLang = lang;
+    const L = LANG[lang];
+
+    document.getElementById("appTitle").textContent = L.appTitle;
+    document.getElementById("cancelBtn").textContent = L.cancel;
+    document.getElementById("saveBtn").textContent = L.save;
+
+    document.querySelectorAll(".cat").forEach(btn => {
+      const key = btn.dataset.cat;
+      btn.querySelector(".catLabel").textContent = L.categories[key];
+    });
+
+    document.querySelector("#backupBox h2").textContent = L.backup.title;
+    document.querySelector("#autoBackupBtn span").textContent = L.backup.autoBackup;
+    document.querySelector("#manualBackupBtn span").textContent = L.backup.manualBackup;
+    document.querySelector("#autoRestoreBtn span").textContent = L.backup.autoRestore;
+    document.querySelector("#manualRestoreBtn span").textContent = L.backup.manualRestore;
+    document.querySelector("#backupCloseBtn span").textContent = L.backup.close;
+
+    localStorage.setItem("lang", lang);
+    showNotes();
+  }
+
+  /* TEMA */
+  function toggleTheme() {
+    const body = document.body;
+    const isDark = body.classList.toggle("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+    document.getElementById("themeBtn").textContent = isDark ? "☀️" : "🌙";
+  }
+
+  /* EVENTI BASE */
+  document.getElementById("addNoteBtn").onclick = () => openEditor();
+  document.getElementById("cancelBtn").onclick = closeEditor;
+  document.getElementById("saveBtn").onclick = saveNote;
+  document.getElementById("deleteNoteBtn").onclick = deleteNote;
+
+  document.querySelectorAll(".cat").forEach(btn => {
+    btn.onclick = () => showNotes(btn.dataset.cat);
+  });
+
+  document.getElementById("langBtn").onclick = () => {
+    document.getElementById("langPopup").style.display = "flex";
+  };
+  document.querySelectorAll(".langChoice").forEach(btn => {
+    btn.onclick = () => {
+      applyLanguage(btn.dataset.lang);
+      document.getElementById("langPopup").style.display = "none";
+    };
+  });
+  document.getElementById("langPopup").onclick = e => {
+    if (e.target.id === "langPopup") {
+      document.getElementById("langPopup").style.display = "none";
+    }
+  };
+
+  document.getElementById("backupBtn").onclick = () => {
+    document.getElementById("backupPopup").style.display = "flex";
+  };
+  document.getElementById("backupCloseBtn").onclick = () => {
+    document.getElementById("backupPopup").style.display = "none";
+  };
+  document.getElementById("backupPopup").onclick = e => {
+    if (e.target.id === "backupPopup") {
+      document.getElementById("backupPopup").style.display = "none";
+    }
+  };
+
+  document.getElementById("manualBackupBtn").onclick = () => {
+    localStorage.setItem("notes_backup_manual", JSON.stringify(notes));
+    showBanner("Backup salvato");
+  };
+  document.getElementById("manualRestoreBtn").onclick = () => {
+    const saved = localStorage.getItem("notes_backup_manual");
+    if (saved) {
+      notes = JSON.parse(saved);
+      saveNotes();
+      showNotes();
+      showBanner("Backup ripristinato");
+    }
+  };
+  document.getElementById("autoBackupBtn").onclick = () => {
+    showBanner("Backup automatico attivo");
+  };
+  document.getElementById("autoRestoreBtn").onclick = () => {
+    autoRestore();
+    showNotes();
+    showBanner("Ripristino automatico eseguito");
+  };
+
+  document.getElementById("themeBtn").onclick = toggleTheme;
+
+  document.querySelectorAll(".paletteBtn").forEach(btn => {
+    btn.onclick = () => {
+      applyPalette(btn.dataset.pal);
+    };
+  });
+
+  /* PIN SYSTEM */
+  let pinCode = null;
+  let enteredPin = "";
+
+  function initPin() {
+    let savedPin = localStorage.getItem("pinCode");
+    if (!savedPin) {
+      savedPin = "4618"; 
+      localStorage.setItem("pinCode", savedPin);
+    }
+    pinCode = savedPin;
+    showPinOverlay();
+  }
+
+  function showPinOverlay() {
+    enteredPin = "";
+    updatePinCircles();
+    const overlay = document.getElementById("pinOverlay");
+    const error = document.getElementById("pinError");
+    error.style.opacity = 0;
+    error.textContent = "";
+    overlay.style.display = "flex";
+  }
+
+  function hidePinOverlay() {
+    const overlay = document.getElementById("pinOverlay");
+    overlay.style.display = "none";
+  }
+
+  function updatePinCircles() {
+    const circles = document.querySelectorAll(".pinCircle");
+    circles.forEach((c, i) => {
+      c.classList.toggle("filled", i < enteredPin.length);
+    });
+  }
+
+  function handlePinDigit(d) {
+    if (enteredPin.length >= 4) return;
+    enteredPin += d;
+    updatePinCircles();
+    if (enteredPin.length === 4) {
+      checkPin();
+    }
+  }
+
+  function handlePinBackspace() {
+    if (!enteredPin.length) return;
+    enteredPin = enteredPin.slice(0, -1);
+    updatePinCircles();
+  }
+
+  function vibrateShort() {
+    if (navigator.vibrate) {
+      navigator.vibrate(120);
+    }
+  }
+
+  function checkPin() {
+    if (enteredPin === pinCode) {
+      hidePinOverlay();
       enteredPin = "";
       updatePinCircles();
-      const overlay = document.getElementById("pinOverlay");
+    } else {
+      enteredPin = "";
+      updatePinCircles();
+      vibrateShort();
+      const box = document.getElementById("pinBox");
       const error = document.getElementById("pinError");
-      error.style.opacity = 0;
-      error.textContent = "";
-      overlay.style.display = "flex";
-    }
-
-    function hidePinOverlay() {
-      const overlay = document.getElementById("pinOverlay");
-      overlay.style.display = "none";
-    }
-
-    function updatePinCircles() {
-      const circles = document.querySelectorAll(".pinCircle");
-      circles.forEach((c, i) => {
-        c.classList.toggle("filled", i < enteredPin.length);
-      });
-    }
-
-    function handlePinDigit(d) {
-      if (enteredPin.length >= 4) return;
-      enteredPin += d;
-      updatePinCircles();
-      if (enteredPin.length === 4) {
-        checkPin();
-      }
-    }
-
-    function handlePinBackspace() {
-      if (!enteredPin.length) return;
-      enteredPin = enteredPin.slice(0, -1);
-      updatePinCircles();
-    }
-
-    function vibrateShort() {
-      if (navigator.vibrate) {
-        navigator.vibrate(120);
-      }
-    }
-
-    function checkPin() {
-      if (enteredPin === pinCode) {
-        hidePinOverlay();
-        enteredPin = "";
-        updatePinCircles();
-      } else {
-        enteredPin = "";
-        updatePinCircles();
-        vibrateShort();
-        const box = document.getElementById("pinBox");
-        const error = document.getElementById("pinError");
-        error.textContent = "PIN errato";
-        error.style.opacity = 1;
+      error.textContent = "PIN errato";
+      error.style.opacity = 1;
+      box.classList.remove("shake");
+      void box.offsetWidth;
+      box.classList.add("shake");
+      setTimeout(() => {
         box.classList.remove("shake");
-        void box.offsetWidth;
-        box.classList.add("shake");
-        setTimeout(() => {
-          box.classList.remove("shake");
-        }, 400);
-      }
+      }, 400);
     }
+  }
 
-    document.querySelectorAll(".pinKey").forEach(key => {
-      const d = key.dataset.digit;
-      if (d) {
-        key.onclick = () => handlePinDigit(d);
-      }
-    });
-    document.getElementById("pinBackspace").onclick = handlePinBackspace;
-
-    /* AVVIO APP */
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      document.body.classList.add("dark");
-      document.getElementById("themeBtn").textContent = "☀️";
+  document.querySelectorAll(".pinKey").forEach(key => {
+    const d = key.dataset.digit;
+    if (d) {
+      key.onclick = () => handlePinDigit(d);
     }
+  });
+  document.getElementById("pinBackspace").onclick = handlePinBackspace;
 
-    notes = loadNotes();
-    autoRestore();
+  /* AVVIO APP */
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "dark") {
+    document.body.classList.add("dark");
+    document.getElementById("themeBtn").textContent = "☀️";
+  }
 
-    const savedPalette = localStorage.getItem("palette") || "mix";
-    applyPalette(savedPalette);
-    applyLanguage(currentLang);
+  notes = loadNotes();
+  autoRestore();
 
-    initPin();
+  const savedPalette = localStorage.getItem("palette") || "mix";
+  applyPalette(savedPalette);
+  applyLanguage(currentLang);
+
+  initPin();
 </script>
 </body>
 </html>
