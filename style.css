@@ -1,487 +1,545 @@
+/* --------------------------------------------------
+   BLOCCO 1 — STRUTTURA BASE + TEMI + TIPOGRAFIA
+   Stile Ultra iOS (blur, ombre morbide, superfici pulite)
+-------------------------------------------------- */
+
+/* RESET BASE */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
 }
 
 body {
-  font-family: -apple-system, system-ui, sans-serif;
-  background: #f2f2f7;
-  color: #111;
-  padding: 20px;
-  transition: background 0.2s, color 0.2s;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
+}
+
+/* --------------------------------------------------
+   TEMI
+-------------------------------------------------- */
+
+/* TEMA CHIARO */
+:root {
+    --bg: #f5f5f7;
+    --text: #1c1c1e;
+    --panel-bg: rgba(255, 255, 255, 0.75);
+    --panel-border: rgba(0, 0, 0, 0.1);
+    --note-bg: #ffffff;
+    --note-border: rgba(0, 0, 0, 0.08);
+    --shadow: rgba(0, 0, 0, 0.08);
 }
 
 /* TEMA SCURO */
 body.dark {
-  background: #000000;
-  color: #f5f5f5;
-}
-
-body.dark .noteItem {
-  background: #1c1c1e;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
-}
-
-body.dark .editorBox {
-  background: #1c1c1e;
-}
-
-body.dark .pinBox {
-  background: #1c1c1e;
-  color: #f5f5f5;
-}
-
-body.dark #categoriesBar {
-  background: #1c1c1e;
-}
-
-/* TOP BAR */
-.topBar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.topLeft h1 {
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.langSelector {
-  margin-top: 4px;
-}
-
-.langBtn {
-  border: none;
-  background: #e5e5ea;
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-size: 12px;
-  margin-right: 4px;
-  cursor: pointer;
-}
-
-.langBtn.active {
-  background: #007aff;
-  color: #fff;
-}
-
-body.dark .langBtn {
-  background: #2c2c2e;
-  color: #f5f5f5;
-}
-
-body.dark .langBtn.active {
-  background: #0a84ff;
-}
-
-.topRight button {
-  border: none;
-  background: #e5e5ea;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  margin-left: 6px;
-  cursor: pointer;
-  font-size: 18px;
-}
-
-body.dark .topRight button {
-  background: #2c2c2e;
-  color: #f5f5f5;
-}
-
-/* CATEGORIE */
-#categoriesBar {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 14px;
-  padding: 6px;
-  background: #ffffff;
-  border-radius: 12px;
-  overflow-x: auto;
-}
-
-.catBtn {
-  border: none;
-  background: #e5e5ea;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 13px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.catBtn.active {
-  background: #007aff;
-  color: #fff;
-}
-
-body.dark #categoriesBar {
-  background: #1c1c1e;
-}
-
-body.dark .catBtn {
-  background: #2c2c2e;
-  color: #f5f5f5;
-}
-
-body.dark .catBtn.active {
-  background: #0a84ff;
-}
-
-/* HEADER NOTE */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-header h2 {
-  font-size: 20px;
-  font-weight: 600;
-}
-
-#addNoteBtn {
-  font-size: 26px;
-  background: #007aff;
-  color: #fff;
-  border: none;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-/* LISTA NOTE */
-#notesList {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.noteItem {
-  background: #fff;
-  padding: 14px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  cursor: pointer;
-  transition: transform 0.1s, background 0.2s;
-}
-
-.noteItem:active {
-  transform: scale(0.97);
-}
-
-.noteHeaderRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 4px;
-}
-
-.noteItem h3 {
-  font-size: 17px;
-}
-
-/* TAG CATEGORIE COLORATI */
-.noteCategoryTag {
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: #e5e5ea;
-}
-
-/* COLORI CATEGORIE PREMIUM */
-.noteCategoryTag.home {
-  background: #ffcc00;
-  color: #000;
-}
-
-.noteCategoryTag.work {
-  background: #007aff;
-  color: #fff;
-}
-
-.noteCategoryTag.ideas {
-  background: #34c759;
-  color: #fff;
-}
-
-.noteCategoryTag.shopping {
-  background: #ff9500;
-  color: #fff;
-}
+    --bg: #1c1c1e;
+    --text: #f5f5f7;
+    --panel-bg: rgba(40, 40, 40, 0.75);
+    --panel-border: rgba(255, 255, 255, 0.1);
+    --note-bg: #2c2c2e;
+    --note-border: rgba(255, 255, 255, 0.08);
+    --shadow: rgba(0, 0, 0, 0.4);
+}
+
+/* TEMA AMOLED (nero assoluto) */
+body.amoled {
+    --bg: #000000;
+    --text: #ffffff;
+    --panel-bg: rgba(20, 20, 20, 0.75);
+    --panel-border: rgba(255, 255, 255, 0.1);
+    --note-bg: #0d0d0d;
+    --note-border: rgba(255, 255, 255, 0.08);
+    --shadow: rgba(0, 0, 0, 0.6);
+}
+
+/* --------------------------------------------------
+   TOP BAR
+-------------------------------------------------- */
 
-.noteCategoryTag.other {
-  background: #af52de;
-  color: #fff;
+.top-bar {
+    width: 100%;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(18px);
+    background: var(--panel-bg);
+    border-bottom: 1px solid var(--panel-border);
+    position: sticky;
+    top: 0;
+    z-index: 50;
 }
-
-body.dark .noteCategoryTag {
-  color: #f5f5f5;
-}
-
-.noteItem p {
-  font-size: 14px;
-  color: #555;
+
+.app-title {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.top-icons {
+    display: flex;
+    gap: 8px;
+}
+
+.top-icons button {
+    background: var(--note-bg);
+    border: 1px solid var(--note-border);
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.top-icons button:active {
+    transform: scale(0.92);
+}
+
+/* --------------------------------------------------
+   CATEGORIE
+-------------------------------------------------- */
+
+.categories {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    overflow-x: auto;
+}
+
+.category-btn {
+    background: var(--note-bg);
+    border: 1px solid var(--note-border);
+    padding: 8px 14px;
+    border-radius: 12px;
+    font-size: 15px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.category-btn:active {
+    transform: scale(0.94);
+}
+
+/* --------------------------------------------------
+   NOTE LIST
+-------------------------------------------------- */
+
+.notes-container {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Singola nota */
+.note {
+    background: var(--note-bg);
+    border: 1px solid var(--note-border);
+    padding: 14px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px var(--shadow);
+    transition: transform 0.2s ease, opacity 0.3s ease;
+    cursor: pointer;
+    opacity: 0;
+    animation: fadeIn 0.4s forwards;
+}
+
+.note-title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.note-text {
+    font-size: 15px;
+    opacity: 0.8;
+}
+
+/* Animazione apparizione note */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --------------------------------------------------
+   PULSANTE +
+-------------------------------------------------- */
+
+.add-note-btn {
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #007aff;
+    color: white;
+    font-size: 32px;
+    border: none;
+    box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.add-note-btn:active {
+    transform: scale(0.88);
+}
+/* --------------------------------------------------
+   BLOCCO 2 — EDITOR, CATEGORIE, ANIMAZIONI PREMIUM
+-------------------------------------------------- */
+
+/* --------------------------------------------------
+   EDITOR NOTA
+-------------------------------------------------- */
+
+.editor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(18px);
+    background: rgba(0, 0, 0, 0.35);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.editor.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.editor-content {
+    width: 92%;
+    max-width: 520px;
+    background: var(--note-bg);
+    border: 1px solid var(--note-border);
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: 0 8px 28px var(--shadow);
+    animation: popIn 0.25s ease forwards;
+}
+
+@keyframes popIn {
+    from { transform: scale(0.92); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.note-title-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    margin-bottom: 10px;
+}
+
+.note-textarea {
+    width: 100%;
+    height: 180px;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    resize: none;
+    margin-bottom: 12px;
+}
+
+.note-title-input:focus,
+.note-textarea:focus {
+    outline: none;
 }
-
-body.dark .noteItem p {
-  color: #d1d1d6;
+
+/* Categoria */
+.note-category-select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid var(--note-border);
+    background: var(--note-bg);
+    color: var(--text);
+    margin-bottom: 12px;
+    font-size: 15px;
 }
 
-/* EDITOR */
-#editor {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Colore */
+.color-picker {
+    width: 100%;
+    height: 40px;
+    border-radius: 12px;
+    border: 1px solid var(--note-border);
+    margin-bottom: 14px;
+    cursor: pointer;
 }
 
-#editor.hidden {
-  display: none;
+/* Bottoni editor */
+.editor-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
 }
 
-.editorBox {
-  background: #fff;
-  padding: 20px;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 420px;
+.editor-buttons button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.2s ease;
 }
 
-body.dark .editorBox {
-  background: #1c1c1e;
-  color: #f5f5f5;
+.save-btn {
+    background: #007aff;
+    color: white;
 }
 
-#noteCategory {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  margin-bottom: 10px;
-  font-size: 14px;
+.delete-btn {
+    background: #ff3b30;
+    color: white;
 }
 
-#editor input,
-#editor textarea {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  margin-bottom: 10px;
-  font-size: 16px;
+.close-btn {
+    background: var(--note-bg);
+    border: 1px solid var(--note-border);
+    color: var(--text);
 }
 
-#editor textarea {
-  height: 160px;
-  resize: none;
+.editor-buttons button:active {
+    transform: scale(0.92);
 }
 
-.editorButtons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-}
+/* --------------------------------------------------
+   NOTE — LAYOUT AVANZATO
+-------------------------------------------------- */
 
-.editorButtons button {
-  flex: 1;
-  padding: 12px;
-  margin: 0 4px;
-  border-radius: 10px;
-  border: none;
-  font-size: 15px;
-  cursor: pointer;
+.note {
+    position: relative;
 }
 
-#saveNote {
-  background: #34c759;
-  color: #fff;
+/* Icona categoria nella nota */
+.note::before {
+    content: attr(data-icon);
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 20px;
+    opacity: 0.25;
 }
 
-#cancelEdit {
-  background: #d1d1d6;
-}
+/* --------------------------------------------------
+   ANIMAZIONI PREMIUM
+-------------------------------------------------- */
 
-#deleteNote {
-  background: #ff3b30;
-  color: #fff;
+/* Animazione apertura pannelli */
+.panel-box {
+    animation: panelPop 0.25s ease forwards;
 }
 
-/* SELETTORE COLORE NOTE */
-.colorPickerBox {
-  margin-top: 10px;
+@keyframes panelPop {
+    from { transform: scale(0.92); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
-.colorPalette {
-  display: flex;
-  gap: 8px;
-  margin: 8px 0;
-  flex-wrap: wrap;
-}
+/* Hover morbido stile iOS */
+button:hover {
+    opacity: 0.85;
+}
+
+/* Transizione generale */
+button, .note, .category-btn {
+    transition: background 0.25s ease, transform 0.15s ease, opacity 0.25s ease;
+}
+
+/* --------------------------------------------------
+   SCROLL MORBIDO
+-------------------------------------------------- */
 
-.colorDot {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 2px solid #ccc;
-  cursor: pointer;
-  transition: transform 0.1s;
-}
+html {
+    scroll-behavior: smooth;
+}
 
-.colorDot:hover {
-  transform: scale(1.1);
-}
+/* --------------------------------------------------
+   BARRA DI SCORRIMENTO (iOS style)
+-------------------------------------------------- */
 
-.colorDot.selected {
-  border: 3px solid #000;
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(120, 120, 120, 0.25);
+    border-radius: 10px;
 }
 
-body.dark .colorDot.selected {
-  border: 3px solid #fff;
+::-webkit-scrollbar-track {
+    background: transparent;
 }
-
-/* PIN */
-#pinOverlay {
-  position: fixed;
-  inset: 0;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* --------------------------------------------------
+   BLOCCO 3 — PANNELLI BACKUP + IMPOSTAZIONI + RESPONSIVE
+-------------------------------------------------- */
+
+/* --------------------------------------------------
+   OVERLAY PANNELLI (Backup + Impostazioni)
+-------------------------------------------------- */
+
+.panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(18px);
+    background: rgba(0, 0, 0, 0.35);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 300;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
 }
 
-.pinBox {
-  background: #fff;
-  padding: 20px;
-  border-radius: 16px;
-  width: 260px;
-  text-align: center;
+.panel.show {
+    opacity: 1;
+    pointer-events: auto;
 }
 
-.pinCircles {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 14px 0;
+.panel-box {
+    width: 92%;
+    max-width: 520px;
+    max-height: 88%;
+    overflow-y: auto;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 8px 28px var(--shadow);
 }
 
-.circle {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid #555;
+/* Titolo pannello */
+.panel-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    text-align: center;
 }
 
-.circle.filled {
-  background: #007aff;
-  border-color: #007aff;
+/* Sezioni */
+.panel-section {
+    font-size: 15px;
+    font-weight: 600;
+    opacity: 0.7;
+    margin-top: 18px;
+    margin-bottom: 6px;
 }
 
-#pinError {
-  color: #ff3b30;
-  height: 18px;
-  font-size: 14px;
-  margin-bottom: 10px;
+/* Bottoni pannello */
+.panel-btn {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    border: 1px solid var(--note-border);
+    background: var(--note-bg);
+    color: var(--text);
+    font-size: 15px;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
 }
 
-.pinPad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+.panel-btn:active {
+    transform: scale(0.94);
 }
 
-.pinPad button {
-  padding: 12px 0;
-  font-size: 18px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  background: #f2f2f7;
-  cursor: pointer;
+.panel-btn.danger {
+    background: #ff3b30;
+    color: white;
+    border: none;
 }
 
-/* IMPOSTAZIONI */
-#settingsOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Pulsante chiudi */
+.close-panel-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 14px;
+    border-radius: 12px;
+    background: var(--note-bg);
+    border: 1px solid var(--note-border);
+    font-size: 15px;
+    cursor: pointer;
 }
 
-#settingsOverlay.hidden {
-  display: none;
-}
+/* --------------------------------------------------
+   RESPONSIVE — iPhone
+-------------------------------------------------- */
 
-.settingsBox {
-  background: #fff;
-  padding: 20px;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 420px;
-}
+@media (max-width: 480px) {
+    .editor-content,
+    .panel-box {
+        width: 94%;
+        border-radius: 16px;
+    }
 
-body.dark .settingsBox {
-  background: #1c1c1e;
-  color: #f5f5f5;
-}
+    .note-title-input {
+        font-size: 17px;
+    }
 
-.settingsGroup {
-  margin-top: 14px;
-}
+    .note-textarea {
+        font-size: 15px;
+    }
 
-.settingsGroup h3 {
-  font-size: 16px;
-  margin-bottom: 4px;
+    .panel-title {
+        font-size: 20px;
+    }
 }
 
-.settingsGroup label {
-  font-size: 14px;
-}
+/* --------------------------------------------------
+   RIFINITURE FINALI ULTRA iOS
+-------------------------------------------------- */
 
-.settingsGroup input[type="password"] {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  margin-top: 4px;
+/* Effetto pressione morbida */
+button:active,
+.note:active {
+    transform: scale(0.97);
 }
 
-.settingsGroup button {
-  margin-top: 6px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  border: none;
-  background: #007aff;
-  color: #fff;
-  font-size: 14px;
-  cursor: pointer;
+/* Ombre morbide */
+.note,
+.panel-box,
+.editor-content {
+    box-shadow: 0 8px 28px var(--shadow);
 }
 
-.settingsHint {
-  font-size: 12px;
-  color: #666;
+/* Transizioni globali */
+* {
+    transition: background 0.25s ease, color 0.25s ease;
 }
 
-body.dark .settingsHint {
-  color: #a1a1a6;
+/* Arrotondamenti coerenti */
+button,
+input,
+textarea,
+select {
+    border-radius: 12px;
 }
 
-.closeSettingsBtn {
-  margin-top: 16px;
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  background: #d1d1d6;
-  cursor: pointer;
+/* Blur più morbido */
+.top-bar,
+.editor,
+.panel {
+    backdrop-filter: blur(18px);
 }
