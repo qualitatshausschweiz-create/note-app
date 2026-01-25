@@ -1396,3 +1396,1192 @@ applyAccent();
 applyBlur();
 applyAnimations();
 renderNotes();
+/* ============================================================
+   NOTE + ARCHIVIO (prima, così esistono per backupBtn)
+   ============================================================ */
+let notes = JSON.parse(localStorage.getItem("notes") || "[]");
+let archive = JSON.parse(localStorage.getItem("archive") || "[]");
+
+/* ============================================================
+   PIN SYSTEM
+   ============================================================ */
+let savedPIN = localStorage.getItem("appPIN") || "4618";
+let enteredPIN = "";
+
+const pinOverlay = document.getElementById("pinOverlay");
+const pinCircles = document.querySelectorAll(".pinCircle");
+const pinError = document.getElementById("pinError");
+
+function updatePinCircles() {
+  pinCircles.forEach((c, i) => c.classList.toggle("filled", i < enteredPIN.length));
+}
+
+function checkPIN() {
+  if (enteredPIN === savedPIN) {
+    pinOverlay.style.display = "none";
+  } else {
+    pinError.textContent = "PIN errato";
+    pinError.style.opacity = 1;
+    setTimeout(() => pinError.style.opacity = 0, 900);
+  }
+  enteredPIN = "";
+  updatePinCircles();
+}
+
+document.querySelectorAll(".pinKey").forEach(btn => {
+  btn.onclick = () => {
+    const d = btn.dataset.digit;
+    if (!d) return;
+    if (enteredPIN.length < 4) {
+      enteredPIN += d;
+      updatePinCircles();
+      if (enteredPIN.length === 4) checkPIN();
+    }
+  };
+});
+
+document.getElementById("pinBackspace").onclick = () => {
+  enteredPIN = enteredPIN.slice(0, -1);
+  updatePinCircles();
+};
+
+/* ============================================================
+   TRADUZIONI
+   ============================================================ */
+const translations = {
+  it: {
+    title: "Note",
+    premium: "Premium",
+    newNote: "Nuova nota",
+    save: "Salva",
+    cancel: "Annulla",
+    delete: "Elimina",
+    archive: "Archivio",
+    reset: "Reset app",
+    theme: "Tema",
+    amoled: "AMOLED",
+    font: "Font",
+    textSize: "Dimensione testo",
+    accent: "Colore accento",
+    blur: "Sfocatura",
+    animations: "Animazioni",
+    haptics: "Haptics",
+    export: "Esporta",
+    import: "Importa",
+    changePin: "Cambia PIN"
+  },
+  de: {
+    title: "Notizen",
+    premium: "Premium",
+    newNote: "Neue Notiz",
+    save: "Speichern",
+    cancel: "Abbrechen",
+    delete: "Löschen",
+    archive: "Archiv",
+    reset: "App zurücksetzen",
+    theme: "Thema",
+    amoled: "AMOLED",
+    font: "Schriftart",
+    textSize: "Textgröße",
+    accent: "Akzentfarbe",
+    blur: "Hintergrund‑Blur",
+    animations: "Animationen",
+    haptics: "Haptik",
+    export: "Exportieren",
+    import: "Importieren",
+    changePin: "PIN ändern"
+  },
+  en: {
+    title: "Notes",
+    premium: "Premium",
+    newNote: "New Note",
+    save: "Save",
+    cancel: "Cancel",
+    delete: "Delete",
+    archive: "Archive",
+    reset: "Reset App",
+    theme: "Theme",
+    amoled: "AMOLED",
+    font: "Font",
+    textSize: "Text Size",
+    accent: "Accent Color",
+    blur: "Background Blur",
+    animations: "Animations",
+    haptics: "Haptics",
+    export: "Export",
+    import: "Import",
+    changePin: "Change PIN"
+  }
+};
+
+let currentLang = localStorage.getItem("appLang") || "it";
+
+function applyTranslations() {
+  const t = translations[currentLang];
+
+  const appTitle = document.querySelector("#appTitle");
+  if (appTitle) {
+    appTitle.childNodes[0].textContent = t.title;
+    appTitle.querySelector(".sub").textContent = t.premium;
+  }
+
+  const editorTitle = document.getElementById("editorTitle");
+  if (editorTitle) editorTitle.textContent = t.newNote;
+
+  const saveBtn = document.getElementById("saveBtn");
+  if (saveBtn) saveBtn.textContent = t.save;
+
+  const cancelBtn = document.getElementById("cancelBtn");
+  if (cancelBtn) cancelBtn.textContent = t.cancel;
+
+  const deleteNoteBtn = document.getElementById("deleteNoteBtn");
+  if (deleteNoteBtn) deleteNoteBtn.textContent = "🗑 " + t.delete;
+
+  const map = [
+    ["settingsTheme", "theme"],
+    ["settingsAmoled", "amoled"],
+    ["settingsFont", "font"],
+    ["settingsTextSize", "textSize"],
+    ["settingsAccent", "accent"],
+    ["settingsBlur", "blur"],
+    ["settingsAnimations", "animations"],
+    ["settingsHaptics", "haptics"],
+    ["settingsExport", "export"],
+    ["settingsImport", "import"],
+    ["settingsArchive", "archive"],
+    ["settingsResetApp", "reset"]
+  ];
+
+  map.forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el) el.querySelector(".label").textContent = t[key];
+  });
+}
+
+document.getElementById("langBtn").onclick = () => {
+  currentLang = currentLang === "it" ? "de" : currentLang === "de" ? "en" : "it";
+  localStorage.setItem("appLang", currentLang);
+  applyTranslations();
+};
+
+/* ============================================================
+   TEMA + AMOLED
+   ============================================================ */
+let theme = localStorage.getItem("theme") || "light";
+let amoled = localStorage.getItem("amoled") === "true";
+
+function applyTheme() {
+  document.body.classList.remove("dark", "amoled");
+  if (amoled) document.body.classList.add("amoled");
+  else if (theme === "dark") document.body.classList.add("dark");
+}
+
+document.getElementById("themeBtn").onclick = () => {
+  theme = theme === "light" ? "dark" : "light";
+  localStorage.setItem("theme", theme);
+  applyTheme();
+};
+
+document.getElementById("settingsAmoled").onclick = () => {
+  amoled = !amoled;
+  localStorage.setItem("amoled", amoled);
+  applyTheme();
+};
+
+/* ============================================================
+   BACKUP MANUALE (🛟)
+   ============================================================ */
+document.getElementById("backupBtn").onclick = () => {
+  const data = {
+    notes,
+    archive,
+    pin: savedPIN,
+    lang: currentLang,
+    theme,
+    amoled
+  };
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "backup.json";
+  a.click();
+  URL.revokeObjectURL(url);
+  showBanner("Backup salvato");
+};
+
+/* ============================================================
+   PALETTE COLORI
+   ============================================================ */
+let editingNoteId = null;
+let selectedColor = "#4f8cff";
+
+const palettes = {
+  warm: ["#ff6b6b", "#ff9f43", "#ffa502", "#ff4757", "#eccc68"],
+  cool: ["#1e90ff", "#3742fa", "#2ed573", "#70a1ff", "#5352ed"],
+  pastel: ["#ffcccc", "#ffd3b6", "#dcedc1", "#a8e6cf", "#d4a5a5"],
+  mix: ["#ff6b6b", "#1e90ff", "#2ed573", "#ffa502", "#a55eea"]
+};
+
+function loadPalette(p) {
+  const row = document.getElementById("colorRow");
+  if (!row) return;
+  row.innerHTML = "";
+  palettes[p].forEach(c => {
+    const dot = document.createElement("div");
+    dot.className = "colorDot";
+    dot.style.background = c;
+    dot.onclick = () => {
+      selectedColor = c;
+      document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
+      dot.classList.add("selected");
+    };
+    row.appendChild(dot);
+  });
+}
+
+document.querySelectorAll(".paletteBtn").forEach(btn => {
+  btn.onclick = () => loadPalette(btn.dataset.pal);
+});
+
+/* ============================================================
+   RENDER NOTE
+   ============================================================ */
+function renderNotes() {
+  const list = document.getElementById("notesList");
+  if (!list) return;
+  list.innerHTML = "";
+
+  const activeCatEl = document.querySelector(".cat.active");
+  const activeCat = activeCatEl ? activeCatEl.dataset.cat : "all";
+
+  notes.forEach(n => {
+    if (activeCat !== "all" && n.category !== activeCat) return;
+
+    const item = document.createElement("div");
+    item.className = "noteItem";
+    item.style.borderLeftColor = n.color;
+    item.innerHTML = `
+      <div class="noteTitleRow">
+        <div class="noteTitle">${n.title || "Senza titolo"}</div>
+        <div class="noteMeta">${n.date}</div>
+      </div>
+      <div class="noteTextPreview">${n.text.slice(0, 120)}</div>
+    `;
+    item.onclick = () => openEditor(n.id);
+    list.appendChild(item);
+  });
+}
+
+/* ============================================================
+   CATEGORIE
+   ============================================================ */
+document.querySelectorAll(".cat").forEach(cat => {
+  cat.onclick = () => {
+    document.querySelectorAll(".cat").forEach(c => c.classList.remove("active"));
+    cat.classList.add("active");
+    renderNotes();
+  };
+});
+
+/* ============================================================
+   EDITOR NOTE
+   ============================================================ */
+function openEditor(id = null) {
+  editingNoteId = id;
+
+  const titleInput = document.getElementById("noteTitleInput");
+  const textInput = document.getElementById("noteText");
+  const editor = document.getElementById("noteEditor");
+
+  if (!titleInput || !textInput || !editor) return;
+
+  if (id) {
+    const n = notes.find(x => x.id === id);
+    if (!n) return;
+    titleInput.value = n.title;
+    textInput.value = n.text;
+    selectedColor = n.color;
+  } else {
+    titleInput.value = "";
+    textInput.value = "";
+    selectedColor = "#4f8cff";
+  }
+
+  loadPalette("mix");
+  editor.style.display = "flex";
+}
+
+document.getElementById("addNoteBtn").onclick = () => openEditor(null);
+
+/* ============================================================
+   SALVA NOTA
+   ============================================================ */
+document.getElementById("saveBtn").onclick = () => {
+  const title = document.getElementById("noteTitleInput").value.trim();
+  const text = document.getElementById("noteText").value.trim();
+
+  if (!text) return showBanner("Nota vuota");
+
+  if (editingNoteId) {
+    const n = notes.find(x => x.id === editingNoteId);
+    if (!n) return;
+    n.title = title;
+    n.text = text;
+    n.color = selectedColor;
+    n.date = new Date().toLocaleDateString();
+  } else {
+    const activeCatEl = document.querySelector(".cat.active");
+    const cat = activeCatEl ? activeCatEl.dataset.cat : "all";
+    notes.push({
+      id: Date.now(),
+      title,
+      text,
+      color: selectedColor,
+      category: cat,
+      date: new Date().toLocaleDateString()
+    });
+  }
+
+  localStorage.setItem("notes", JSON.stringify(notes));
+  document.getElementById("noteEditor").style.display = "none";
+  renderNotes();
+};
+
+/* ============================================================
+   ELIMINA (ARCHIVIA) NOTA
+   ============================================================ */
+document.getElementById("deleteNoteBtn").onclick = () => {
+  if (!editingNoteId) return;
+  const n = notes.find(x => x.id === editingNoteId);
+  if (!n) return;
+
+  archive.push(n);
+  notes = notes.filter(x => x.id !== editingNoteId);
+
+  localStorage.setItem("notes", JSON.stringify(notes));
+  localStorage.setItem("archive", JSON.stringify(archive));
+
+  document.getElementById("noteEditor").style.display = "none";
+  renderNotes();
+};
+
+/* ============================================================
+   ANNULLA EDITOR
+   ============================================================ */
+document.getElementById("cancelBtn").onclick = () => {
+  document.getElementById("noteEditor").style.display = "none";
+};
+
+/* ============================================================
+   ARCHIVIO
+   ============================================================ */
+document.getElementById("settingsArchive").onclick = () => {
+  const list = document.getElementById("archiveList");
+  if (!list) return;
+  list.innerHTML = "";
+  archive.forEach(n => {
+    const div = document.createElement("div");
+    div.innerHTML = `<b>${n.title}</b><br>${n.text.slice(0, 100)}...`;
+    div.style.marginBottom = "10px";
+    list.appendChild(div);
+  });
+  document.getElementById("archivePopup").style.display = "flex";
+};
+
+document.getElementById("archiveCloseBtn").onclick = () => {
+  document.getElementById("archivePopup").style.display = "none";
+};
+
+/* ============================================================
+   BANNER
+   ============================================================ */
+function showBanner(msg) {
+  const b = document.getElementById("bannerMsg");
+  if (!b) return;
+  b.textContent = msg;
+  b.classList.add("show");
+  setTimeout(() => b.classList.remove("show"), 1500);
+}
+
+/* ============================================================
+   IMPORT JSON
+   ============================================================ */
+document.getElementById("settingsImport").onclick = () => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "application/json";
+
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+
+        notes = data.notes || [];
+        archive = data.archive || [];
+        savedPIN = data.pin || "4618";
+        currentLang = data.lang || "it";
+        theme = data.theme || "light";
+        amoled = data.amoled || false;
+
+        localStorage.setItem("notes", JSON.stringify(notes));
+        localStorage.setItem("archive", JSON.stringify(archive));
+        localStorage.setItem("appPIN", savedPIN);
+        localStorage.setItem("appLang", currentLang);
+        localStorage.setItem("theme", theme);
+        localStorage.setItem("amoled", amoled);
+
+        applyTranslations();
+        applyTheme();
+        renderNotes();
+
+        showBanner("Import riuscito");
+      } catch {
+        showBanner("Errore import");
+      }
+    };
+
+    reader.readAsText(file);
+  };
+
+  input.click();
+};
+
+/* ============================================================
+   RESET APP
+   ============================================================ */
+document.getElementById("settingsResetApp").onclick = () => {
+  document.getElementById("resetPopup").style.display = "flex";
+};
+
+document.getElementById("resetCancelBtn").onclick = () => {
+  document.getElementById("resetPopup").style.display = "none";
+};
+
+document.getElementById("resetConfirmBtn").onclick = () => {
+  localStorage.clear();
+
+  notes = [];
+  archive = [];
+  savedPIN = "4618";
+  currentLang = "it";
+  theme = "light";
+  amoled = false;
+
+  applyTranslations();
+  applyTheme();
+  renderNotes();
+
+  document.getElementById("resetPopup").style.display = "none";
+  showBanner("Reset completato");
+};
+
+/* ============================================================
+   IMPOSTAZIONI AVANZATE
+   ============================================================ */
+
+/* FONT */
+let currentFont = localStorage.getItem("font") || "-apple-system";
+
+function applyFont() {
+  document.body.style.fontFamily = currentFont;
+}
+
+document.getElementById("settingsFont").onclick = () => {
+  const fonts = ["-apple-system", "Helvetica Neue", "Arial", "Georgia", "Courier New"];
+  currentFont = fonts[(fonts.indexOf(currentFont) + 1) % fonts.length];
+  localStorage.setItem("font", currentFont);
+  applyFont();
+  showBanner("Font cambiato");
+};
+
+/* DIMENSIONE TESTO */
+let textSize = parseInt(localStorage.getItem("textSize") || "16");
+
+function applyTextSize() {
+  document.body.style.fontSize = textSize + "px";
+}
+
+document.getElementById("settingsTextSize").onclick = () => {
+  textSize = textSize >= 22 ? 14 : textSize + 1;
+  localStorage.setItem("textSize", textSize);
+  applyTextSize();
+  showBanner("Dimensione: " + textSize);
+};
+
+/* COLORE ACCENTO */
+let accentColors = ["#4f8cff", "#ff3b30", "#ff9500", "#34c759", "#5856d6"];
+let accentIndex = parseInt(localStorage.getItem("accentIndex") || "0");
+
+function applyAccent() {
+  document.documentElement.style.setProperty("--accent", accentColors[accentIndex]);
+  document.documentElement.style.setProperty("--accent-light", accentColors[accentIndex] + "55");
+  document.documentElement.style.setProperty("--accent-glow", accentColors[accentIndex] + "55");
+}
+
+document.getElementById("settingsAccent").onclick = () => {
+  accentIndex = (accentIndex + 1) % accentColors.length;
+  localStorage.setItem("accentIndex", accentIndex);
+  applyAccent();
+  showBanner("Colore cambiato");
+};
+
+/* BLUR */
+let blurAmount = parseInt(localStorage.getItem("blur") || "18");
+
+function applyBlur() {
+  document.documentElement.style.setProperty("--blur-amount", blurAmount + "px");
+}
+
+document.getElementById("settingsBlur").onclick = () => {
+  blurAmount = blurAmount >= 30 ? 6 : blurAmount + 2;
+  localStorage.setItem("blur", blurAmount);
+  applyBlur();
+  showBanner("Blur: " + blurAmount);
+};
+
+/* ANIMAZIONI */
+let animationsEnabled = localStorage.getItem("animations") !== "false";
+
+function applyAnimations() {
+  document.body.style.setProperty("--anim", animationsEnabled ? "1" : "0");
+}
+
+document.getElementById("settingsAnimations").onclick = () => {
+  animationsEnabled = !animationsEnabled;
+  localStorage.setItem("animations", animationsEnabled);
+  applyAnimations();
+  showBanner(animationsEnabled ? "Animazioni ON" : "Animazioni OFF");
+};
+
+/* HAPTICS (placeholder) */
+let hapticsEnabled = localStorage.getItem("haptics") !== "false";
+
+document.getElementById("settingsHaptics").onclick = () => {
+  hapticsEnabled = !hapticsEnabled;
+  localStorage.setItem("haptics", hapticsEnabled);
+  showBanner(hapticsEnabled ? "Haptics ON" : "Haptics OFF");
+};
+
+/* ============================================================
+   PANNELLO IMPOSTAZIONI (⚙️)
+   ============================================================ */
+document.getElementById("settingsBtn").onclick = () => {
+  document.getElementById("settingsPanel").style.display = "flex";
+};
+
+document.querySelector("#settingsPanel .settingsClose").onclick = () => {
+  document.getElementById("settingsPanel").style.display = "none";
+};
+
+/* ============================================================
+   INIZIALIZZAZIONE FINALE
+   ============================================================ */
+applyTranslations();
+applyTheme();
+applyFont();
+applyTextSize();
+applyAccent();
+applyBlur();
+applyAnimations();
+renderNotes();
+   /* ============================================================
+   NOTE + ARCHIVIO (prima, così esistono per backupBtn)
+   ============================================================ */
+let notes = JSON.parse(localStorage.getItem("notes") || "[]");
+let archive = JSON.parse(localStorage.getItem("archive") || "[]");
+
+/* ============================================================
+   PIN SYSTEM
+   ============================================================ */
+let savedPIN = localStorage.getItem("appPIN") || "4618";
+let enteredPIN = "";
+
+const pinOverlay = document.getElementById("pinOverlay");
+const pinCircles = document.querySelectorAll(".pinCircle");
+const pinError = document.getElementById("pinError");
+
+function updatePinCircles() {
+  pinCircles.forEach((c, i) => c.classList.toggle("filled", i < enteredPIN.length));
+}
+
+function checkPIN() {
+  if (enteredPIN === savedPIN) {
+    pinOverlay.style.display = "none";
+  } else {
+    pinError.textContent = "PIN errato";
+    pinError.style.opacity = 1;
+    setTimeout(() => pinError.style.opacity = 0, 900);
+  }
+  enteredPIN = "";
+  updatePinCircles();
+}
+
+document.querySelectorAll(".pinKey").forEach(btn => {
+  btn.onclick = () => {
+    const d = btn.dataset.digit;
+    if (!d) return;
+    if (enteredPIN.length < 4) {
+      enteredPIN += d;
+      updatePinCircles();
+      if (enteredPIN.length === 4) checkPIN();
+    }
+  };
+});
+
+document.getElementById("pinBackspace").onclick = () => {
+  enteredPIN = enteredPIN.slice(0, -1);
+  updatePinCircles();
+};
+
+/* ============================================================
+   TRADUZIONI
+   ============================================================ */
+const translations = {
+  it: {
+    title: "Note",
+    premium: "Premium",
+    newNote: "Nuova nota",
+    save: "Salva",
+    cancel: "Annulla",
+    delete: "Elimina",
+    archive: "Archivio",
+    reset: "Reset app",
+    theme: "Tema",
+    amoled: "AMOLED",
+    font: "Font",
+    textSize: "Dimensione testo",
+    accent: "Colore accento",
+    blur: "Sfocatura",
+    animations: "Animazioni",
+    haptics: "Haptics",
+    export: "Esporta",
+    import: "Importa",
+    changePin: "Cambia PIN"
+  },
+  de: {
+    title: "Notizen",
+    premium: "Premium",
+    newNote: "Neue Notiz",
+    save: "Speichern",
+    cancel: "Abbrechen",
+    delete: "Löschen",
+    archive: "Archiv",
+    reset: "App zurücksetzen",
+    theme: "Thema",
+    amoled: "AMOLED",
+    font: "Schriftart",
+    textSize: "Textgröße",
+    accent: "Akzentfarbe",
+    blur: "Hintergrund‑Blur",
+    animations: "Animationen",
+    haptics: "Haptik",
+    export: "Exportieren",
+    import: "Importieren",
+    changePin: "PIN ändern"
+  },
+  en: {
+    title: "Notes",
+    premium: "Premium",
+    newNote: "New Note",
+    save: "Save",
+    cancel: "Cancel",
+    delete: "Delete",
+    archive: "Archive",
+    reset: "Reset App",
+    theme: "Theme",
+    amoled: "AMOLED",
+    font: "Font",
+    textSize: "Text Size",
+    accent: "Accent Color",
+    blur: "Background Blur",
+    animations: "Animations",
+    haptics: "Haptics",
+    export: "Export",
+    import: "Import",
+    changePin: "Change PIN"
+  }
+};
+
+let currentLang = localStorage.getItem("appLang") || "it";
+
+function applyTranslations() {
+  const t = translations[currentLang];
+
+  const appTitle = document.querySelector("#appTitle");
+  if (appTitle) {
+    appTitle.childNodes[0].textContent = t.title;
+    appTitle.querySelector(".sub").textContent = t.premium;
+  }
+
+  const editorTitle = document.getElementById("editorTitle");
+  if (editorTitle) editorTitle.textContent = t.newNote;
+
+  const saveBtn = document.getElementById("saveBtn");
+  if (saveBtn) saveBtn.textContent = t.save;
+
+  const cancelBtn = document.getElementById("cancelBtn");
+  if (cancelBtn) cancelBtn.textContent = t.cancel;
+
+  const deleteNoteBtn = document.getElementById("deleteNoteBtn");
+  if (deleteNoteBtn) deleteNoteBtn.textContent = "🗑 " + t.delete;
+
+  const map = [
+    ["settingsTheme", "theme"],
+    ["settingsAmoled", "amoled"],
+    ["settingsFont", "font"],
+    ["settingsTextSize", "textSize"],
+    ["settingsAccent", "accent"],
+    ["settingsBlur", "blur"],
+    ["settingsAnimations", "animations"],
+    ["settingsHaptics", "haptics"],
+    ["settingsExport", "export"],
+    ["settingsImport", "import"],
+    ["settingsArchive", "archive"],
+    ["settingsResetApp", "reset"]
+  ];
+
+  map.forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el) el.querySelector(".label").textContent = t[key];
+  });
+}
+
+document.getElementById("langBtn").onclick = () => {
+  currentLang = currentLang === "it" ? "de" : currentLang === "de" ? "en" : "it";
+  localStorage.setItem("appLang", currentLang);
+  applyTranslations();
+};
+
+/* ============================================================
+   TEMA + AMOLED
+   ============================================================ */
+let theme = localStorage.getItem("theme") || "light";
+let amoled = localStorage.getItem("amoled") === "true";
+
+function applyTheme() {
+  document.body.classList.remove("dark", "amoled");
+  if (amoled) document.body.classList.add("amoled");
+  else if (theme === "dark") document.body.classList.add("dark");
+}
+
+document.getElementById("themeBtn").onclick = () => {
+  theme = theme === "light" ? "dark" : "light";
+  localStorage.setItem("theme", theme);
+  applyTheme();
+};
+
+document.getElementById("settingsAmoled").onclick = () => {
+  amoled = !amoled;
+  localStorage.setItem("amoled", amoled);
+  applyTheme();
+};
+
+/* ============================================================
+   BACKUP MANUALE (🛟)
+   ============================================================ */
+document.getElementById("backupBtn").onclick = () => {
+  const data = {
+    notes,
+    archive,
+    pin: savedPIN,
+    lang: currentLang,
+    theme,
+    amoled
+  };
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "backup.json";
+  a.click();
+  URL.revokeObjectURL(url);
+  showBanner("Backup salvato");
+};
+
+/* ============================================================
+   PALETTE COLORI
+   ============================================================ */
+let editingNoteId = null;
+let selectedColor = "#4f8cff";
+
+const palettes = {
+  warm: ["#ff6b6b", "#ff9f43", "#ffa502", "#ff4757", "#eccc68"],
+  cool: ["#1e90ff", "#3742fa", "#2ed573", "#70a1ff", "#5352ed"],
+  pastel: ["#ffcccc", "#ffd3b6", "#dcedc1", "#a8e6cf", "#d4a5a5"],
+  mix: ["#ff6b6b", "#1e90ff", "#2ed573", "#ffa502", "#a55eea"]
+};
+
+function loadPalette(p) {
+  const row = document.getElementById("colorRow");
+  if (!row) return;
+  row.innerHTML = "";
+  palettes[p].forEach(c => {
+    const dot = document.createElement("div");
+    dot.className = "colorDot";
+    dot.style.background = c;
+    dot.onclick = () => {
+      selectedColor = c;
+      document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
+      dot.classList.add("selected");
+    };
+    row.appendChild(dot);
+  });
+}
+
+document.querySelectorAll(".paletteBtn").forEach(btn => {
+  btn.onclick = () => loadPalette(btn.dataset.pal);
+});
+
+/* ============================================================
+   RENDER NOTE
+   ============================================================ */
+function renderNotes() {
+  const list = document.getElementById("notesList");
+  if (!list) return;
+  list.innerHTML = "";
+
+  const activeCatEl = document.querySelector(".cat.active");
+  const activeCat = activeCatEl ? activeCatEl.dataset.cat : "all";
+
+  notes.forEach(n => {
+    if (activeCat !== "all" && n.category !== activeCat) return;
+
+    const item = document.createElement("div");
+    item.className = "noteItem";
+    item.style.borderLeftColor = n.color;
+    item.innerHTML = `
+      <div class="noteTitleRow">
+        <div class="noteTitle">${n.title || "Senza titolo"}</div>
+        <div class="noteMeta">${n.date}</div>
+      </div>
+      <div class="noteTextPreview">${n.text.slice(0, 120)}</div>
+    `;
+    item.onclick = () => openEditor(n.id);
+    list.appendChild(item);
+  });
+}
+
+/* ============================================================
+   CATEGORIE
+   ============================================================ */
+document.querySelectorAll(".cat").forEach(cat => {
+  cat.onclick = () => {
+    document.querySelectorAll(".cat").forEach(c => c.classList.remove("active"));
+    cat.classList.add("active");
+    renderNotes();
+  };
+});
+
+/* ============================================================
+   EDITOR NOTE
+   ============================================================ */
+function openEditor(id = null) {
+  editingNoteId = id;
+
+  const titleInput = document.getElementById("noteTitleInput");
+  const textInput = document.getElementById("noteText");
+  const editor = document.getElementById("noteEditor");
+
+  if (!titleInput || !textInput || !editor) return;
+
+  if (id) {
+    const n = notes.find(x => x.id === id);
+    if (!n) return;
+    titleInput.value = n.title;
+    textInput.value = n.text;
+    selectedColor = n.color;
+  } else {
+    titleInput.value = "";
+    textInput.value = "";
+    selectedColor = "#4f8cff";
+  }
+
+  loadPalette("mix");
+  editor.style.display = "flex";
+}
+
+document.getElementById("addNoteBtn").onclick = () => openEditor(null);
+
+/* ============================================================
+   SALVA NOTA
+   ============================================================ */
+document.getElementById("saveBtn").onclick = () => {
+  const title = document.getElementById("noteTitleInput").value.trim();
+  const text = document.getElementById("noteText").value.trim();
+
+  if (!text) return showBanner("Nota vuota");
+
+  if (editingNoteId) {
+    const n = notes.find(x => x.id === editingNoteId);
+    if (!n) return;
+    n.title = title;
+    n.text = text;
+    n.color = selectedColor;
+    n.date = new Date().toLocaleDateString();
+  } else {
+    const activeCatEl = document.querySelector(".cat.active");
+    const cat = activeCatEl ? activeCatEl.dataset.cat : "all";
+    notes.push({
+      id: Date.now(),
+      title,
+      text,
+      color: selectedColor,
+      category: cat,
+      date: new Date().toLocaleDateString()
+    });
+  }
+
+  localStorage.setItem("notes", JSON.stringify(notes));
+  document.getElementById("noteEditor").style.display = "none";
+  renderNotes();
+};
+
+/* ============================================================
+   ELIMINA (ARCHIVIA) NOTA
+   ============================================================ */
+document.getElementById("deleteNoteBtn").onclick = () => {
+  if (!editingNoteId) return;
+  const n = notes.find(x => x.id === editingNoteId);
+  if (!n) return;
+
+  archive.push(n);
+  notes = notes.filter(x => x.id !== editingNoteId);
+
+  localStorage.setItem("notes", JSON.stringify(notes));
+  localStorage.setItem("archive", JSON.stringify(archive));
+
+  document.getElementById("noteEditor").style.display = "none";
+  renderNotes();
+};
+
+/* ============================================================
+   ANNULLA EDITOR
+   ============================================================ */
+document.getElementById("cancelBtn").onclick = () => {
+  document.getElementById("noteEditor").style.display = "none";
+};
+
+/* ============================================================
+   ARCHIVIO
+   ============================================================ */
+document.getElementById("settingsArchive").onclick = () => {
+  const list = document.getElementById("archiveList");
+  if (!list) return;
+  list.innerHTML = "";
+  archive.forEach(n => {
+    const div = document.createElement("div");
+    div.innerHTML = `<b>${n.title}</b><br>${n.text.slice(0, 100)}...`;
+    div.style.marginBottom = "10px";
+    list.appendChild(div);
+  });
+  document.getElementById("archivePopup").style.display = "flex";
+};
+
+document.getElementById("archiveCloseBtn").onclick = () => {
+  document.getElementById("archivePopup").style.display = "none";
+};
+
+/* ============================================================
+   BANNER
+   ============================================================ */
+function showBanner(msg) {
+  const b = document.getElementById("bannerMsg");
+  if (!b) return;
+  b.textContent = msg;
+  b.classList.add("show");
+  setTimeout(() => b.classList.remove("show"), 1500);
+}
+
+/* ============================================================
+   IMPORT JSON
+   ============================================================ */
+document.getElementById("settingsImport").onclick = () => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "application/json";
+
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+
+        notes = data.notes || [];
+        archive = data.archive || [];
+        savedPIN = data.pin || "4618";
+        currentLang = data.lang || "it";
+        theme = data.theme || "light";
+        amoled = data.amoled || false;
+
+        localStorage.setItem("notes", JSON.stringify(notes));
+        localStorage.setItem("archive", JSON.stringify(archive));
+        localStorage.setItem("appPIN", savedPIN);
+        localStorage.setItem("appLang", currentLang);
+        localStorage.setItem("theme", theme);
+        localStorage.setItem("amoled", amoled);
+
+        applyTranslations();
+        applyTheme();
+        renderNotes();
+
+        showBanner("Import riuscito");
+      } catch {
+        showBanner("Errore import");
+      }
+    };
+
+    reader.readAsText(file);
+  };
+
+  input.click();
+};
+
+/* ============================================================
+   RESET APP
+   ============================================================ */
+document.getElementById("settingsResetApp").onclick = () => {
+  document.getElementById("resetPopup").style.display = "flex";
+};
+
+document.getElementById("resetCancelBtn").onclick = () => {
+  document.getElementById("resetPopup").style.display = "none";
+};
+
+document.getElementById("resetConfirmBtn").onclick = () => {
+  localStorage.clear();
+
+  notes = [];
+  archive = [];
+  savedPIN = "4618";
+  currentLang = "it";
+  theme = "light";
+  amoled = false;
+
+  applyTranslations();
+  applyTheme();
+  renderNotes();
+
+  document.getElementById("resetPopup").style.display = "none";
+  showBanner("Reset completato");
+};
+
+/* ============================================================
+   IMPOSTAZIONI AVANZATE
+   ============================================================ */
+
+/* FONT */
+let currentFont = localStorage.getItem("font") || "-apple-system";
+
+function applyFont() {
+  document.body.style.fontFamily = currentFont;
+}
+
+document.getElementById("settingsFont").onclick = () => {
+  const fonts = ["-apple-system", "Helvetica Neue", "Arial", "Georgia", "Courier New"];
+  currentFont = fonts[(fonts.indexOf(currentFont) + 1) % fonts.length];
+  localStorage.setItem("font", currentFont);
+  applyFont();
+  showBanner("Font cambiato");
+};
+
+/* DIMENSIONE TESTO */
+let textSize = parseInt(localStorage.getItem("textSize") || "16");
+
+function applyTextSize() {
+  document.body.style.fontSize = textSize + "px";
+}
+
+document.getElementById("settingsTextSize").onclick = () => {
+  textSize = textSize >= 22 ? 14 : textSize + 1;
+  localStorage.setItem("textSize", textSize);
+  applyTextSize();
+  showBanner("Dimensione: " + textSize);
+};
+
+/* COLORE ACCENTO */
+let accentColors = ["#4f8cff", "#ff3b30", "#ff9500", "#34c759", "#5856d6"];
+let accentIndex = parseInt(localStorage.getItem("accentIndex") || "0");
+
+function applyAccent() {
+  document.documentElement.style.setProperty("--accent", accentColors[accentIndex]);
+  document.documentElement.style.setProperty("--accent-light", accentColors[accentIndex] + "55");
+  document.documentElement.style.setProperty("--accent-glow", accentColors[accentIndex] + "55");
+}
+
+document.getElementById("settingsAccent").onclick = () => {
+  accentIndex = (accentIndex + 1) % accentColors.length;
+  localStorage.setItem("accentIndex", accentIndex);
+  applyAccent();
+  showBanner("Colore cambiato");
+};
+
+/* BLUR */
+let blurAmount = parseInt(localStorage.getItem("blur") || "18");
+
+function applyBlur() {
+  document.documentElement.style.setProperty("--blur-amount", blurAmount + "px");
+}
+
+document.getElementById("settingsBlur").onclick = () => {
+  blurAmount = blurAmount >= 30 ? 6 : blurAmount + 2;
+  localStorage.setItem("blur", blurAmount);
+  applyBlur();
+  showBanner("Blur: " + blurAmount);
+};
+
+/* ANIMAZIONI */
+let animationsEnabled = localStorage.getItem("animations") !== "false";
+
+function applyAnimations() {
+  document.body.style.setProperty("--anim", animationsEnabled ? "1" : "0");
+}
+
+document.getElementById("settingsAnimations").onclick = () => {
+  animationsEnabled = !animationsEnabled;
+  localStorage.setItem("animations", animationsEnabled);
+  applyAnimations();
+  showBanner(animationsEnabled ? "Animazioni ON" : "Animazioni OFF");
+};
+
+/* HAPTICS (placeholder) */
+let hapticsEnabled = localStorage.getItem("haptics") !== "false";
+
+document.getElementById("settingsHaptics").onclick = () => {
+  hapticsEnabled = !hapticsEnabled;
+  localStorage.setItem("haptics", hapticsEnabled);
+  showBanner(hapticsEnabled ? "Haptics ON" : "Haptics OFF");
+};
+
+/* ============================================================
+   PANNELLO IMPOSTAZIONI (⚙️)
+   ============================================================ */
+document.getElementById("settingsBtn").onclick = () => {
+  document.getElementById("settingsPanel").style.display = "flex";
+};
+
+document.querySelector("#settingsPanel .settingsClose").onclick = () => {
+  document.getElementById("settingsPanel").style.display = "none";
+};
+
+/* ============================================================
+   INIZIALIZZAZIONE FINALE
+   ============================================================ */
+applyTranslations();
+applyTheme();
+applyFont();
+applyTextSize();
+applyAccent();
+applyBlur();
+applyAnimations();
+renderNotes();
+   
