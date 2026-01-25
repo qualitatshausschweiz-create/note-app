@@ -1,59 +1,78 @@
-let savedPIN = localStorage.getItem("appPIN") || "4618";
-let enteredPIN = "";
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Note</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-const pinOverlay = document.getElementById("pinOverlay");
-const pinCircles = document.querySelectorAll(".circle");
-const pinError = document.getElementById("pinError");
+  <!-- COLLEGAMENTO AL CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
 
-function updateCircles() {
-  pinCircles.forEach((c, i) => {
-    c.classList.toggle("filled", i < enteredPIN.length);
-  });
-}
+<body>
 
-function checkPIN() {
-  if (enteredPIN === savedPIN) {
-    pinOverlay.style.display = "none";
-  } else {
-    pinError.textContent = "PIN errato";
-    setTimeout(() => pinError.textContent = "", 1000);
-  }
-  enteredPIN = "";
-  updateCircles();
-}
+<!-- ============================
+     OVERLAY PIN
+============================= -->
+<div id="pinOverlay">
+  <div class="pinBox">
+    <h2>Inserisci PIN</h2>
 
-document.querySelectorAll(".pinPad button").forEach(btn => {
-  btn.onclick = () => {
-    const num = btn.dataset.num;
-    if (num !== undefined) {
-      if (enteredPIN.length < 4) {
-        enteredPIN += num;
-        updateCircles();
-        if (enteredPIN.length === 4) checkPIN();
-      }
-    }
-  };
-});
+    <div class="pinCircles">
+      <div class="circle"></div>
+      <div class="circle"></div>
+      <div class="circle"></div>
+      <div class="circle"></div>
+    </div>
 
-document.getElementById("pinBack").onclick = () => {
-  enteredPIN = enteredPIN.slice(0, -1);
-  updateCircles();
-};
+    <div id="pinError"></div>
 
-let notes = JSON.parse(localStorage.getItem("notes") || "[]");
-let editingId = null;
+    <div class="pinPad">
+      <button data-num="1">1</button>
+      <button data-num="2">2</button>
+      <button data-num="3">3</button>
+      <button data-num="4">4</button>
+      <button data-num="5">5</button>
+      <button data-num="6">6</button>
+      <button data-num="7">7</button>
+      <button data-num="8">8</button>
+      <button data-num="9">9</button>
+      <div></div>
+      <button data-num="0">0</button>
+      <button id="pinBack">⌫</button>
+    </div>
+  </div>
+</div>
 
-function saveNotes() {
-  localStorage.setItem("notes", JSON.stringify(notes));
-}
+<!-- ============================
+     HEADER
+============================= -->
+<header>
+  <h1>Note</h1>
+  <button id="addNoteBtn">＋</button>
+</header>
 
-function renderNotes() {
-  const list = document.getElementById("notesList");
-  list.innerHTML = "";
+<!-- ============================
+     LISTA NOTE
+============================= -->
+<div id="notesList"></div>
 
-  notes.forEach(n => {
-    const div = document.createElement("div");
-    div.className = "noteItem";
-    div.innerHTML = `
-      <h3>${n.title || "Senza titolo"}</h3>
-      <p>${n.text.slice(0, 100)}</
+<!-- ============================
+     EDITOR
+============================= -->
+<div id="editor" class="hidden">
+  <input id="noteTitle" placeholder="Titolo">
+  <textarea id="noteText" placeholder="Scrivi..."></textarea>
+
+  <div class="editorButtons">
+    <button id="saveNote">Salva</button>
+    <button id="cancelEdit">Annulla</button>
+    <button id="deleteNote" class="danger">Elimina</button>
+  </div>
+</div>
+
+<!-- COLLEGAMENTO AL JAVASCRIPT -->
+<script src="script.js"></script>
+
+</body>
+</html>
