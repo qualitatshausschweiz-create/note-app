@@ -13,7 +13,7 @@
 <!-- PIN -->
 <div id="pinOverlay">
   <div class="pinBox">
-    <h2>Inserisci PIN</h2>
+    <h2 data-i18n="enterPin">Inserisci PIN</h2>
 
     <div class="pinCircles">
       <div class="circle"></div>
@@ -41,9 +41,43 @@
   </div>
 </div>
 
-<!-- HEADER -->
+<!-- TOP BAR: titolo, lingua, tema -->
+<div class="topBar">
+  <div class="topLeft">
+    <h1 id="appTitle" data-i18n="notesTitle">Le mie note</h1>
+    <div class="langSelector">
+      <button class="langBtn" data-lang="it">IT</button>
+      <button class="langBtn" data-lang="en">EN</button>
+      <button class="langBtn" data-lang="de">DE</button>
+      <button class="langBtn" data-lang="es">ES</button>
+    </div>
+  </div>
+
+  <div class="topRight">
+    <button id="themeToggle" aria-label="Tema">
+      <span id="themeIcon">🌞</span>
+    </button>
+    <button id="backupBtn" aria-label="Backup" title="Backup">
+      🛟
+    </button>
+    <button id="settingsBtn" aria-label="Impostazioni" title="Impostazioni">
+      ⚙️
+    </button>
+  </div>
+</div>
+
+<!-- CATEGORIE -->
+<div id="categoriesBar">
+  <button class="catBtn active" data-category="all" data-i18n="catAll">Tutte</button>
+  <button class="catBtn" data-category="home" data-i18n="catHome">Casa</button>
+  <button class="catBtn" data-category="work" data-i18n="catWork">Lavoro</button>
+  <button class="catBtn" data-category="ideas" data-i18n="catIdeas">Idee</button>
+  <button class="catBtn" data-category="other" data-i18n="catOther">Altro</button>
+</div>
+
+<!-- HEADER NOTE -->
 <header>
-  <h1>Le mie note</h1>
+  <h2 data-i18n="notesSection">Note</h2>
   <button id="addNoteBtn">＋</button>
 </header>
 
@@ -53,14 +87,59 @@
 <!-- EDITOR -->
 <div id="editor" class="hidden">
   <div class="editorBox">
-    <input id="noteTitle" placeholder="Titolo">
-    <textarea id="noteText" placeholder="Scrivi la tua nota..."></textarea>
+    <select id="noteCategory">
+      <option value="home" data-i18n="catHome">Casa</option>
+      <option value="work" data-i18n="catWork">Lavoro</option>
+      <option value="ideas" data-i18n="catIdeas">Idee</option>
+      <option value="other" data-i18n="catOther">Altro</option>
+    </select>
+
+    <input id="noteTitle" placeholder="Titolo" data-i18n-placeholder="titlePlaceholder">
+    <textarea id="noteText" placeholder="Scrivi la tua nota..." data-i18n-placeholder="textPlaceholder"></textarea>
 
     <div class="editorButtons">
-      <button id="saveNote">Salva</button>
-      <button id="cancelEdit">Annulla</button>
-      <button id="deleteNote">Elimina</button>
+      <button id="saveNote" data-i18n="save">Salva</button>
+      <button id="cancelEdit" data-i18n="cancel">Annulla</button>
+      <button id="deleteNote" data-i18n="delete">Elimina</button>
     </div>
+  </div>
+</div>
+
+<!-- MODALE IMPOSTAZIONI -->
+<div id="settingsOverlay" class="hidden">
+  <div class="settingsBox">
+    <h2 data-i18n="settingsTitle">Impostazioni</h2>
+
+    <div class="settingsGroup">
+      <label data-i18n="changePin">Cambia PIN</label>
+      <input type="password" id="newPin" maxlength="4" placeholder="Nuovo PIN">
+      <button id="saveNewPin" data-i18n="savePin">Salva PIN</button>
+    </div>
+
+    <div class="settingsGroup">
+      <label>
+        <input type="checkbox" id="rememberPin">
+        <span data-i18n="rememberPin">Memorizza PIN su questo dispositivo</span>
+      </label>
+    </div>
+
+    <div class="settingsGroup">
+      <h3 data-i18n="backupTitle">Backup & Ripristino</h3>
+      <button id="manualBackup" data-i18n="manualBackup">Backup manuale</button>
+      <button id="manualRestore" data-i18n="manualRestore">Ripristino manuale</button>
+      <p class="settingsHint" data-i18n="autoBackupInfo">
+        Il backup automatico avviene ad ogni salvataggio.
+      </p>
+    </div>
+
+    <div class="settingsGroup">
+      <h3 data-i18n="appInfoTitle">Info app</h3>
+      <p id="appInfo" data-i18n="appInfoText">
+        App note privata con PIN, categorie, backup e tema chiaro/scuro.
+      </p>
+    </div>
+
+    <button id="closeSettings" class="closeSettingsBtn" data-i18n="close">Chiudi</button>
   </div>
 </div>
 
