@@ -318,72 +318,29 @@ window.addEventListener("load", () => {
     showPinLock();
   }
 });
-/* ================================
-   INTEGRAZIONE MENU IMPOSTAZIONI
-   ================================ */
+<!-- Sezione Sicurezza -->
+<div class="settingsSection">
+  <h3>Sicherheit</h3>
 
-/* --- Switch attiva/disattiva PIN --- */
-const pinSwitch = document.getElementById("pinEnabledSwitch");
+  <div class="settingsItem" id="togglePinLock">
+    <span>App mit PIN sperren</span>
+    <input type="checkbox" id="pinEnabledSwitch">
+  </div>
 
-if (localStorage.getItem("appPIN")) {
-  pinSwitch.checked = true;
-}
+  <div class="settingsItem" id="changePinBtn">
+    <span>PIN ändern</span>
+  </div>
 
-pinSwitch.addEventListener("change", () => {
-  if (pinSwitch.checked) {
-    startCreatePIN();
-  } else {
-    if (confirm("PIN wirklich deaktivieren?")) {
-      localStorage.removeItem("appPIN");
-      alert("PIN deaktiviert");
-    } else {
-      pinSwitch.checked = true;
-    }
-  }
-});
-
-/* --- Timeout blocco --- */
-const timeoutSelect = document.getElementById("pinTimeoutSelect");
-timeoutSelect.value = pinTimeout;
-
-timeoutSelect.addEventListener("change", () => {
-  pinTimeout = timeoutSelect.value;
-  localStorage.setItem("pinTimeout", pinTimeout);
-});
-
-/* --- Cambio PIN --- */
-document.getElementById("changePinBtn").addEventListener("click", () => {
-  if (!localStorage.getItem("appPIN")) {
-    alert("Kein PIN gesetzt");
-    return;
-  }
-
-  // Richiede PIN attuale
-  isCreatingPIN = false;
-  isConfirmingPIN = false;
-  pinInput = "";
-  updatePinCircles();
-  document.getElementById("pinTitle").textContent = "Aktuellen PIN eingeben";
-  showPinLock();
-
-  // Quando il PIN è corretto → crea nuovo PIN
-  const originalVerify = verifyPIN;
-  verifyPIN = function () {
-    const savedPIN = localStorage.getItem("appPIN");
-
-    if (pinInput === savedPIN) {
-      // Ripristina funzione originale
-      verifyPIN = originalVerify;
-
-      // Avvia creazione nuovo PIN
-      startCreatePIN();
-    } else {
-      triggerShake();
-      pinInput = "";
-      updatePinCircles();
-    }
-  };
-});
+  <div class="settingsItem">
+    <span>Timeout</span>
+    <select id="pinTimeoutSelect">
+      <option value="immediately">Sofort</option>
+      <option value="30s">30 Sekunden</option>
+      <option value="1min">1 Minute</option>
+      <option value="5min">5 Minuten</option>
+    </select>
+  </div>
+</div>
 /* ================================
    INTEGRAZIONE MENU IMPOSTAZIONI
    ================================ */
