@@ -2,404 +2,850 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
+
+  <!-- ============================================================
+       TITOLO + RESPONSIVE
+       ============================================================ -->
   <title>Sandro Premium Notes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!-- ============================================================
+       STILI BASE (CSS verrà completato nel BLOCCO 2/4)
+       ============================================================ -->
   <style>
-    :root {
-      --bg: #050814;
-      --bg-soft: rgba(10, 14, 30, 0.9);
-      --card: rgba(18, 24, 48, 0.9);
-      --border: rgba(255, 255, 255, 0.06);
-      --text: #f7f9ff;
-      --text-soft: #a5b0d0;
-      --accent: #4f8cff;
-      --accent-light: #4f8cff55;
-      --accent-glow: #4f8cff55;
-      --danger: #ff4b5c;
-      --blur-amount: 18px;
-      --text-size: 16px;
-      --anim: 1;
-    }
-
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      margin: 0;
-      font-family: -apple-system, system-ui, sans-serif;
-      background: radial-gradient(circle at top, #1b2a4a 0, #050814 55%, #000 100%);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
-    }
-
-    body.dark {
-      background: radial-gradient(circle at top, #0f172a 0, #020617 60%, #000 100%);
-    }
-
-    body.amoled {
-      background: #000;
-    }
-
-    .appShell {
-      width: 100%;
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 18px 14px 26px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .glass {
-      background: var(--bg-soft);
-      border-radius: 22px;
-      border: 1px solid var(--border);
-      backdrop-filter: blur(var(--blur-amount));
-      -webkit-backdrop-filter: blur(var(--blur-amount));
-      box-shadow:
-        0 18px 40px rgba(0, 0, 0, 0.7),
-        0 0 0 1px rgba(255, 255, 255, 0.02);
-    }
-
-    .header {
-      padding: 14px 16px 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    #appTitle {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      display: flex;
-      flex-direction: column;
-    }
-
-    #appTitle .sub {
-      font-size: 11px;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      margin-top: 2px;
-    }
-
-    .headerButtons {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .iconBtn {
-      width: 32px;
-      height: 32px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: radial-gradient(circle at top, #1f2937 0, #020617 80%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-soft);
-      font-size: 15px;
-      cursor: pointer;
-      transition: transform 0.18s ease;
-    }
-
-    .iconBtn:active {
-      transform: scale(0.94);
-    }
-
-    .categories {
-      padding: 0 10px 10px;
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .categories::-webkit-scrollbar {
-      display: none;
-    }
-
-    .cat {
-      padding: 6px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      font-size: 12px;
-      color: var(--text-soft);
-      cursor: pointer;
-      white-space: nowrap;
-      background: rgba(15, 23, 42, 0.9);
-    }
-
-    .cat.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent-light);
-    }
-
-    .notesCard {
-      padding: 10px 10px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    #notesList {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-height: 55vh;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-
-    .noteItem {
-      border-radius: 18px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid var(--border);
-      padding: 10px 11px 9px;
-      cursor: pointer;
-      border-left: 3px solid var(--accent);
-    }
-
-    .noteTitleRow {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .noteTitle {
-      font-size: 15px;
-      font-weight: 600;
-      color: #e5edff;
-    }
-
-    .noteMeta {
-      font-size: 11px;
-      color: var(--text-soft);
-    }
-
-    .noteTextPreview {
-      font-size: 13px;
-      color: var(--text-soft);
-      margin-top: 4px;
-    }
-
-    .addNoteBar {
-      display: flex;
-      justify-content: flex-end;
-      padding: 0 2px 2px;
-    }
-
-    #addNoteBtn {
-      border-radius: 999px;
-      padding: 7px 14px;
-      border: none;
-      background: linear-gradient(135deg, var(--accent), #7c5cff);
-      color: #fff;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    /* Placeholder: il CSS completo arriva nel BLOCCO 2/4 */
   </style>
 </head>
 
 <body>
-  <!-- PIN overlay -->
-  <div id="pinOverlay">
-    <div class="pinCard glass">
-      <div class="pinTitle">PIN</div>
-      <div class="pinCircles">
-        <div class="pinCircle"></div>
-        <div class="pinCircle"></div>
-        <div class="pinCircle"></div>
-        <div class="pinCircle"></div>
+
+<!-- ============================================================
+     OVERLAY PIN (schermata iniziale di sicurezza)
+     ============================================================ -->
+<div id="pinOverlay">
+  <div class="pinCard glass">
+
+    <!-- Titolo PIN -->
+    <div class="pinTitle">PIN</div>
+
+    <!-- Cerchi che si riempiono quando digiti -->
+    <div class="pinCircles">
+      <div class="pinCircle"></div>
+      <div class="pinCircle"></div>
+      <div class="pinCircle"></div>
+      <div class="pinCircle"></div>
+    </div>
+
+    <!-- Errore PIN -->
+    <div id="pinError" class="pinError"></div>
+
+    <!-- Tastierino numerico -->
+    <div class="pinPad">
+      <button class="pinKey" data-digit="1">1</button>
+      <button class="pinKey" data-digit="2">2</button>
+      <button class="pinKey" data-digit="3">3</button>
+      <button class="pinKey" data-digit="4">4</button>
+      <button class="pinKey" data-digit="5">5</button>
+      <button class="pinKey" data-digit="6">6</button>
+      <button class="pinKey" data-digit="7">7</button>
+      <button class="pinKey" data-digit="8">8</button>
+      <button class="pinKey" data-digit="9">9</button>
+      <div></div>
+      <button class="pinKey" data-digit="0">0</button>
+      <button id="pinBackspace">⌫</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     APP SHELL (contenitore principale dell’app)
+     ============================================================ -->
+<div class="appShell">
+
+  <!-- ============================================================
+       HEADER MODERNO CON 4 ICONE A DESTRA
+       ============================================================ -->
+  <div class="glass">
+    <div class="header">
+
+      <!-- Titolo dell’app -->
+      <div id="appTitle">
+        Note
+        <span class="sub">Premium</span>
       </div>
-      <div id="pinError" class="pinError"></div>
-      <div class="pinPad">
-        <button class="pinKey" data-digit="1">1</button>
-        <button class="pinKey" data-digit="2">2</button>
-        <button class="pinKey" data-digit="3">3</button>
-        <button class="pinKey" data-digit="4">4</button>
-        <button class="pinKey" data-digit="5">5</button>
-        <button class="pinKey" data-digit="6">6</button>
-        <button class="pinKey" data-digit="7">7</button>
-        <button class="pinKey" data-digit="8">8</button>
-        <button class="pinKey" data-digit="9">9</button>
-        <div></div>
-        <button class="pinKey" data-digit="0">0</button>
-        <button id="pinBackspace">⌫</button>
+
+      <!-- Pulsanti header -->
+      <div class="headerButtons">
+
+        <!-- Lingua -->
+        <button id="langBtn" class="iconBtn">🌐</button>
+
+        <!-- Tema chiaro/scuro -->
+        <button id="themeBtn" class="iconBtn">☾</button>
+
+        <!-- Backup manuale -->
+        <button id="backupBtn" class="iconBtn">🛟</button>
+
+        <!-- Impostazioni -->
+        <button id="settingsBtn" class="iconBtn">⚙︎</button>
+
       </div>
     </div>
-  </div>
 
-  <!-- App Shell -->
-  <div class="appShell">
-    <div class="glass">
-      <div class="header">
-        <div id="appTitle">
-          Note
-          <span class="sub">Premium</span>
-        </div>
-        <div class="headerButtons">
-          <button id="langBtn" class="iconBtn">🌐</button>
-          <button id="themeBtn" class="iconBtn">☾</button>
-          <button id="settingsBtn" class="iconBtn">⚙︎</button>
-        </div>
-      </div>
+    <!-- ============================================================
+         CATEGORIE ORIZZONTALI (scrollabili)
+         ============================================================ -->
+    <div class="categories">
+      <div class="cat active" data-cat="all">All</div>
+      <div class="cat" data-cat="work">Work</div>
+      <div class="cat" data-cat="personal">Personal</div>
+      <div class="cat" data-cat="ideas">Ideas</div>
+      <div class="cat" data-cat="todo">To‑Do</div>
+    </div>
 
-      <div class="categories">
-        <div class="cat active" data-cat="all">All</div>
-        <div class="cat" data-cat="work">Work</div>
-        <div class="cat" data-cat="personal">Personal</div>
-        <div class="cat" data-cat="ideas">Ideas</div>
-        <div class="cat" data-cat="todo">To‑Do</div>
-      </div>
+    <!-- ============================================================
+         LISTA NOTE
+         ============================================================ -->
+    <div class="notesCard">
+      <div id="notesList"></div>
 
-      <div class="notesCard">
-        <div id="notesList"></div>
-        <div class="addNoteBar">
-          <button id="addNoteBtn">＋ Nuova</button>
-        </div>
+      <!-- Pulsante per aggiungere una nuova nota -->
+      <div class="addNoteBar">
+        <button id="addNoteBtn">＋ Nuova</button>
       </div>
     </div>
+
+  </div> <!-- fine glass header+lista -->
+
+</div> <!-- fine appShell -->
+<!-- ============================================================
+     EDITOR NOTE (creazione e modifica)
+     ============================================================ -->
+<div id="noteEditor" style="display:none;">
+  <div class="editorCard glass">
+
+    <!-- Titolo dinamico: "Nuova nota" oppure "Modifica nota" -->
+    <div id="editorTitle">Nuova nota</div>
+
+    <!-- Campi di input -->
+    <div class="editorInputs">
+      <input id="noteTitleInput" type="text" placeholder="Titolo" />
+      <textarea id="noteText" placeholder="Scrivi qui..."></textarea>
+    </div>
+
+    <!-- Palette colori -->
+    <div class="paletteRow">
+
+      <!-- Pulsanti per scegliere la palette -->
+      <div class="paletteBtns">
+        <button class="paletteBtn" data-pal="warm">Warm</button>
+        <button class="paletteBtn" data-pal="cool">Cool</button>
+        <button class="paletteBtn" data-pal="pastel">Pastel</button>
+        <button class="paletteBtn" data-pal="mix">Mix</button>
+      </div>
+
+      <!-- Colori generati dinamicamente -->
+      <div id="colorRow"></div>
+    </div>
+
+    <!-- Pulsanti azione -->
+    <div class="editorActions">
+
+      <!-- A sinistra: elimina -->
+      <div class="editorLeft">
+        <button id="deleteNoteBtn" class="btnDanger">🗑 Elimina</button>
+      </div>
+
+      <!-- A destra: annulla + salva -->
+      <div class="editorRight">
+        <button id="cancelBtn" class="btnGhost">Annulla</button>
+        <button id="saveBtn" class="btnPrimary">Salva</button>
+      </div>
+
+    </div>
+
   </div>
-  <!-- EDITOR -->
-  <div id="noteEditor" style="display:none;">
-    <div class="editorCard glass">
-      <div id="editorTitle">Nuova nota</div>
+</div>
 
-      <div class="editorInputs">
-        <input id="noteTitleInput" type="text" placeholder="Titolo" />
-        <textarea id="noteText" placeholder="Scrivi qui..."></textarea>
+<!-- ============================================================
+     PANNELLO IMPOSTAZIONI
+     ============================================================ -->
+<div id="settingsPanel" style="display:none;">
+  <div class="settingsCard glass">
+
+    <!-- Header impostazioni -->
+    <div class="settingsHeader">
+      <div class="settingsTitle">Impostazioni</div>
+      <div class="settingsClose">✕</div>
+    </div>
+
+    <!-- Lista impostazioni -->
+    <div class="settingsList">
+
+      <!-- Tema -->
+      <div id="settingsTheme" class="settingsItem">
+        <span class="label">Tema</span><span class="value">Toggle</span>
       </div>
 
-      <div class="paletteRow">
-        <div class="paletteBtns">
-          <button class="paletteBtn" data-pal="warm">Warm</button>
-          <button class="paletteBtn" data-pal="cool">Cool</button>
-          <button class="paletteBtn" data-pal="pastel">Pastel</button>
-          <button class="paletteBtn" data-pal="mix">Mix</button>
-        </div>
-        <div id="colorRow"></div>
+      <!-- AMOLED -->
+      <div id="settingsAmoled" class="settingsItem">
+        <span class="label">AMOLED</span><span class="value">On/Off</span>
       </div>
 
-      <div class="editorActions">
-        <div class="editorLeft">
-          <button id="deleteNoteBtn" class="btnDanger">🗑 Elimina</button>
-        </div>
-        <div class="editorRight">
-          <button id="cancelBtn" class="btnGhost">Annulla</button>
-          <button id="saveBtn" class="btnPrimary">Salva</button>
-        </div>
+      <!-- Font -->
+      <div id="settingsFont" class="settingsItem">
+        <span class="label">Font</span><span class="value">Cycle</span>
       </div>
+
+      <!-- Dimensione testo -->
+      <div id="settingsTextSize" class="settingsItem">
+        <span class="label">Dimensione testo</span><span class="value">Cycle</span>
+      </div>
+
+      <!-- Colore accento -->
+      <div id="settingsAccent" class="settingsItem">
+        <span class="label">Colore accento</span><span class="value">Cycle</span>
+      </div>
+
+      <!-- Sfocatura -->
+      <div id="settingsBlur" class="settingsItem">
+        <span class="label">Sfocatura</span><span class="value">Cycle</span>
+      </div>
+
+      <!-- Animazioni -->
+      <div id="settingsAnimations" class="settingsItem">
+        <span class="label">Animazioni</span><span class="value">On/Off</span>
+      </div>
+
+      <!-- Haptics -->
+      <div id="settingsHaptics" class="settingsItem">
+        <span class="label">Haptics</span><span class="value">On/Off</span>
+      </div>
+
+      <!-- Esporta -->
+      <div id="settingsExport" class="settingsItem">
+        <span class="label">Esporta</span><span class="value">JSON</span>
+      </div>
+
+      <!-- Importa -->
+      <div id="settingsImport" class="settingsItem">
+        <span class="label">Importa</span><span class="value">JSON</span>
+      </div>
+
+      <!-- Archivio -->
+      <div id="settingsArchive" class="settingsItem">
+        <span class="label">Archivio</span><span class="value">Apri</span>
+      </div>
+
+      <!-- Cambia PIN -->
+      <div id="settingsChangePin" class="settingsItem">
+        <span class="label">Cambia PIN</span><span class="value">Manuale</span>
+      </div>
+
+      <!-- Reset app -->
+      <div id="settingsResetApp" class="settingsItem settingsDanger">
+        <span class="label">Reset app</span><span class="value">Danger</span>
+      </div>
+
     </div>
   </div>
+</div>
 
-  <!-- SETTINGS PANEL -->
-  <div id="settingsPanel" style="display:none;">
-    <div class="settingsCard glass">
-      <div class="settingsHeader">
-        <div class="settingsTitle">Impostazioni</div>
-        <div class="settingsClose">✕</div>
-      </div>
+<!-- ============================================================
+     POPUP ARCHIVIO
+     ============================================================ -->
+<div id="archivePopup" style="display:none;">
+  <div class="popupCard glass">
 
-      <div class="settingsList">
-        <div id="settingsTheme" class="settingsItem">
-          <span class="label">Tema</span><span class="value">Toggle</span>
-        </div>
-
-        <div id="settingsAmoled" class="settingsItem">
-          <span class="label">AMOLED</span><span class="value">On/Off</span>
-        </div>
-
-        <div id="settingsFont" class="settingsItem">
-          <span class="label">Font</span><span class="value">Cycle</span>
-        </div>
-
-        <div id="settingsTextSize" class="settingsItem">
-          <span class="label">Dimensione testo</span><span class="value">Cycle</span>
-        </div>
-
-        <div id="settingsAccent" class="settingsItem">
-          <span class="label">Colore accento</span><span class="value">Cycle</span>
-        </div>
-
-        <div id="settingsBlur" class="settingsItem">
-          <span class="label">Sfocatura</span><span class="value">Cycle</span>
-        </div>
-
-        <div id="settingsAnimations" class="settingsItem">
-          <span class="label">Animazioni</span><span class="value">On/Off</span>
-        </div>
-
-        <div id="settingsHaptics" class="settingsItem">
-          <span class="label">Haptics</span><span class="value">On/Off</span>
-        </div>
-
-        <div id="settingsExport" class="settingsItem">
-          <span class="label">Esporta</span><span class="value">JSON</span>
-        </div>
-
-        <div id="settingsImport" class="settingsItem">
-          <span class="label">Importa</span><span class="value">JSON</span>
-        </div>
-
-        <div id="settingsArchive" class="settingsItem">
-          <span class="label">Archivio</span><span class="value">Apri</span>
-        </div>
-
-        <div id="settingsChangePin" class="settingsItem">
-          <span class="label">Cambia PIN</span><span class="value">Manuale</span>
-        </div>
-
-        <div id="settingsResetApp" class="settingsItem settingsDanger">
-          <span class="label">Reset app</span><span class="value">Danger</span>
-        </div>
-      </div>
+    <div class="popupHeader">
+      <div class="popupTitle">Archivio</div>
+      <div id="archiveCloseBtn" class="popupClose">✕</div>
     </div>
-  </div>
 
-  <!-- ARCHIVE POPUP -->
-  <div id="archivePopup" style="display:none;">
-    <div class="popupCard glass">
-      <div class="popupHeader">
-        <div class="popupTitle">Archivio</div>
-        <div id="archiveCloseBtn" class="popupClose">✕</div>
-      </div>
-      <div id="archiveList"></div>
+    <!-- Lista note archiviate -->
+    <div id="archiveList"></div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     POPUP RESET APP
+     ============================================================ -->
+<div id="resetPopup" style="display:none;">
+  <div class="popupCard glass">
+
+    <div class="popupHeader">
+      <div class="popupTitle">Reset app?</div>
     </div>
-  </div>
 
-  <!-- RESET POPUP -->
-  <div id="resetPopup" style="display:none;">
-    <div class="popupCard glass">
-      <div class="popupHeader">
-        <div class="popupTitle">Reset app?</div>
-      </div>
-
-      <div style="font-size:13px;color:var(--text-soft);margin-top:4px;">
-        Tutte le note, archivio, impostazioni e PIN verranno eliminati.
-      </div>
-
-      <div class="popupActions">
-        <button id="resetCancelBtn" class="btnGhost">Annulla</button>
-        <button id="resetConfirmBtn" class="btnDanger">Sì, elimina</button>
-      </div>
+    <div style="font-size:13px;color:var(--text-soft);margin-top:4px;">
+      Tutte le note, archivio, impostazioni e PIN verranno eliminati.
     </div>
-  </div>
 
-  <!-- BANNER -->
-  <div id="bannerMsg"></div>
+    <div class="popupActions">
+      <button id="resetCancelBtn" class="btnGhost">Annulla</button>
+      <button id="resetConfirmBtn" class="btnDanger">Sì, elimina</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     BANNER (notifiche brevi)
+     ============================================================ -->
+<div id="bannerMsg"></div>
+
+<!-- ============================================================
+     JAVASCRIPT (verrà inserito nel BLOCCO 3/4)
+     ============================================================ -->
 <script>
+  /* Il tuo JavaScript completo arriverà nel BLOCCO 3/4 */
+</script>
+
+</body>
+</html>
+/* ============================================================
+   VARIABILI GLOBALI (colori, blur, animazioni)
+   ============================================================ */
+:root {
+  --bg: #050814;
+  --bg-soft: rgba(10, 14, 30, 0.9);
+  --card: rgba(18, 24, 48, 0.9);
+  --border: rgba(255, 255, 255, 0.06);
+  --text: #f7f9ff;
+  --text-soft: #a5b0d0;
+  --accent: #4f8cff;
+  --accent-light: #4f8cff55;
+  --accent-glow: #4f8cff55;
+  --danger: #ff4b5c;
+  --blur-amount: 18px;
+  --text-size: 16px;
+  --anim: 1;
+}
+
+/* ============================================================
+   RESET + BASE
+   ============================================================ */
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, system-ui, sans-serif;
+  background: radial-gradient(circle at top, #1b2a4a 0, #050814 55%, #000 100%);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  font-size: var(--text-size);
+  transition: background 0.3s ease;
+}
+
+/* Tema scuro */
+body.dark {
+  background: radial-gradient(circle at top, #0f172a 0, #020617 60%, #000 100%);
+}
+
+/* AMOLED puro */
+body.amoled {
+  background: #000;
+}
+
+/* ============================================================
+   CONTENITORE PRINCIPALE
+   ============================================================ */
+.appShell {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 18px 14px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ============================================================
+   EFFETTO VETRO (glassmorphism)
+   ============================================================ */
+.glass {
+  background: var(--bg-soft);
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  backdrop-filter: blur(var(--blur-amount));
+  -webkit-backdrop-filter: blur(var(--blur-amount));
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.header {
+  padding: 14px 16px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+#appTitle {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: flex;
+  flex-direction: column;
+}
+
+#appTitle .sub {
+  font-size: 11px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-top: 2px;
+}
+
+/* Pulsanti icona header */
+.headerButtons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.iconBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: radial-gradient(circle at top, #1f2937 0, #020617 80%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-soft);
+  font-size: 15px;
+  cursor: pointer;
+  transition: transform 0.18s ease;
+}
+
+.iconBtn:active {
+  transform: scale(0.94);
+}
+
+/* ============================================================
+   CATEGORIE
+   ============================================================ */
+.categories {
+  padding: 0 10px 10px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.categories::-webkit-scrollbar {
+  display: none;
+}
+
+.cat {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-soft);
+  cursor: pointer;
+  white-space: nowrap;
+  background: rgba(15, 23, 42, 0.9);
+  transition: background 0.2s ease;
+}
+
+.cat.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent-light);
+}
+
+/* ============================================================
+   LISTA NOTE
+   ============================================================ */
+.notesCard {
+  padding: 10px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#notesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 55vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.noteItem {
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid var(--border);
+  padding: 10px 11px 9px;
+  cursor: pointer;
+  border-left: 3px solid var(--accent);
+  transition: transform 0.15s ease;
+}
+
+.noteItem:active {
+  transform: scale(0.97);
+}
+
+.noteTitleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.noteTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #e5edff;
+}
+
+.noteMeta {
+  font-size: 11px;
+  color: var(--text-soft);
+}
+
+.noteTextPreview {
+  font-size: 13px;
+  color: var(--text-soft);
+  margin-top: 4px;
+}
+
+/* ============================================================
+   PULSANTE NUOVA NOTA
+   ============================================================ */
+.addNoteBar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 2px 2px;
+}
+
+#addNoteBtn {
+  border-radius: 999px;
+  padding: 7px 14px;
+  border: none;
+  background: linear-gradient(135deg, var(--accent), #7c5cff);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ============================================================
+   EDITOR NOTE
+   ============================================================ */
+#noteEditor {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.editorCard {
+  width: 100%;
+  max-width: 480px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.editorInputs input,
+.editorInputs textarea {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.9);
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 15px;
+}
+
+.editorInputs textarea {
+  height: 160px;
+  resize: none;
+}
+
+/* Palette */
+.paletteRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.paletteBtns {
+  display: flex;
+  gap: 6px;
+}
+
+.paletteBtn {
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text-soft);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#colorRow {
+  display: flex;
+  gap: 8px;
+}
+
+.colorDot {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.colorDot.selected {
+  border-color: #fff;
+}
+
+/* Pulsanti editor */
+.editorActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btnDanger {
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btnGhost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btnPrimary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* ============================================================
+   PANNELLO IMPOSTAZIONI
+   ============================================================ */
+#settingsPanel {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.settingsCard {
+  width: 100%;
+  max-width: 480px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.settingsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settingsTitle {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.settingsClose {
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--text-soft);
+}
+
+.settingsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settingsItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.9);
+  cursor: pointer;
+}
+
+.settingsDanger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* ============================================================
+   POPUP ARCHIVIO + RESET
+   ============================================================ */
+#archivePopup,
+#resetPopup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.popupCard {
+  width: 100%;
+  max-width: 480px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.popupHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.popupClose {
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--text-soft);
+}
+
+.popupActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* ============================================================
+   BANNER
+   ============================================================ */
+#bannerMsg {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--accent);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 14px;
+  opacity: 0;
+  transition: 0.4s ease;
+}
+
+#bannerMsg.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ============================================================
+   PIN OVERLAY
+   ============================================================ */
+#pinOverlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pinCard {
+  width: 260px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pinTitle {
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.pinCircles {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pinCircle {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid var(--text-soft);
+}
+
+.pinCircle.filled {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.pinError {
+  text-align: center;
+  color: var(--danger);
+  font-size: 13px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.pinPad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.pinKey,
+#pinBackspace {
+  padding: 12px 0;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+}
 /* ============================================================
    PIN SYSTEM
    ============================================================ */
@@ -418,6 +864,7 @@ function checkPIN() {
   if (enteredPIN === savedPIN) {
     pinOverlay.style.display = "none";
   } else {
+    pinError.textContent = "PIN errato";
     pinError.style.opacity = 1;
     setTimeout(() => pinError.style.opacity = 0, 900);
   }
@@ -515,8 +962,10 @@ let currentLang = localStorage.getItem("appLang") || "it";
 
 function applyTranslations() {
   const t = translations[currentLang];
+
   document.querySelector("#appTitle").childNodes[0].textContent = t.title;
   document.querySelector("#appTitle .sub").textContent = t.premium;
+
   document.getElementById("editorTitle").textContent = t.newNote;
   document.getElementById("saveBtn").textContent = t.save;
   document.getElementById("cancelBtn").textContent = t.cancel;
@@ -567,6 +1016,30 @@ document.getElementById("settingsAmoled").onclick = () => {
 };
 
 /* ============================================================
+   BACKUP MANUALE (🛟)
+   ============================================================ */
+document.getElementById("backupBtn").onclick = () => {
+  const data = {
+    notes,
+    archive,
+    pin: savedPIN,
+    lang: currentLang,
+    theme,
+    amoled
+  };
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "backup.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+  showBanner("Backup salvato");
+};
+/* ============================================================
    NOTE SYSTEM
    ============================================================ */
 let notes = JSON.parse(localStorage.getItem("notes") || "[]");
@@ -582,6 +1055,9 @@ const palettes = {
   mix: ["#ff6b6b", "#1e90ff", "#2ed573", "#ffa502", "#a55eea"]
 };
 
+/* ============================================================
+   PALETTE COLORI
+   ============================================================ */
 function loadPalette(p) {
   const row = document.getElementById("colorRow");
   row.innerHTML = "";
@@ -602,6 +1078,9 @@ document.querySelectorAll(".paletteBtn").forEach(btn => {
   btn.onclick = () => loadPalette(btn.dataset.pal);
 });
 
+/* ============================================================
+   RENDER NOTE
+   ============================================================ */
 function renderNotes() {
   const list = document.getElementById("notesList");
   list.innerHTML = "";
@@ -626,6 +1105,9 @@ function renderNotes() {
   });
 }
 
+/* ============================================================
+   CATEGORIE
+   ============================================================ */
 document.querySelectorAll(".cat").forEach(cat => {
   cat.onclick = () => {
     document.querySelectorAll(".cat").forEach(c => c.classList.remove("active"));
@@ -634,6 +1116,9 @@ document.querySelectorAll(".cat").forEach(cat => {
   };
 });
 
+/* ============================================================
+   EDITOR NOTE
+   ============================================================ */
 function openEditor(id = null) {
   editingNoteId = id;
 
@@ -654,6 +1139,9 @@ function openEditor(id = null) {
 
 document.getElementById("addNoteBtn").onclick = () => openEditor(null);
 
+/* ============================================================
+   SALVA NOTA
+   ============================================================ */
 document.getElementById("saveBtn").onclick = () => {
   const title = document.getElementById("noteTitleInput").value.trim();
   const text = document.getElementById("noteText").value.trim();
@@ -683,17 +1171,25 @@ document.getElementById("saveBtn").onclick = () => {
   renderNotes();
 };
 
+/* ============================================================
+   ELIMINA (ARCHIVIA) NOTA
+   ============================================================ */
 document.getElementById("deleteNoteBtn").onclick = () => {
   if (!editingNoteId) return;
   const n = notes.find(x => x.id === editingNoteId);
   archive.push(n);
   notes = notes.filter(x => x.id !== editingNoteId);
+
   localStorage.setItem("notes", JSON.stringify(notes));
   localStorage.setItem("archive", JSON.stringify(archive));
+
   document.getElementById("noteEditor").style.display = "none";
   renderNotes();
 };
 
+/* ============================================================
+   ANNULLA EDITOR
+   ============================================================ */
 document.getElementById("cancelBtn").onclick = () => {
   document.getElementById("noteEditor").style.display = "none";
 };
@@ -726,45 +1222,8 @@ function showBanner(msg) {
   b.classList.add("show");
   setTimeout(() => b.classList.remove("show"), 1500);
 }
-
 /* ============================================================
-   BACKUP + EXPORT
-   ============================================================ */
-function autoBackup() {
-  const data = {
-    notes,
-    archive,
-    pin: savedPIN,
-    lang: currentLang,
-    theme,
-    amoled
-  };
-  localStorage.setItem("autoBackup", JSON.stringify(data));
-}
-setInterval(autoBackup, 5000);
-
-document.getElementById("settingsExport").onclick = () => {
-  const data = {
-    notes,
-    archive,
-    pin: savedPIN,
-    lang: currentLang,
-    theme,
-    amoled
-  };
-
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "backup.json";
-  a.click();
-  URL.revokeObjectURL(url);
-  showBanner("Esportato");
-};
-
-/* ============================================================
-   IMPORT
+   IMPORT JSON
    ============================================================ */
 document.getElementById("settingsImport").onclick = () => {
   const input = document.createElement("input");
@@ -779,6 +1238,7 @@ document.getElementById("settingsImport").onclick = () => {
     reader.onload = ev => {
       try {
         const data = JSON.parse(ev.target.result);
+
         notes = data.notes || [];
         archive = data.archive || [];
         savedPIN = data.pin || "4618";
@@ -796,11 +1256,13 @@ document.getElementById("settingsImport").onclick = () => {
         applyTranslations();
         applyTheme();
         renderNotes();
+
         showBanner("Import riuscito");
       } catch {
         showBanner("Errore import");
       }
     };
+
     reader.readAsText(file);
   };
 
@@ -820,6 +1282,7 @@ document.getElementById("resetCancelBtn").onclick = () => {
 
 document.getElementById("resetConfirmBtn").onclick = () => {
   localStorage.clear();
+
   notes = [];
   archive = [];
   savedPIN = "4618";
@@ -838,10 +1301,14 @@ document.getElementById("resetConfirmBtn").onclick = () => {
 /* ============================================================
    IMPOSTAZIONI AVANZATE
    ============================================================ */
+
+/* FONT */
 let currentFont = localStorage.getItem("font") || "-apple-system";
+
 function applyFont() {
   document.body.style.fontFamily = currentFont;
 }
+
 document.getElementById("settingsFont").onclick = () => {
   const fonts = ["-apple-system", "Helvetica Neue", "Arial", "Georgia", "Courier New"];
   currentFont = fonts[(fonts.indexOf(currentFont) + 1) % fonts.length];
@@ -850,10 +1317,13 @@ document.getElementById("settingsFont").onclick = () => {
   showBanner("Font cambiato");
 };
 
+/* DIMENSIONE TESTO */
 let textSize = parseInt(localStorage.getItem("textSize") || "16");
+
 function applyTextSize() {
   document.body.style.fontSize = textSize + "px";
 }
+
 document.getElementById("settingsTextSize").onclick = () => {
   textSize = textSize >= 22 ? 14 : textSize + 1;
   localStorage.setItem("textSize", textSize);
@@ -861,13 +1331,16 @@ document.getElementById("settingsTextSize").onclick = () => {
   showBanner("Dimensione: " + textSize);
 };
 
+/* COLORE ACCENTO */
 let accentColors = ["#4f8cff", "#ff3b30", "#ff9500", "#34c759", "#5856d6"];
 let accentIndex = parseInt(localStorage.getItem("accentIndex") || "0");
+
 function applyAccent() {
   document.documentElement.style.setProperty("--accent", accentColors[accentIndex]);
   document.documentElement.style.setProperty("--accent-light", accentColors[accentIndex] + "55");
   document.documentElement.style.setProperty("--accent-glow", accentColors[accentIndex] + "55");
 }
+
 document.getElementById("settingsAccent").onclick = () => {
   accentIndex = (accentIndex + 1) % accentColors.length;
   localStorage.setItem("accentIndex", accentIndex);
@@ -875,10 +1348,13 @@ document.getElementById("settingsAccent").onclick = () => {
   showBanner("Colore cambiato");
 };
 
+/* BLUR */
 let blurAmount = parseInt(localStorage.getItem("blur") || "18");
+
 function applyBlur() {
   document.documentElement.style.setProperty("--blur-amount", blurAmount + "px");
 }
+
 document.getElementById("settingsBlur").onclick = () => {
   blurAmount = blurAmount >= 30 ? 6 : blurAmount + 2;
   localStorage.setItem("blur", blurAmount);
@@ -886,12 +1362,37 @@ document.getElementById("settingsBlur").onclick = () => {
   showBanner("Blur: " + blurAmount);
 };
 
+/* ANIMAZIONI */
 let animationsEnabled = localStorage.getItem("animations") !== "false";
+
 function applyAnimations() {
   document.body.style.setProperty("--anim", animationsEnabled ? "1" : "0");
 }
+
 document.getElementById("settingsAnimations").onclick = () => {
   animationsEnabled = !animationsEnabled;
   localStorage.setItem("animations", animationsEnabled);
   applyAnimations();
-  showBanner(animationsEnabled ? "Animazioni ON" : "Anim
+  showBanner(animationsEnabled ? "Animazioni ON" : "Animazioni OFF");
+};
+
+/* HAPTICS (placeholder, iOS Safari non supporta nativamente) */
+let hapticsEnabled = localStorage.getItem("haptics") !== "false";
+
+document.getElementById("settingsHaptics").onclick = () => {
+  hapticsEnabled = !hapticsEnabled;
+  localStorage.setItem("haptics", hapticsEnabled);
+  showBanner(hapticsEnabled ? "Haptics ON" : "Haptics OFF");
+};
+
+/* ============================================================
+   INIZIALIZZAZIONE FINALE
+   ============================================================ */
+applyTranslations();
+applyTheme();
+applyFont();
+applyTextSize();
+applyAccent();
+applyBlur();
+applyAnimations();
+renderNotes();
