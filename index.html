@@ -1,6 +1,333 @@
-<!-- ============================
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notizen Premium</title>
+
+<style>
+/* ============================================================
+   RESET + VARIABILI
+   ============================================================ */
+:root {
+  --accent: #007aff;
+  --app-font: system-ui, sans-serif;
+  --text-size: 16px;
+  --blur-amount: 18px;
+}
+
+body {
+  margin: 0;
+  font-family: var(--app-font);
+  font-size: var(--text-size);
+  background: #f2f2f7;
+  color: #111;
+  transition: background 0.3s, color 0.3s;
+}
+
+body.dark {
+  background: #1c1c1e;
+  color: #fff;
+}
+
+body.amoled {
+  background: #000;
+  color: #fff;
+}
+
+/* ============================================================
+   PIN OVERLAY
+   ============================================================ */
+#pinOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+
+#pinBox {
+  background: #fff;
+  color: #000;
+  padding: 25px;
+  border-radius: 18px;
+  width: 260px;
+  text-align: center;
+}
+
+#pinTitle {
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+#pinCircles {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.pinCircle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #000;
+}
+
+.pinCircle.filled {
+  background: #000;
+}
+
+#pinPad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.pinKey {
+  padding: 14px;
+  font-size: 18px;
+  border-radius: 12px;
+  border: none;
+  background: #e5e5ea;
+}
+
+.pinKey.backspace {
+  background: #ff3b30;
+  color: #fff;
+}
+
+#pinError {
+  margin-top: 10px;
+  color: red;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  margin-left: 10px;
+}
+
+/* ============================================================
+   CATEGORIE
+   ============================================================ */
+#categories {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 10px;
+}
+
+.cat {
+  padding: 8px 14px;
+  background: #e5e5ea;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   NOTE LIST
+   ============================================================ */
+#notesList {
+  padding: 15px;
+}
+
+.noteItem {
+  background: #fff;
+  padding: 14px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  border-left: 4px solid var(--accent);
+}
+
+/* ============================================================
+   ADD NOTE BUTTON
+   ============================================================ */
+#addNoteBtn {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 32px;
+}
+
+/* ============================================================
+   EDITOR
+   ============================================================ */
+#noteEditor {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+#noteEditorBox {
+  background: #fff;
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
+  border-radius: 18px;
+}
+
+#noteText {
+  width: 100%;
+  height: 150px;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+}
+
+#editorButtons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+#paletteSelector {
+  margin-top: 10px;
+}
+
+.colorDot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  margin-right: 8px;
+  display: inline-block;
+  border: 2px solid transparent;
+}
+
+.colorDot.selected {
+  border-color: #000;
+}
+
+/* ============================================================
+   POPUP GENERICI
+   ============================================================ */
+.popupBox {
+  background: #fff;
+  padding: 20px;
+  border-radius: 18px;
+  width: 85%;
+  max-width: 380px;
+}
+
+#archivePopup,
+#infoPopup,
+#resetPopup {
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
+}
+
+/* ============================================================
+   SETTINGS PANEL
+   ============================================================ */
+#settingsPanel {
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: flex-end;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(5px);
+}
+
+#settingsSheet {
+  width: 80%;
+  max-width: 350px;
+  background: #fff;
+  height: 100%;
+  padding: 20px;
+  border-radius: 20px 0 0 20px;
+  transform: translateX(100%);
+  transition: transform 0.3s;
+}
+
+#settingsPanel.show #settingsSheet {
+  transform: translateX(0);
+}
+
+.settingsItem {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: #e5e5ea;
+  border-radius: 12px;
+  border: none;
+  text-align: left;
+}
+
+.settingsSection {
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+.settingsClose {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 12px;
+  border: none;
+}
+
+/* ============================================================
+   BANNER
+   ============================================================ */
+#bannerMsg {
+  position: fixed;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 12px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+#bannerMsg.show {
+  opacity: 1;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================
      BOX 2.1 — PIN OVERLAY
-     ============================ -->
+     ============================================================ -->
 <div id="pinOverlay">
   <div id="pinBox">
     <div id="pinTitle">Inserisci PIN</div>
@@ -33,14 +360,14 @@
     <div id="pinError"></div>
   </div>
 </div>
-<!-- ============================
+
+<!-- ============================================================
      BOX 2.2 — APP WRAPPER
-     ============================ -->
+     ============================================================ -->
 <div id="app">
 
   <div id="bannerMsg"></div>
 
-  <!-- HEADER -->
   <header>
     <div id="appTitle">Notizen</div>
     <div>
@@ -51,27 +378,25 @@
     </div>
   </header>
 
-  <!-- CATEGORIE -->
   <div id="categories">
-    <div class="cat" data-cat="favorite"><span class="catLabel">Favoriten</span></div>
-    <div class="cat" data-cat="alle"><span class="catLabel">Alle</span></div>
-    <div class="cat" data-cat="arbeit"><span class="catLabel">Arbeit</span></div>
-    <div class="cat" data-cat="einkauf"><span class="catLabel">Einkauf</span></div>
-    <div class="cat" data-cat="zuhause"><span class="catLabel">Zuhause</span></div>
-    <div class="cat" data-cat="ideen"><span class="catLabel">Ideen</span></div>
-    <div class="cat" data-cat="personlich"><span class="catLabel">Persönlich</span></div>
+    <div class="cat" data-cat="favorite">Favoriten</div>
+    <div class="cat" data-cat="alle">Alle</div>
+    <div class="cat" data-cat="arbeit">Arbeit</div>
+    <div class="cat" data-cat="einkauf">Einkauf</div>
+    <div class="cat" data-cat="zuhause">Zuhause</div>
+    <div class="cat" data-cat="ideen">Ideen</div>
+    <div class="cat" data-cat="personlich">Persönlich</div>
   </div>
 
-  <!-- LISTA NOTE -->
   <div id="notesList"></div>
 
-  <!-- BOTTONE + -->
   <button id="addNoteBtn">+</button>
 
 </div>
-<!-- ============================
+
+<!-- ============================================================
      BOX 2.3 — EDITOR NOTE
-     ============================ -->
+     ============================================================ -->
 <div id="noteEditor">
   <div id="noteEditorBox">
 
@@ -98,22 +423,20 @@
 
   </div>
 </div>
-<!-- ============================
-     BOX 2.4 — POPUP PREMIUM + SETTINGS PANEL
-     ============================ -->
 
-<!-- POPUP ARCHIVIO -->
+<!-- ============================================================
+     BOX 2.4 — POPUP PREMIUM + SETTINGS PANEL
+     ============================================================ -->
 <div id="archivePopup">
-  <div id="archiveBox" class="popupBox">
+  <div class="popupBox">
     <h2>Archivio</h2>
     <div id="archiveList"></div>
     <button id="archiveCloseBtn" class="popupBtn">Chiudi</button>
   </div>
 </div>
 
-<!-- POPUP INFO APP -->
 <div id="infoPopup">
-  <div id="infoBox" class="popupBox">
+  <div class="popupBox">
     <h2>Info App</h2>
     <p>Versione: 2.0 Premium</p>
     <p>Autore: Sandro</p>
@@ -122,9 +445,8 @@
   </div>
 </div>
 
-<!-- POPUP RESET APP -->
 <div id="resetPopup">
-  <div id="resetBox" class="popupBox">
+  <div class="popupBox">
     <h2>Reset App</h2>
     <p>Questa azione cancellerà tutte le note e le impostazioni.</p>
     <button id="resetConfirmBtn" class="popupBtn">Conferma</button>
@@ -132,13 +454,11 @@
   </div>
 </div>
 
-<!-- SETTINGS PANEL PREMIUM -->
 <div id="settingsPanel">
   <div id="settingsSheet">
 
     <div class="settingsTitle">Impostazioni</div>
 
-    <!-- ASPETTO -->
     <div class="settingsSection">Aspetto</div>
     <button class="settingsItem" id="settingsTheme">Tema (Chiaro/Scuro)</button>
     <button class="settingsItem" id="settingsAmoled">Tema AMOLED</button>
@@ -147,19 +467,16 @@
     <button class="settingsItem" id="settingsAccent">Colore interfaccia</button>
     <button class="settingsItem" id="settingsBlur">Blur sfondo</button>
 
-    <!-- SICUREZZA -->
     <div class="settingsSection">Sicurezza</div>
     <button class="settingsItem" id="settingsChangePin">Cambia PIN</button>
     <button class="settingsItem" id="settingsResetPin">Reset PIN</button>
     <button class="settingsItem" id="settingsTimeout">Timeout PIN</button>
 
-    <!-- NOTE -->
     <div class="settingsSection">Note</div>
     <button class="settingsItem" id="settingsArchive">Archivio</button>
     <button class="settingsItem" id="settingsAnimations">Animazioni Premium</button>
     <button class="settingsItem" id="settingsHaptics">Haptic Feedback</button>
 
-    <!-- SISTEMA -->
     <div class="settingsSection">Sistema</div>
     <button class="settingsItem" id="settingsExport">Esporta</button>
     <button class="settingsItem" id="settingsImport">Importa</button>
@@ -170,12 +487,13 @@
 
   </div>
 </div>
-<!-- ============================
-     BOX 3.1 — COSTANTI + STATO APP
-     ============================ -->
+
+<!-- ============================================================
+     SCRIPT COMPLETO
+     ============================================================ -->
 <script>
 /* ============================================================
-   COSTANTI STORAGE
+   STORAGE KEYS
    ============================================================ */
 const STORAGE_NOTES_KEY = "notes_v1";
 const STORAGE_ARCHIVE_KEY = "archive_v1";
@@ -191,7 +509,6 @@ const STORAGE_TIMEOUT_KEY = "timeout_v1";
 const STORAGE_ANIM_KEY = "anim_v1";
 const STORAGE_HAPTIC_KEY = "haptic_v1";
 
-/* PIN di default */
 const DEFAULT_PIN = "4618";
 
 /* ============================================================
@@ -209,7 +526,6 @@ const notesList = document.getElementById("notesList");
 const addNoteBtn = document.getElementById("addNoteBtn");
 
 const noteEditor = document.getElementById("noteEditor");
-const noteEditorBox = document.getElementById("noteEditorBox");
 const editorTitle = document.getElementById("editorTitle");
 const noteText = document.getElementById("noteText");
 const deleteNoteBtn = document.getElementById("deleteNoteBtn");
@@ -218,16 +534,6 @@ const saveBtn = document.getElementById("saveBtn");
 
 const paletteBtns = Array.from(document.querySelectorAll(".paletteBtn"));
 const colorRow = document.getElementById("colorRow");
-
-const langPopup = document.getElementById("langPopup");
-const langChoices = Array.from(document.querySelectorAll(".langChoice"));
-
-const backupPopup = document.getElementById("backupPopup");
-const autoBackupBtn = document.getElementById("autoBackupBtn");
-const manualBackupBtn = document.getElementById("manualBackupBtn");
-const autoRestoreBtn = document.getElementById("autoRestoreBtn");
-const manualRestoreBtn = document.getElementById("manualRestoreBtn");
-const backupCloseBtn = document.getElementById("backupCloseBtn");
 
 const themeBtn = document.getElementById("themeBtn");
 const langBtn = document.getElementById("langBtn");
@@ -256,691 +562,4 @@ const settingsHaptics = document.getElementById("settingsHaptics");
 const settingsExport = document.getElementById("settingsExport");
 const settingsImport = document.getElementById("settingsImport");
 const settingsResetApp = document.getElementById("settingsResetApp");
-const settingsInfo = document.getElementById("settingsInfo");
-
-const archivePopup = document.getElementById("archivePopup");
-const archiveList = document.getElementById("archiveList");
-const archiveCloseBtn = document.getElementById("archiveCloseBtn");
-
-const infoPopup = document.getElementById("infoPopup");
-const infoCloseBtn = document.getElementById("infoCloseBtn");
-
-const resetPopup = document.getElementById("resetPopup");
-const resetConfirmBtn = document.getElementById("resetConfirmBtn");
-const resetCancelBtn = document.getElementById("resetCancelBtn");
-
-const categories = Array.from(document.querySelectorAll(".cat"));
-
-/* ============================================================
-   STATO APP
-   ============================================================ */
-let notes = [];
-let archive = [];
-let currentNoteId = null;
-let currentColor = "#ffd60a";
-let currentPalette = "warm";
-let currentCategoryFilter = "alle";
-let currentLang = "de";
-let currentTheme = "light";
-let currentAmoled = false;
-let currentFont = "";
-let currentTextSize = 16;
-let currentAccent = "#007aff";
-let currentBlur = 18;
-let currentPinInput = "";
-let currentTimeout = 0;
-let currentAnimations = true;
-let currentHaptics = true;
-/* ============================================================
-   UTILS
-   ============================================================ */
-function showBanner(msg) {
-  bannerMsg.textContent = msg;
-  bannerMsg.classList.add("show");
-  setTimeout(() => bannerMsg.classList.remove("show"), 2000);
-}
-
-function haptic() {
-  if (!currentHaptics) return;
-  if (navigator.vibrate) navigator.vibrate(10);
-}
-
-/* ============================================================
-   STORAGE
-   ============================================================ */
-function saveAll() {
-  localStorage.setItem(STORAGE_NOTES_KEY, JSON.stringify(notes));
-  localStorage.setItem(STORAGE_ARCHIVE_KEY, JSON.stringify(archive));
-}
-
-function loadAll() {
-  notes = JSON.parse(localStorage.getItem(STORAGE_NOTES_KEY) || "[]");
-  archive = JSON.parse(localStorage.getItem(STORAGE_ARCHIVE_KEY) || "[]");
-
-  currentLang = localStorage.getItem(STORAGE_LANG_KEY) || "de";
-  currentTheme = localStorage.getItem(STORAGE_THEME_KEY) || "light";
-  currentAmoled = localStorage.getItem(STORAGE_AMOLED_KEY) === "true";
-  currentFont = localStorage.getItem(STORAGE_FONT_KEY) || "";
-  currentTextSize = parseInt(localStorage.getItem(STORAGE_TEXTSIZE_KEY) || "16");
-  currentAccent = localStorage.getItem(STORAGE_ACCENT_KEY) || "#007aff";
-  currentBlur = parseInt(localStorage.getItem(STORAGE_BLUR_KEY) || "18");
-  currentTimeout = parseInt(localStorage.getItem(STORAGE_TIMEOUT_KEY) || "0");
-  currentAnimations = localStorage.getItem(STORAGE_ANIM_KEY) !== "false";
-  currentHaptics = localStorage.getItem(STORAGE_HAPTIC_KEY) !== "false";
-
-  if (currentTheme === "dark") document.body.classList.add("dark");
-  if (currentAmoled) document.body.classList.add("amoled");
-  if (currentFont) document.documentElement.style.setProperty("--app-font", currentFont);
-  document.documentElement.style.setProperty("--text-size", currentTextSize + "px");
-  document.documentElement.style.setProperty("--accent", currentAccent);
-  document.documentElement.style.setProperty("--blur-amount", currentBlur + "px");
-
-  if (!localStorage.getItem(STORAGE_PIN_KEY)) {
-    localStorage.setItem(STORAGE_PIN_KEY, DEFAULT_PIN);
-  }
-}
-
-/* ============================================================
-   RENDER NOTE
-   ============================================================ */
-function renderNotes() {
-  notesList.innerHTML = "";
-
-  const filtered = notes.filter(n => {
-    if (currentCategoryFilter === "alle") return true;
-    if (currentCategoryFilter === "favorite") return n.favorite;
-    return n.category === currentCategoryFilter;
-  });
-
-  filtered.forEach(n => {
-    const div = document.createElement("div");
-    div.className = "noteItem";
-    div.dataset.id = n.id;
-    div.style.borderLeft = `4px solid ${n.color}`;
-    div.textContent = n.text;
-    notesList.appendChild(div);
-  });
-}
-
-/* ============================================================
-   EDITOR
-   ============================================================ */
-function openEditor(id = null) {
-  currentNoteId = id;
-
-  if (id) {
-    const note = notes.find(n => n.id === id);
-    editorTitle.textContent = "Notiz bearbeiten";
-    noteText.value = note.text;
-    currentColor = note.color;
-    currentPalette = note.palette;
-    deleteNoteBtn.style.display = "block";
-  } else {
-    editorTitle.textContent = "Neue Notiz";
-    noteText.value = "";
-    currentColor = "#ffd60a";
-    currentPalette = "warm";
-    deleteNoteBtn.style.display = "none";
-  }
-
-  updatePaletteUI();
-  noteEditor.style.display = "flex";
-  haptic();
-}
-
-function closeEditor() {
-  noteEditor.style.display = "none";
-  currentNoteId = null;
-}
-
-/* ============================================================
-   NOTE CRUD
-   ============================================================ */
-function createNote(text) {
-  notes.unshift({
-    id: Date.now().toString(),
-    text,
-    color: currentColor,
-    palette: currentPalette,
-    category: "alle",
-    favorite: false
-  });
-  saveAll();
-  renderNotes();
-}
-
-function updateNote(id, text) {
-  const note = notes.find(n => n.id === id);
-  if (!note) return;
-  note.text = text;
-  note.color = currentColor;
-  note.palette = currentPalette;
-  saveAll();
-  renderNotes();
-}
-
-function deleteNote(id) {
-  notes = notes.filter(n => n.id !== id);
-  saveAll();
-  renderNotes();
-}
-
-/* ============================================================
-   PALETTE COLORI
-   ============================================================ */
-const palettes = {
-  warm: ["#ffd60a", "#ff9f1c", "#ff6b6b", "#ff4d6d"],
-  cool: ["#4dabf7", "#4361ee", "#3a86ff", "#00b4d8"],
-  pastel: ["#ffc8dd", "#bde0fe", "#caffbf", "#ffafcc"],
-  mix: ["#ffd60a", "#4dabf7", "#ffafcc", "#caffbf"]
-};
-
-function updatePaletteUI() {
-  paletteBtns.forEach(b => b.classList.toggle("active", b.dataset.pal === currentPalette));
-
-  colorRow.innerHTML = "";
-  palettes[currentPalette].forEach(c => {
-    const dot = document.createElement("div");
-    dot.className = "colorDot show";
-    dot.style.background = c;
-    if (c === currentColor) dot.classList.add("selected");
-    dot.addEventListener("click", () => {
-      currentColor = c;
-      updatePaletteUI();
-    });
-    colorRow.appendChild(dot);
-  });
-}
-/* ============================================================
-   ARCHIVIO (PREMIUM)
-   ============================================================ */
-function openArchive() {
-  archiveList.innerHTML = "";
-
-  archive.forEach(n => {
-    const div = document.createElement("div");
-    div.className = "noteItem";
-    div.textContent = n.text;
-    div.style.borderLeft = `4px solid ${n.color}`;
-    div.addEventListener("click", () => restoreFromArchive(n.id));
-    archiveList.appendChild(div);
-  });
-
-  archivePopup.style.display = "flex";
-}
-
-function restoreFromArchive(id) {
-  const note = archive.find(n => n.id === id);
-  if (!note) return;
-  archive = archive.filter(n => n.id !== id);
-  notes.unshift(note);
-  saveAll();
-  renderNotes();
-  openArchive();
-}
-
-function moveToArchive(id) {
-  const note = notes.find(n => n.id === id);
-  if (!note) return;
-  notes = notes.filter(n => n.id !== id);
-  archive.unshift(note);
-  saveAll();
-  renderNotes();
-}
-
-/* ============================================================
-   LINGUA
-   ============================================================ */
-function setLanguage(lang) {
-  currentLang = lang;
-  localStorage.setItem(STORAGE_LANG_KEY, lang);
-  showBanner("Sprache geändert");
-}
-
-/* ============================================================
-   TEMA
-   ============================================================ */
-function toggleTheme() {
-  if (currentTheme === "light") {
-    currentTheme = "dark";
-    document.body.classList.add("dark");
-  } else {
-    currentTheme = "light";
-    document.body.classList.remove("dark");
-  }
-  localStorage.setItem(STORAGE_THEME_KEY, currentTheme);
-}
-
-function toggleAmoled() {
-  currentAmoled = !currentAmoled;
-  if (currentAmoled) document.body.classList.add("amoled");
-  else document.body.classList.remove("amoled");
-  localStorage.setItem(STORAGE_AMOLED_KEY, currentAmoled);
-}
-
-/* ============================================================
-   FONT SELECTOR
-   ============================================================ */
-function chooseFont() {
-  const f = prompt("Inserisci nome font (es: 'Georgia', 'Arial')");
-  if (!f) return;
-  currentFont = f;
-  document.documentElement.style.setProperty("--app-font", f);
-  localStorage.setItem(STORAGE_FONT_KEY, f);
-}
-
-/* ============================================================
-   DIMENSIONE TESTO
-   ============================================================ */
-function chooseTextSize() {
-  const s = prompt("Dimensione testo (12–26):", currentTextSize);
-  if (!s) return;
-  const size = parseInt(s);
-  if (size < 12 || size > 26) return;
-  currentTextSize = size;
-  document.documentElement.style.setProperty("--text-size", size + "px");
-  localStorage.setItem(STORAGE_TEXTSIZE_KEY, size);
-}
-
-/* ============================================================
-   COLORE ACCENTO
-   ============================================================ */
-function chooseAccent() {
-  const c = prompt("Colore accento (es: #ff0000):", currentAccent);
-  if (!c) return;
-  currentAccent = c;
-  document.documentElement.style.setProperty("--accent", c);
-  localStorage.setItem(STORAGE_ACCENT_KEY, c);
-}
-
-/* ============================================================
-   BLUR
-   ============================================================ */
-function chooseBlur() {
-  const b = prompt("Blur sfondo (0–40):", currentBlur);
-  if (!b) return;
-  const val = parseInt(b);
-  if (val < 0 || val > 40) return;
-  currentBlur = val;
-  document.documentElement.style.setProperty("--blur-amount", val + "px");
-  localStorage.setItem(STORAGE_BLUR_KEY, val);
-}
-
-/* ============================================================
-   BACKUP
-   ============================================================ */
-function autoBackup() {
-  const data = {
-    notes,
-    archive,
-    lang: currentLang,
-    theme: currentTheme,
-    amoled: currentAmoled,
-    font: currentFont,
-    textSize: currentTextSize,
-    accent: currentAccent,
-    blur: currentBlur
-  };
-  localStorage.setItem("backup_v1", JSON.stringify(data));
-  showBanner("Backup salvato");
-}
-
-function autoRestore() {
-  const raw = localStorage.getItem("backup_v1");
-  if (!raw) return showBanner("Nessun backup");
-  try {
-    const data = JSON.parse(raw);
-    notes = data.notes || [];
-    archive = data.archive || [];
-    currentLang = data.lang || "de";
-    currentTheme = data.theme || "light";
-    currentAmoled = data.amoled || false;
-    currentFont = data.font || "";
-    currentTextSize = data.textSize || 16;
-    currentAccent = data.accent || "#007aff";
-    currentBlur = data.blur || 18;
-
-    saveAll();
-    loadAll();
-    renderNotes();
-    showBanner("Backup ripristinato");
-  } catch {
-    showBanner("Errore ripristino");
-  }
-}
-
-function manualBackup() {
-  const data = {
-    notes,
-    archive,
-    lang: currentLang,
-    theme: currentTheme,
-    amoled: currentAmoled,
-    font: currentFont,
-    textSize: currentTextSize,
-    accent: currentAccent,
-    blur: currentBlur
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "notizen-backup.json";
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function manualRestore() {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "application/json";
-  input.addEventListener("change", () => {
-    const file = input.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const data = JSON.parse(reader.result);
-        notes = data.notes || [];
-        archive = data.archive || [];
-        currentLang = data.lang || "de";
-        currentTheme = data.theme || "light";
-        currentAmoled = data.amoled || false;
-        currentFont = data.font || "";
-        currentTextSize = data.textSize || 16;
-        currentAccent = data.accent || "#007aff";
-        currentBlur = data.blur || 18;
-
-        saveAll();
-        loadAll();
-        renderNotes();
-        showBanner("Backup importato");
-      } catch {
-        showBanner("Errore import");
-      }
-    };
-    reader.readAsText(file);
-  });
-  input.click();
-}
-
-/* ============================================================
-   PIN (4 CIFRE, 4618)
-   ============================================================ */
-function getStoredPin() {
-  return localStorage.getItem(STORAGE_PIN_KEY) || DEFAULT_PIN;
-}
-
-function resetPinInput() {
-  currentPinInput = "";
-  pinCircles.forEach(c => c.classList.remove("filled"));
-}
-
-function updatePinCircles() {
-  pinCircles.forEach((c, i) => {
-    c.classList.toggle("filled", i < currentPinInput.length);
-  });
-}
-
-function showPinError(msg) {
-  pinError.textContent = msg;
-  pinError.style.opacity = 1;
-  setTimeout(() => pinError.style.opacity = 0, 1500);
-}
-
-function handlePinDigit(d) {
-  if (currentPinInput.length >= 4) return;
-
-  currentPinInput += d;
-  updatePinCircles();
-  haptic();
-
-  if (currentPinInput.length === 4) {
-    const storedPin = getStoredPin();
-    if (currentPinInput === storedPin) {
-      pinOverlay.style.display = "none";
-      resetPinInput();
-      startPinTimeout();
-    } else {
-      showPinError("PIN falsch");
-      setTimeout(() => resetPinInput(), 400);
-    }
-  }
-}
-
-function handlePinBackspace() {
-  if (!currentPinInput.length) return;
-  currentPinInput = currentPinInput.slice(0, -1);
-  updatePinCircles();
-  haptic();
-}
-
-/* CAMBIO PIN */
-function changePinFlow() {
-  const oldPin = prompt("Inserisci PIN attuale:");
-  if (!oldPin) return;
-
-  if (oldPin !== getStoredPin()) {
-    alert("PIN errato");
-    return;
-  }
-
-  const newPin = prompt("Nuovo PIN (4 cifre):");
-  if (!newPin || newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
-    alert("PIN non valido");
-    return;
-  }
-
-  localStorage.setItem(STORAGE_PIN_KEY, newPin);
-  alert("PIN aggiornato");
-}
-
-/* RESET PIN */
-function resetPinToDefault() {
-  localStorage.setItem(STORAGE_PIN_KEY, DEFAULT_PIN);
-  alert("PIN ripristinato (4618)");
-}
-
-/* ============================================================
-   TIMEOUT PIN (PREMIUM)
-   ============================================================ */
-let pinTimeoutTimer = null;
-
-function startPinTimeout() {
-  if (currentTimeout <= 0) return;
-
-  if (pinTimeoutTimer) clearTimeout(pinTimeoutTimer);
-
-  pinTimeoutTimer = setTimeout(() => {
-    pinOverlay.style.display = "flex";
-    resetPinInput();
-  }, currentTimeout * 60000);
-}
-
-function chooseTimeout() {
-  const t = prompt("Timeout PIN in minuti (0 = disattivato):", currentTimeout);
-  if (t === null) return;
-
-  const val = parseInt(t);
-  if (val < 0 || val > 120) return;
-
-  currentTimeout = val;
-  localStorage.setItem(STORAGE_TIMEOUT_KEY, val);
-
-  showBanner("Timeout aggiornato");
-}
-
-/* ============================================================
-   RESET APP (PREMIUM)
-   ============================================================ */
-function resetApp() {
-  localStorage.clear();
-  location.reload();
-}
-/* ============================================================
-   EVENT LISTENERS
-   ============================================================ */
-
-/* NOTE LIST CLICK */
-notesList.addEventListener("click", e => {
-  const item = e.target.closest(".noteItem");
-  if (!item) return;
-  const id = item.dataset.id;
-  openEditor(id);
-});
-
-/* ADD NOTE */
-addNoteBtn.addEventListener("click", () => openEditor(null));
-
-/* CANCEL EDITOR */
-cancelBtn.addEventListener("click", closeEditor);
-
-/* SAVE NOTE */
-saveBtn.addEventListener("click", () => {
-  const text = noteText.value.trim();
-  if (!text) return;
-
-  if (currentNoteId) updateNote(currentNoteId, text);
-  else createNote(text);
-
-  closeEditor();
-});
-
-/* DELETE NOTE */
-deleteNoteBtn.addEventListener("click", () => {
-  if (!currentNoteId) return;
-  moveToArchive(currentNoteId);
-  closeEditor();
-});
-
-/* PALETTE BUTTONS */
-paletteBtns.forEach(btn => {
-  btn.addEventListener("click", () => {
-    currentPalette = btn.dataset.pal;
-    updatePaletteUI();
-  });
-});
-
-/* CATEGORY FILTER */
-categories.forEach(cat => {
-  cat.addEventListener("click", () => {
-    currentCategoryFilter = cat.dataset.cat;
-    renderNotes();
-  });
-});
-
-/* LANGUAGE POPUP */
-langBtn.addEventListener("click", () => {
-  langPopup.style.display = "flex";
-});
-
-langChoices.forEach(btn => {
-  btn.addEventListener("click", () => {
-    setLanguage(btn.dataset.lang);
-    langPopup.style.display = "none";
-  });
-});
-
-/* BACKUP POPUP */
-backupBtn.addEventListener("click", () => {
-  backupPopup.style.display = "flex";
-});
-
-backupCloseBtn.addEventListener("click", () => {
-  backupPopup.style.display = "none";
-});
-
-autoBackupBtn.addEventListener("click", autoBackup);
-manualBackupBtn.addEventListener("click", manualBackup);
-autoRestoreBtn.addEventListener("click", autoRestore);
-manualRestoreBtn.addEventListener("click", manualRestore);
-
-/* SETTINGS PANEL */
-settingsBtn.addEventListener("click", () => {
-  settingsPanel.style.display = "flex";
-  setTimeout(() => settingsPanel.classList.add("show"), 10);
-});
-
-settingsClose.addEventListener("click", () => {
-  settingsPanel.classList.remove("show");
-  setTimeout(() => settingsPanel.style.display = "none", 300);
-});
-
-/* SETTINGS ACTIONS */
-settingsTheme.addEventListener("click", toggleTheme);
-settingsAmoled.addEventListener("click", toggleAmoled);
-settingsFont.addEventListener("click", chooseFont);
-settingsTextSize.addEventListener("click", chooseTextSize);
-settingsAccent.addEventListener("click", chooseAccent);
-settingsBlur.addEventListener("click", chooseBlur);
-
-settingsArchive.addEventListener("click", openArchive);
-archiveCloseBtn.addEventListener("click", () => archivePopup.style.display = "none");
-
-settingsAnimations.addEventListener("click", () => {
-  currentAnimations = !currentAnimations;
-  localStorage.setItem(STORAGE_ANIM_KEY, currentAnimations);
-  showBanner("Animazioni aggiornate");
-});
-
-settingsHaptics.addEventListener("click", () => {
-  currentHaptics = !currentHaptics;
-  localStorage.setItem(STORAGE_HAPTIC_KEY, currentHaptics);
-  showBanner("Haptic aggiornato");
-});
-
-settingsChangePin.addEventListener("click", changePinFlow);
-settingsResetPin.addEventListener("click", resetPinToDefault);
-settingsTimeout.addEventListener("click", chooseTimeout);
-
-settingsExport.addEventListener("click", manualBackup);
-settingsImport.addEventListener("click", manualRestore);
-
-settingsResetApp.addEventListener("click", () => {
-  resetPopup.style.display = "flex";
-});
-
-resetCancelBtn.addEventListener("click", () => {
-  resetPopup.style.display = "none";
-});
-
-resetConfirmBtn.addEventListener("click", () => {
-  resetApp();
-});
-
-settingsInfo.addEventListener("click", () => {
-  infoPopup.style.display = "flex";
-});
-
-infoCloseBtn.addEventListener("click", () => {
-  infoPopup.style.display = "none";
-});
-
-/* PIN KEYPAD */
-pinKeys.forEach(k => {
-  if (k.classList.contains("empty")) return;
-  if (k.classList.contains("backspace")) return;
-
-  k.addEventListener("click", () => handlePinDigit(k.dataset.digit));
-});
-
-pinBackspace.addEventListener("click", handlePinBackspace);
-/* ============================================================
-   INIT APP
-   ============================================================ */
-function init() {
-  loadAll();
-  renderNotes();
-
-  // Mostra PIN all'avvio
-  pinOverlay.style.display = "flex";
-  resetPinInput();
-}
-
-init();
-</script>
-<!-- ============================
-     BOX 4.1 — CHIUSURA FINALE
-     ============================ -->
-</body>
-</html>
+const settingsInfo = document.getElementById("settings
