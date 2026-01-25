@@ -170,7 +170,7 @@ header h2 {
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   cursor: pointer;
-  transition: transform 0.1s;
+  transition: transform 0.1s, background 0.2s;
 }
 
 .noteItem:active {
@@ -188,6 +188,7 @@ header h2 {
   font-size: 17px;
 }
 
+/* TAG CATEGORIE COLORATI */
 .noteCategoryTag {
   font-size: 11px;
   padding: 2px 8px;
@@ -195,8 +196,33 @@ header h2 {
   background: #e5e5ea;
 }
 
+/* COLORI CATEGORIE PREMIUM */
+.noteCategoryTag.home {
+  background: #ffcc00;
+  color: #000;
+}
+
+.noteCategoryTag.work {
+  background: #007aff;
+  color: #fff;
+}
+
+.noteCategoryTag.ideas {
+  background: #34c759;
+  color: #fff;
+}
+
+.noteCategoryTag.shopping {
+  background: #ff9500;
+  color: #fff;
+}
+
+.noteCategoryTag.other {
+  background: #af52de;
+  color: #fff;
+}
+
 body.dark .noteCategoryTag {
-  background: #2c2c2e;
   color: #f5f5f5;
 }
 
@@ -229,6 +255,11 @@ body.dark .noteItem p {
   border-radius: 16px;
   width: 90%;
   max-width: 420px;
+}
+
+body.dark .editorBox {
+  background: #1c1c1e;
+  color: #f5f5f5;
 }
 
 #noteCategory {
@@ -283,6 +314,39 @@ body.dark .noteItem p {
 #deleteNote {
   background: #ff3b30;
   color: #fff;
+}
+
+/* SELETTORE COLORE NOTE */
+.colorPickerBox {
+  margin-top: 10px;
+}
+
+.colorPalette {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+
+.colorDot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.colorDot:hover {
+  transform: scale(1.1);
+}
+
+.colorDot.selected {
+  border: 3px solid #000;
+}
+
+body.dark .colorDot.selected {
+  border: 3px solid #fff;
 }
 
 /* PIN */
