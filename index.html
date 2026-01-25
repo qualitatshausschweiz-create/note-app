@@ -1,409 +1,1080 @@
-<!-- Schermata di blocco PIN -->
-<div id="pinLockScreen">
-  <div id="pinBlur"></div>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notizen</title>
 
-  <div id="pinContainer">
-    <h2 id="pinTitle">PIN eingeben</h2>
+  <style>
+    :root {
+      --bg: #f2f2f7;
+      --card: #ffffff;
+      --text: #000000;
 
-    <div id="pinCircles">
-      <div class="pinCircle"></div>
-      <div class="pinCircle"></div>
-      <div class="pinCircle"></div>
-      <div class="pinCircle"></div>
-    </div>
-
-    <div id="pinKeypad">
-      <button class="pinKey">1</button>
-      <button class="pinKey">2</button>
-      <button class="pinKey">3</button>
-      <button class="pinKey">4</button>
-      <button class="pinKey">5</button>
-      <button class="pinKey">6</button>
-      <button class="pinKey">7</button>
-      <button class="pinKey">8</button>
-      <button class="pinKey">9</button>
-
-      <div class="pinEmpty"></div>
-      <button class="pinKey">0</button>
-      <button id="pinDelete">⌫</button>
-    </div>
-
-    <button id="pinResetBtn">App zurücksetzen</button>
-  </div>
-</div>
-/* ================================
-   SCHERMATA DI BLOCCO PIN (iOS)
-   ================================ */
-
-#pinLockScreen {
-  position: fixed;
-  inset: 0;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  backdrop-filter: blur(12px);
-  background: rgba(0,0,0,0.25); /* A1: blur + leggero scurimento */
-  z-index: 9999;
-}
-
-#pinContainer {
-  text-align: center;
-  width: 90%;
-  max-width: 360px;
-  color: white;
-}
-
-#pinTitle {
-  font-size: 24px;
-  margin-bottom: 20px;
-  font-weight: 600;
-}
-
-/* Cerchi grandi */
-#pinCircles {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  margin-bottom: 25px;
-}
-
-.pinCircle {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 2px solid white;
-  background: transparent;
-  transition: background 0.2s;
-}
-
-.pinCircle.filled {
-  background: white;
-}
-
-/* Tastierino stile iOS */
-#pinKeypad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin: 25px auto;
-  width: 90%;
-  max-width: 300px;
-}
-
-.pinKey {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: white;
-  color: black;
-  font-size: 28px;
-  border: none;
-  font-weight: 500;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: transform 0.1s;
-}
-
-.pinKey:active {
-  transform: scale(0.92);
-}
-
-/* Tasto delete */
-#pinDelete {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: white;
-  color: black;
-  font-size: 26px;
-  border: none;
-  font-weight: 600;
-}
-
-/* Spazio vuoto */
-.pinEmpty {
-  width: 80px;
-  height: 80px;
-}
-
-/* Pulsante reset */
-#pinResetBtn {
-  margin-top: 15px;
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 15px;
-  text-decoration: underline;
-  opacity: 0.8;
-}
-
-/* Shake forte */
-.shake {
-  animation: shakeAnim 0.4s ease;
-}
-
-@keyframes shakeAnim {
-  0% { transform: translateX(0); }
-  20% { transform: translateX(-18px); }
-  40% { transform: translateX(18px); }
-  60% { transform: translateX(-12px); }
-  80% { transform: translateX(12px); }
-  100% { transform: translateX(0); }
-}
-/* ================================
-   SISTEMA DI BLOCCO PIN (iOS)
-   ================================ */
-
-let pinInput = "";
-let isCreatingPIN = false;
-let isConfirmingPIN = false;
-let tempNewPIN = "";
-let pinTimeout = localStorage.getItem("pinTimeout") || "immediately";
-let lastActiveTime = Date.now();
-
-/* --- Utility vibrazione --- */
-function vibrate(ms) {
-  if (navigator.vibrate) navigator.vibrate(ms);
-}
-
-/* --- Mostra schermata PIN --- */
-function showPinLock() {
-  pinInput = "";
-  updatePinCircles();
-  document.getElementById("pinLockScreen").style.display = "flex";
-}
-
-/* --- Nasconde schermata PIN --- */
-function hidePinLock() {
-  document.getElementById("pinLockScreen").style.display = "none";
-}
-
-/* --- Aggiorna cerchi --- */
-function updatePinCircles() {
-  const circles = document.querySelectorAll(".pinCircle");
-  circles.forEach((c, i) => {
-    c.classList.toggle("filled", i < pinInput.length);
-  });
-}
-
-/* --- Shake forte --- */
-function triggerShake() {
-  const container = document.getElementById("pinContainer");
-  container.classList.add("shake");
-  vibrate(120);
-
-  setTimeout(() => {
-    container.classList.remove("shake");
-  }, 400);
-}
-
-/* --- Verifica PIN --- */
-function verifyPIN() {
-  const savedPIN = localStorage.getItem("appPIN");
-
-  if (!savedPIN) return;
-
-  if (pinInput === savedPIN) {
-    hidePinLock();
-    pinInput = "";
-    updatePinCircles();
-    return;
-  }
-
-  // PIN errato
-  triggerShake();
-  pinInput = "";
-  updatePinCircles();
-}
-
-/* --- Creazione PIN --- */
-function startCreatePIN() {
-  isCreatingPIN = true;
-  isConfirmingPIN = false;
-  pinInput = "";
-  updatePinCircles();
-  document.getElementById("pinTitle").textContent = "Neuen PIN erstellen";
-  showPinLock();
-}
-
-function handleCreatePIN() {
-  if (!isConfirmingPIN) {
-    tempNewPIN = pinInput;
-    pinInput = "";
-    updatePinCircles();
-    isConfirmingPIN = true;
-    document.getElementById("pinTitle").textContent = "PIN bestätigen";
-    return;
-  }
-
-  if (pinInput === tempNewPIN) {
-    localStorage.setItem("appPIN", pinInput);
-    isCreatingPIN = false;
-    isConfirmingPIN = false;
-    hidePinLock();
-  } else {
-    triggerShake();
-    pinInput = "";
-    updatePinCircles();
-  }
-}
-
-/* --- Timeout blocco --- */
-function shouldLockApp() {
-  if (!localStorage.getItem("appPIN")) return false;
-
-  const now = Date.now();
-  const diff = now - lastActiveTime;
-
-  switch (pinTimeout) {
-    case "immediately":
-      return true;
-    case "30s":
-      return diff > 30000;
-    case "1min":
-      return diff > 60000;
-    case "5min":
-      return diff > 300000;
-  }
-  return true;
-}
-
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    lastActiveTime = Date.now();
-  } else {
-    if (shouldLockApp()) showPinLock();
-  }
-});
-
-/* --- Tastierino numerico --- */
-document.querySelectorAll(".pinKey").forEach(btn => {
-  btn.addEventListener("click", () => {
-    vibrate(30);
-
-    if (pinInput.length < 4) {
-      pinInput += btn.textContent;
-      updatePinCircles();
+      --banner-bg: rgba(0,0,0,0.85);
+      --banner-text: #ffffff;
     }
 
-    if (pinInput.length === 4) {
-      if (isCreatingPIN) {
-        handleCreatePIN();
-      } else {
-        verifyPIN();
+    body.dark {
+      --bg: #000000;
+      --card: #1c1c1e;
+      --text: #ffffff;
+
+      --banner-bg: rgba(255,255,255,0.85);
+      --banner-text: #000000;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    #app {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* HEADER */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    #appTitle {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .iconBtn {
+      border: none;
+      background: none;
+      font-size: 22px;
+      cursor: pointer;
+      margin-left: 8px;
+      color: var(--text);
+    }
+
+    /* BANNER */
+    #bannerMsg {
+      position: fixed;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--banner-bg);
+      color: var(--banner-text);
+      padding: 10px 18px;
+      border-radius: 14px;
+      font-size: 15px;
+      z-index: 2000;
+      opacity: 0;
+      transition: all 0.35s ease;
+    }
+    #bannerMsg.show {
+      top: 20px;
+      opacity: 1;
+    }
+
+    /* CATEGORIE */
+    #categories {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin-bottom: 12px;
+    }
+    .cat {
+      flex: 0 0 auto;
+      padding: 8px 12px;
+      border-radius: 16px;
+      background: var(--card);
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    .catLabel {
+      font-size: 14px;
+    }
+
+    /* LISTA NOTE */
+    #notesList {
+      display: block;
+    }
+    .noteItem {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      cursor: pointer;
+    }
+
+    /* BOTTONE + */
+    #addNoteBtn {
+      position: fixed;
+      right: 20px;
+      bottom: 30px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: none;
+      background: #007aff;
+      color: #fff;
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      cursor: pointer;
+      z-index: 1100;
+    }
+
+    /* EDITOR */
+    #noteEditor {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1400;
+    }
+    #noteEditorBox {
+      width: 90%;
+      max-width: 500px;
+      background: var(--card);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+    }
+
+    /* ICONA 🗑 */
+    #deleteNoteBtn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 22px;
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      display: none;
+      z-index: 9999;
+    }
+
+    #editorTitle {
+      margin: 0 0 4px 0;
+      font-size: 18px;
+    }
+
+    #noteText {
+      width: 100%;
+      min-height: 120px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      padding: 8px;
+      font-size: 16px;
+      resize: vertical;
+      background: transparent;
+      color: inherit;
+    }
+
+    #editorButtons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    #editorButtons button {
+      border-radius: 12px;
+      border: none;
+      padding: 8px 14px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    #cancelBtn {
+      background: #ccc;
+      color: #000;
+    }
+    #saveBtn {
+      background: #007aff;
+      color: #fff;
+    }
+
+    /* PALETTE */
+    #paletteSelector {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+    .paletteBtn {
+      padding: 4px 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      background: var(--card);
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.25s ease, transform 0.2s ease, color 0.2s ease;
+    }
+    .paletteBtn.active {
+      background: #007aff;
+      color: #fff;
+      transform: scale(1.05);
+    }
+    .paletteBtn:active {
+      transform: scale(0.9);
+    }
+
+    #colorRow {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .colorDot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.25s ease, opacity 0.25s ease, box-shadow 0.25s ease;
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    .colorDot.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .colorDot.selected {
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.4);
+      transform: scale(1.15);
+    }
+    .colorDot:active {
+      transform: scale(0.85);
+      opacity: 0.7;
+    }
+
+    /* POPUP LINGUA / BACKUP */
+    #langPopup,
+    #backupPopup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1500;
+    }
+    #langBox,
+    #backupBox {
+      width: 80%;
+      max-width: 360px;
+      background: var(--card);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .langChoice {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      background: transparent;
+      color: inherit;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .backupBtnRow {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .backupAction {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: #000;
+    }
+
+    #autoBackupBtn { background: #007aff; color: white; }
+    #manualBackupBtn { background: #ffcc00; color: black; }
+    #autoRestoreBtn { background: #ff9500; color: white; }
+    #manualRestoreBtn { background: #34c759; color: white; }
+    #backupCloseBtn { background: #ccc; color: black; }
+
+    /* PIN OVERLAY */
+    #pinOverlay {
+      position: fixed;
+      inset: 0;
+      backdrop-filter: blur(18px);
+      background: rgba(0,0,0,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+    }
+    #pinBox {
+      width: 80%;
+      max-width: 360px;
+      background: rgba(28,28,30,0.95);
+      color: #fff;
+      border-radius: 22px;
+      padding: 20px 18px 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+    #pinTitle {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    #pinCircles {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .pinCircle {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #007aff;
+      background: transparent;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .pinCircle.filled {
+      background: #007aff;
+      transform: scale(1.1);
+    }
+    #pinPad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      justify-items: center;
+    }
+    .pinKey {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #007aff;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      transition: transform 0.1s ease, opacity 0.1s ease, box-shadow 0.1s ease;
+    }
+    .pinKey:active {
+      transform: scale(0.9);
+      opacity: 0.8;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .pinKey.empty {
+      background: transparent;
+      box-shadow: none;
+      cursor: default;
+    }
+    .pinKey.backspace {
+      font-size: 20px;
+      background: #3a3a3c;
+    }
+    #pinError {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #ff453a;
+      min-height: 16px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    #pinBox.shake {
+      animation: pinShake 0.35s;
+    }
+    @keyframes pinShake {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
+      100% { transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PIN OVERLAY -->
+  <div id="pinOverlay">
+    <div id="pinBox">
+      <div id="pinTitle">Inserisci PIN</div>
+
+      <div id="pinCircles">
+        <div class="pinCircle"></div>
+        <div class="pinCircle"></div>
+        <div class="pinCircle"></div>
+        <div class="pinCircle"></div>
+      </div>
+
+      <div id="pinPad">
+        <button class="pinKey" data-digit="1">1</button>
+        <button class="pinKey" data-digit="2">2</button>
+        <button class="pinKey" data-digit="3">3</button>
+
+        <button class="pinKey" data-digit="4">4</button>
+        <button class="pinKey" data-digit="5">5</button>
+        <button class="pinKey" data-digit="6">6</button>
+
+        <button class="pinKey" data-digit="7">7</button>
+        <button class="pinKey" data-digit="8">8</button>
+        <button class="pinKey" data-digit="9">9</button>
+
+        <button class="pinKey empty"></button>
+        <button class="pinKey" data-digit="0">0</button>
+        <button class="pinKey backspace" id="pinBackspace">⌫</button>
+      </div>
+
+      <div id="pinError"></div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app">
+
+    <div id="bannerMsg"></div>
+
+    <header>
+      <div id="appTitle">Notizen</div>
+      <div>
+        <button id="themeBtn" class="iconBtn">🌙</button>
+        <button id="langBtn" class="iconBtn">🌐</button>
+        <button id="backupBtn" class="iconBtn">🛟</button>
+      </div>
+    </header>
+
+    <!-- CATEGORIE -->
+    <div id="categories">
+      <div class="cat" data-cat="favorite"><span class="catLabel">Favoriten</span></div>
+      <div class="cat" data-cat="alle"><span class="catLabel">Alle</span></div>
+      <div class="cat" data-cat="arbeit"><span class="catLabel">Arbeit</span></div>
+      <div class="cat" data-cat="einkauf"><span class="catLabel">Einkauf</span></div>
+      <div class="cat" data-cat="zuhause"><span class="catLabel">Zuhause</span></div>
+      <div class="cat" data-cat="ideen"><span class="catLabel">Ideen</span></div>
+      <div class="cat" data-cat="personlich"><span class="catLabel">Persönlich</span></div>
+    </div>
+
+    <!-- LISTA NOTE -->
+    <div id="notesList"></div>
+
+    <!-- BOTTONE + -->
+    <button id="addNoteBtn">+</button>
+
+  </div>
+
+  <!-- EDITOR -->
+  <div id="noteEditor">
+    <div id="noteEditorBox">
+
+      <button id="deleteNoteBtn">🗑</button>
+
+      <h2 id="editorTitle">Neue Notiz</h2>
+
+      <textarea id="noteText"></textarea>
+
+      <div id="paletteSelector">
+        <span style="font-size:14px; opacity:0.7;">Palette:</span>
+        <button class="paletteBtn" data-pal="warm">Caldi</button>
+        <button class="paletteBtn" data-pal="cool">Freddi</button>
+        <button class="paletteBtn" data-pal="pastel">Pastello</button>
+        <button class="paletteBtn" data-pal="mix">Mix</button>
+      </div>
+
+      <div id="colorRow"></div>
+
+      <div id="editorButtons">
+        <button id="cancelBtn">Abbrechen</button>
+        <button id="saveBtn">Speichern</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- POPUP LINGUA -->
+  <div id="langPopup">
+    <div id="langBox">
+      <h2>Sprache</h2>
+      <button class="langChoice" data-lang="de">Deutsch</button>
+      <button class="langChoice" data-lang="it">Italiano</button>
+      <button class="langChoice" data-lang="en">English</button>
+      <button class="langChoice" data-lang="es">Español</button>
+    </div>
+  </div>
+
+  <!-- POPUP BACKUP -->
+  <div id="backupPopup">
+    <div id="backupBox">
+      <h2>Sicherung</h2>
+
+      <div class="backupBtnRow">
+        <button id="autoBackupBtn" class="backupAction"><span>Backup automatisch</span></button>
+        <button id="manualBackupBtn" class="backupAction"><span>Backup manuell</span></button>
+        <button id="autoRestoreBtn" class="backupAction"><span>Wiederherstellung automatisch</span></button>
+        <button id="manualRestoreBtn" class="backupAction"><span>Wiederherstellung manuell</span></button>
+        <button id="backupCloseBtn" class="backupAction"><span>Schliessen</span></button>
+      </div>
+
+    </div>
+  </div>
+<script>
+    let notes = [];
+    let currentNoteId = null;
+    let currentLang = localStorage.getItem("lang") || "de";
+
+    /* PALETTE */
+    const PALETTES = {
+      warm: ["#FFE4E1", "#FFD166", "#FF8C42", "#FFB5A7", "#F4A261", "#E76F51", "#E63946"],
+      cool: ["#DDE7F2", "#CDE7F0", "#A8DADC", "#457B9D", "#3A86FF", "#2A9D8F", "#264653"],
+      pastel: ["#FDE2E4", "#E2F0CB", "#DDE7F2", "#FFF1C1", "#E0F7FA", "#E8F5E9", "#F7EDE2"],
+      mix: ["#FDE2E4", "#E2F0CB", "#DDE7F2", "#FFD166", "#FF8C42", "#3A86FF", "#E63946"]
+    };
+
+    /* BANNER */
+    function showBanner(msg) {
+      const b = document.getElementById("bannerMsg");
+      b.textContent = msg;
+      b.classList.add("show");
+      setTimeout(() => b.classList.remove("show"), 1800);
+    }
+
+    /* BACKUP AUTO */
+    function autoBackup() {
+      localStorage.setItem("notes_backup_auto", JSON.stringify(notes));
+    }
+
+    function autoRestore() {
+      const saved = localStorage.getItem("notes_backup_auto");
+      if (saved) {
+        notes = JSON.parse(saved);
+        saveNotes();
       }
     }
-  });
-});
 
-/* --- Cancella --- */
-document.getElementById("pinDelete").addEventListener("click", () => {
-  vibrate(20);
-  pinInput = pinInput.slice(0, -1);
-  updatePinCircles();
-});
-
-/* --- Reset app --- */
-document.getElementById("pinResetBtn").addEventListener("click", () => {
-  if (confirm("App wirklich zurücksetzen?")) {
-    localStorage.clear();
-    location.reload();
-  }
-});
-
-/* --- Blocco all’avvio --- */
-window.addEventListener("load", () => {
-  if (localStorage.getItem("appPIN")) {
-    showPinLock();
-  }
-});
-<!-- Sezione Sicurezza -->
-<div class="settingsSection">
-  <h3>Sicherheit</h3>
-
-  <div class="settingsItem" id="togglePinLock">
-    <span>App mit PIN sperren</span>
-    <input type="checkbox" id="pinEnabledSwitch">
-  </div>
-
-  <div class="settingsItem" id="changePinBtn">
-    <span>PIN ändern</span>
-  </div>
-
-  <div class="settingsItem">
-    <span>Timeout</span>
-    <select id="pinTimeoutSelect">
-      <option value="immediately">Sofort</option>
-      <option value="30s">30 Sekunden</option>
-      <option value="1min">1 Minute</option>
-      <option value="5min">5 Minuten</option>
-    </select>
-  </div>
-</div>
-/* ================================
-   INTEGRAZIONE MENU IMPOSTAZIONI
-   ================================ */
-
-/* --- Switch attiva/disattiva PIN --- */
-const pinSwitch = document.getElementById("pinEnabledSwitch");
-
-if (localStorage.getItem("appPIN")) {
-  pinSwitch.checked = true;
-}
-
-pinSwitch.addEventListener("change", () => {
-  if (pinSwitch.checked) {
-    startCreatePIN();
-  } else {
-    if (confirm("PIN wirklich deaktivieren?")) {
-      localStorage.removeItem("appPIN");
-      alert("PIN deaktiviert");
-    } else {
-      pinSwitch.checked = true;
+    /* STORAGE */
+    function saveNotes() {
+      localStorage.setItem("notes", JSON.stringify(notes));
+      autoBackup();
     }
-  }
-});
 
-/* --- Timeout blocco --- */
-const timeoutSelect = document.getElementById("pinTimeoutSelect");
-timeoutSelect.value = pinTimeout;
+    function loadNotes() {
+      return JSON.parse(localStorage.getItem("notes") || "[]");
+    }
 
-timeoutSelect.addEventListener("change", () => {
-  pinTimeout = timeoutSelect.value;
-  localStorage.setItem("pinTimeout", pinTimeout);
-});
+    /* MOSTRA NOTE */
+    function showNotes(filter = "alle") {
+      const list = document.getElementById("notesList");
+      list.innerHTML = "";
 
-/* --- Cambio PIN --- */
-document.getElementById("changePinBtn").addEventListener("click", () => {
-  if (!localStorage.getItem("appPIN")) {
-    alert("Kein PIN gesetzt");
-    return;
-  }
+      let filtered = notes;
 
-  // Richiede PIN attuale
-  isCreatingPIN = false;
-  isConfirmingPIN = false;
-  pinInput = "";
-  updatePinCircles();
-  document.getElementById("pinTitle").textContent = "Aktuellen PIN eingeben";
-  showPinLock();
+      if (filter === "favorite") {
+        filtered = notes.filter(n => n.favorite);
+      } else if (filter !== "alle") {
+        filtered = notes.filter(n => n.category === filter);
+      }
 
-  // Quando il PIN è corretto → crea nuovo PIN
-  const originalVerify = verifyPIN;
-  verifyPIN = function () {
-    const savedPIN = localStorage.getItem("appPIN");
+      filtered.forEach(note => {
+        const div = document.createElement("div");
+        div.className = "noteItem";
+        div.style.background = note.color || "#ffffff";
 
-    if (pinInput === savedPIN) {
-      // Ripristina funzione originale
-      verifyPIN = originalVerify;
+        div.innerHTML = `
+          <div>${note.text.substring(0, 80)}</div>
+          <div class="favBtn" style="font-size:18px;margin-top:6px;cursor:pointer;">
+            ${note.favorite ? "⭐" : "☆"}
+          </div>
+        `;
 
-      // Avvia creazione nuovo PIN
-      startCreatePIN();
-    } else {
-      triggerShake();
-      pinInput = "";
+        div.querySelector(".favBtn").onclick = (e) => {
+          e.stopPropagation();
+          toggleFavorite(note.id);
+        };
+
+        div.onclick = () => openEditor(note.id);
+
+        list.appendChild(div);
+      });
+    }
+
+    /* EDITOR */
+    function openEditor(id = null) {
+      currentNoteId = id;
+
+      const editor = document.getElementById("noteEditor");
+      const title = document.getElementById("editorTitle");
+      const delBtn = document.getElementById("deleteNoteBtn");
+
+      if (id === null) {
+        title.textContent = LANG[currentLang].newNote;
+        document.getElementById("noteText").value = "";
+        delBtn.style.display = "none";
+        document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
+      } else {
+        const note = notes.find(n => n.id === id);
+        if (!note) return;
+        title.textContent = LANG[currentLang].editNote;
+        document.getElementById("noteText").value = note.text;
+        delBtn.style.display = "block";
+
+        document.querySelectorAll(".colorDot").forEach(d => {
+          d.classList.toggle("selected", d.dataset.color === note.color);
+        });
+      }
+
+      editor.style.display = "flex";
+    }
+
+    function saveNote() {
+      const text = document.getElementById("noteText").value.trim();
+      if (!text) {
+        closeEditor();
+        return;
+      }
+
+      let selectedColor = "#ffffff";
+      const selectedDot = document.querySelector(".colorDot.selected");
+      if (selectedDot) selectedColor = selectedDot.dataset.color;
+
+      if (currentNoteId === null) {
+        notes.push({
+          id: Date.now(),
+          text,
+          color: selectedColor,
+          category: "alle",
+          favorite: false
+        });
+      } else {
+        const note = notes.find(n => n.id === currentNoteId);
+        if (note) {
+          note.text = text;
+          note.color = selectedColor;
+        }
+      }
+
+      saveNotes();
+      showNotes();
+      closeEditor();
+    }
+
+    function deleteNote() {
+      if (!confirm("Sei sicuro?")) return;
+
+      notes = notes.filter(n => n.id !== currentNoteId);
+      saveNotes();
+      showNotes();
+      closeEditor();
+
+      showBanner(LANG[currentLang].msg.deleted);
+    }
+
+    function toggleFavorite(id) {
+      const note = notes.find(n => n.id === id);
+      if (!note) return;
+
+      note.favorite = !note.favorite;
+
+      saveNotes();
+      showNotes();
+
+      showBanner(note.favorite ? LANG[currentLang].msg.favAdd : LANG[currentLang].msg.favRemove);
+    }
+
+    function closeEditor() {
+      document.getElementById("noteEditor").style.display = "none";
+      currentNoteId = null;
+    }
+
+    /* PALETTE */
+    function applyPalette(name) {
+      const row = document.getElementById("colorRow");
+      row.innerHTML = "";
+
+      PALETTES[name].forEach((color, index) => {
+        const dot = document.createElement("div");
+        dot.className = "colorDot";
+        dot.dataset.color = color;
+        dot.style.background = color;
+
+        row.appendChild(dot);
+
+        setTimeout(() => {
+          dot.classList.add("show");
+        }, index * 60);
+      });
+
+      document.querySelectorAll(".colorDot").forEach(dot => {
+        dot.onclick = () => {
+          const color = dot.dataset.color;
+
+          document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
+          dot.classList.add("selected");
+
+          if (currentNoteId !== null) {
+            const note = notes.find(n => n.id === currentNoteId);
+            if (note) {
+              note.color = color;
+              saveNotes();
+              showNotes();
+            }
+          }
+        };
+      });
+
+      document.querySelectorAll(".paletteBtn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.pal === name);
+      });
+
+      localStorage.setItem("palette", name);
+    }
+
+    /* LINGUE */
+    const LANG = {
+      de: {
+        appTitle: "Notizen",
+        newNote: "Neue Notiz",
+        editNote: "Notiz bearbeiten",
+        cancel: "Abbrechen",
+        save: "Speichern",
+        categories: {
+          favorite: "Favoriten",
+          alle: "Alle",
+          arbeit: "Arbeit",
+          einkauf: "Einkauf",
+          zuhause: "Zuhause",
+          ideen: "Ideen",
+          personlich: "Persönlich"
+        },
+        backup: {
+          title: "Sicherung",
+          autoBackup: "Backup automatisch",
+          manualBackup: "Backup manuell",
+          autoRestore: "Wiederherstellung automatisch",
+          manualRestore: "Wiederherstellung manuell",
+          close: "Schliessen"
+        },
+        msg: {
+          favAdd: "Zu Favoriten hinzugefügt",
+          favRemove: "Aus Favoriten entfernt",
+          deleted: "Notiz gelöscht"
+        }
+      },
+      it: {
+        appTitle: "Note",
+        newNote: "Nuova nota",
+        editNote: "Modifica nota",
+        cancel: "Annulla",
+        save: "Salva",
+        categories: {
+          favorite: "Preferiti",
+          alle: "Tutte",
+          arbeit: "Lavoro",
+          einkauf: "Spesa",
+          zuhause: "Casa",
+          ideen: "Idee",
+          personlich: "Personale"
+        },
+        backup: {
+          title: "Backup",
+          autoBackup: "Backup automatico",
+          manualBackup: "Backup manuale",
+          autoRestore: "Ripristino automatico",
+          manualRestore: "Ripristino manuale",
+          close: "Chiudi"
+        },
+        msg: {
+          favAdd: "Aggiunto ai preferiti",
+          favRemove: "Rimosso dai preferiti",
+          deleted: "Nota eliminata"
+        }
+      },
+      en: {
+        appTitle: "Notes",
+        newNote: "New Note",
+        editNote: "Edit Note",
+        cancel: "Cancel",
+        save: "Save",
+        categories: {
+          favorite: "Favorites",
+          alle: "All",
+          arbeit: "Work",
+          einkauf: "Shopping",
+          zuhause: "Home",
+          ideen: "Ideas",
+          personlich: "Personal"
+        },
+        backup: {
+          title: "Backup",
+          autoBackup: "Automatic Backup",
+          manualBackup: "Manual Backup",
+          autoRestore: "Automatic Restore",
+          manualRestore: "Manual Restore",
+          close: "Close"
+        },
+        msg: {
+          favAdd: "Added to favorites",
+          favRemove: "Removed from favorites",
+          deleted: "Note deleted"
+        }
+      },
+      es: {
+        appTitle: "Notas",
+        newNote: "Nueva nota",
+        editNote: "Editar nota",
+        cancel: "Cancelar",
+        save: "Guardar",
+        categories: {
+          favorite: "Favoritos",
+          alle: "Todas",
+          arbeit: "Trabajo",
+          einkauf: "Compras",
+          zuhause: "Casa",
+          ideen: "Ideas",
+          personlich: "Personal"
+        },
+        backup: {
+          title: "Copia de seguridad",
+          autoBackup: "Copia automática",
+          manualBackup: "Copia manual",
+          autoRestore: "Restauración automática",
+          manualRestore: "Restauración manual",
+          close: "Cerrar"
+        },
+        msg: {
+          favAdd: "Añadido a favoritos",
+          favRemove: "Eliminado de favoritos",
+          deleted: "Nota eliminada"
+        }
+      }
+    };
+
+    function applyLanguage(lang) {
+      currentLang = lang;
+      const L = LANG[lang];
+
+      document.getElementById("appTitle").textContent = L.appTitle;
+      document.getElementById("cancelBtn").textContent = L.cancel;
+      document.getElementById("saveBtn").textContent = L.save;
+
+      document.querySelectorAll(".cat").forEach(btn => {
+        const key = btn.dataset.cat;
+        btn.querySelector(".catLabel").textContent = L.categories[key];
+      });
+
+      document.querySelector("#backupBox h2").textContent = L.backup.title;
+      document.querySelector("#autoBackupBtn span").textContent = L.backup.autoBackup;
+      document.querySelector("#manualBackupBtn span").textContent = L.backup.manualBackup;
+      document.querySelector("#autoRestoreBtn span").textContent = L.backup.autoRestore;
+      document.querySelector("#manualRestoreBtn span").textContent = L.backup.manualRestore;
+      document.querySelector("#backupCloseBtn span").textContent = L.backup.close;
+
+      localStorage.setItem("lang", lang);
+      showNotes();
+    }
+
+    /* TEMA */
+    function toggleTheme() {
+      const body = document.body;
+      const isDark = body.classList.toggle("dark");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+      document.getElementById("themeBtn").textContent = isDark ? "☀️" : "🌙";
+    }
+
+    /* EVENTI BASE */
+    document.getElementById("addNoteBtn").onclick = () => openEditor();
+    document.getElementById("cancelBtn").onclick = closeEditor;
+    document.getElementById("saveBtn").onclick = saveNote;
+    document.getElementById("deleteNoteBtn").onclick = deleteNote;
+
+    document.querySelectorAll(".cat").forEach(btn => {
+      btn.onclick = () => showNotes(btn.dataset.cat);
+    });
+
+    document.getElementById("langBtn").onclick = () => {
+      document.getElementById("langPopup").style.display = "flex";
+    };
+    document.querySelectorAll(".langChoice").forEach(btn => {
+      btn.onclick = () => {
+        applyLanguage(btn.dataset.lang);
+        document.getElementById("langPopup").style.display = "none";
+      };
+    });
+    document.getElementById("langPopup").onclick = e => {
+      if (e.target.id === "langPopup") {
+        document.getElementById("langPopup").style.display = "none";
+      }
+    };
+
+    document.getElementById("backupBtn").onclick = () => {
+      document.getElementById("backupPopup").style.display = "flex";
+    };
+    document.getElementById("backupCloseBtn").onclick = () => {
+      document.getElementById("backupPopup").style.display = "none";
+    };
+    document.getElementById("backupPopup").onclick = e => {
+      if (e.target.id === "backupPopup") {
+        document.getElementById("backupPopup").style.display = "none";
+      }
+    };
+
+    document.getElementById("manualBackupBtn").onclick = () => {
+      localStorage.setItem("notes_backup_manual", JSON.stringify(notes));
+      showBanner("Backup salvato");
+    };
+    document.getElementById("manualRestoreBtn").onclick = () => {
+      const saved = localStorage.getItem("notes_backup_manual");
+      if (saved) {
+        notes = JSON.parse(saved);
+        saveNotes();
+        showNotes();
+        showBanner("Backup ripristinato");
+      }
+    };
+    document.getElementById("autoBackupBtn").onclick = () => {
+      showBanner("Backup automatico attivo");
+    };
+    document.getElementById("autoRestoreBtn").onclick = () => {
+      autoRestore();
+      showNotes();
+      showBanner("Ripristino automatico eseguito");
+    };
+
+    document.getElementById("themeBtn").onclick = toggleTheme;
+
+    document.querySelectorAll(".paletteBtn").forEach(btn => {
+      btn.onclick = () => {
+        applyPalette(btn.dataset.pal);
+      };
+    });
+
+    /* PIN SYSTEM */
+    let pinCode = null;
+    let enteredPin = "";
+
+    function initPin() {
+      let savedPin = localStorage.getItem("pinCode");
+      if (!savedPin) {
+        savedPin = "4618"; 
+        localStorage.setItem("pinCode", savedPin);
+      }
+      pinCode = savedPin;
+      showPinOverlay();
+    }
+
+    function showPinOverlay() {
+      enteredPin = "";
+      updatePinCircles();
+      const overlay = document.getElementById("pinOverlay");
+      const error = document.getElementById("pinError");
+      error.style.opacity = 0;
+      error.textContent = "";
+      overlay.style.display = "flex";
+    }
+
+    function hidePinOverlay() {
+      const overlay = document.getElementById("pinOverlay");
+      overlay.style.display = "none";
+    }
+
+    function updatePinCircles() {
+      const circles = document.querySelectorAll(".pinCircle");
+      circles.forEach((c, i) => {
+        c.classList.toggle("filled", i < enteredPin.length);
+      });
+    }
+
+    function handlePinDigit(d) {
+      if (enteredPin.length >= 4) return;
+      enteredPin += d;
+      updatePinCircles();
+      if (enteredPin.length === 4) {
+        checkPin();
+      }
+    }
+
+    function handlePinBackspace() {
+      if (!enteredPin.length) return;
+      enteredPin = enteredPin.slice(0, -1);
       updatePinCircles();
     }
-  };
-});
+
+    function vibrateShort() {
+      if (navigator.vibrate) {
+        navigator.vibrate(120);
+      }
+    }
+
+    function checkPin() {
+      if (enteredPin === pinCode) {
+        hidePinOverlay();
+        enteredPin = "";
+        updatePinCircles();
+      } else {
+        enteredPin = "";
+        updatePinCircles();
+        vibrateShort();
+        const box = document.getElementById("pinBox");
+        const error = document.getElementById("pinError");
+        error.textContent = "PIN errato";
+        error.style.opacity = 1;
+        box.classList.remove("shake");
+        void box.offsetWidth;
+        box.classList.add("shake");
+        setTimeout(() => {
+          box.classList.remove("shake");
+        }, 400);
+      }
+    }
+
+    document.querySelectorAll(".pinKey").forEach(key => {
+      const d = key.dataset.digit;
+      if (d) {
+        key.onclick = () => handlePinDigit(d);
+      }
+    });
+    document.getElementById("pinBackspace").onclick = handlePinBackspace;
+
+    /* AVVIO APP */
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark");
+      document.getElementById("themeBtn").textContent = "☀️";
+    }
+
+    notes = loadNotes();
+    autoRestore();
+
+    const savedPalette = localStorage.getItem("palette") || "mix";
+    applyPalette(savedPalette);
+    applyLanguage(currentLang);
+
+    initPin();
+</script>
+</body>
+</html>
