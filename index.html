@@ -1,504 +1,704 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notizen Premium</title>
-
-<style>
-:root {
-  --accent: #007aff;
-  --accent-light: #4da3ff;
-  --accent-glow: rgba(0,122,255,0.35);
-  --app-font: -apple-system, system-ui, sans-serif;
-  --text-size: 16px;
-}
-
-body {
-  margin: 0;
-  font-family: var(--app-font);
-  font-size: var(--text-size);
-  background: #f2f2f7;
-  color: #111;
-  transition: background 0.3s, color 0.3s;
-}
-
-body.dark {
-  background: #1c1c1e;
-  color: #fff;
-}
-
-body.amoled {
-  background: #000;
-  color: #fff;
-}
-
-/* HEADER */
-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 15px;
-  font-size: 22px;
-  font-weight: bold;
-}
-
-.iconBtn {
-  background: none;
-  border: none;
-  font-size: 24px;
-  margin-left: 10px;
-}
-
-/* CATEGORIE */
-#categories {
-  display: flex;
-  overflow-x: auto;
-  gap: 12px;
-  padding: 10px;
-}
-
-.cat {
-  padding: 8px 16px;
-  background: #e5e5ea;
-  border-radius: 14px;
-  white-space: nowrap;
-  font-size: 15px;
-}
-
-/* NOTE LIST */
-#notesList {
-  padding: 15px;
-}
-
-.noteItem {
-  background: #fff;
-  padding: 16px;
-  margin-bottom: 14px;
-  border-radius: 14px;
-  border-left: 5px solid var(--accent);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-/* ADD BUTTON */
-#addNoteBtn {
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: none;
-  background: var(--accent);
-  color: #fff;
-  font-size: 36px;
-  box-shadow: 0 6px 20px var(--accent-glow);
-}
-
-/* EDITOR */
-#noteEditor {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(10px);
-  display: none;
-  justify-content: center;
-  align-items: center;
-}
-
-#noteEditorBox {
-  background: #fff;
-  width: 90%;
-  max-width: 420px;
-  padding: 22px;
-  border-radius: 20px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-}
-
-#noteText {
-  width: 100%;
-  height: 160px;
-  margin-top: 12px;
-  padding: 12px;
-  border-radius: 14px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-}
-
-#editorButtons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 18px;
-}
-
-/* POPUP GENERICI */
-.popupBox {
-  background: #fff;
-  padding: 22px;
-  border-radius: 20px;
-  width: 85%;
-  max-width: 380px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-}
-
-#archivePopup,
-#infoPopup,
-#resetPopup {
-  position: fixed;
-  inset: 0;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(10px);
-}
-
-/* SETTINGS PANEL */
-#settingsPanel {
-  position: fixed;
-  inset: 0;
-  display: none;
-  justify-content: flex-end;
-  background: rgba(0,0,0,0.3);
-  backdrop-filter: blur(5px);
-}
-
-#settingsSheet {
-  width: 80%;
-  max-width: 350px;
-  background: #fff;
-  height: 100%;
-  padding: 22px;
-  border-radius: 20px 0 0 20px;
-  transform: translateX(100%);
-  transition: transform 0.3s;
-}
-
-#settingsPanel.show #settingsSheet {
-  transform: translateX(0);
-}
-
-.settingsItem {
-  width: 100%;
-  padding: 14px;
-  margin-bottom: 10px;
-  background: #e5e5ea;
-  border-radius: 14px;
-  border: none;
-  text-align: left;
-  font-size: 16px;
-}
-
-.settingsClose {
-  margin-top: 20px;
-  width: 100%;
-  padding: 14px;
-  background: var(--accent);
-  color: #fff;
-  border-radius: 14px;
-  border: none;
-}
-
-/* BANNER */
-#bannerMsg {
-  position: fixed;
-  top: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--accent);
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 14px;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-#bannerMsg.show {
-  opacity: 1;
-}
-</style>
-</head>
-
-<body>
-
-<div id="app">
-
-  <div id="bannerMsg"></div>
-
-  <header>
-    <div id="appTitle">Notizen</div>
-    <div>
-      <button id="themeBtn" class="iconBtn">🌙</button>
-      <button id="langBtn" class="iconBtn">🌐</button>
-      <button id="backupBtn" class="iconBtn">🛟</button>
-      <button id="settingsBtn" class="iconBtn">⚙️</button>
-    </div>
-  </header>
-
-  <div id="categories">
-    <div class="cat" data-cat="favorite">Favoriten</div>
-    <div class="cat" data-cat="alle">Alle</div>
-    <div class="cat" data-cat="arbeit">Arbeit</div>
-    <div class="cat" data-cat="einkauf">Einkauf</div>
-    <div class="cat" data-cat="zuhause">Zuhause</div>
-    <div class="cat" data-cat="ideen">Ideen</div>
-    <div class="cat" data-cat="personlich">Persönlich</div>
-  </div>
-
-  <div id="notesList"></div>
-
-  <button id="addNoteBtn">+</button>
-
-</div>
-
-<!-- EDITOR -->
-<div id="noteEditor">
-  <div id="noteEditorBox">
-
-    <button id="deleteNoteBtn">🗑</button>
-
-    <h2 id="editorTitle">Neue Notiz</h2>
-
-    <textarea id="noteText"></textarea>
-
-    <div id="editorButtons">
-      <button id="cancelBtn">Abbrechen</button>
-      <button id="saveBtn">Speichern</button>
-    </div>
-
-  </div>
-</div>
-
-<!-- POPUP + SETTINGS -->
-<div id="archivePopup">
-  <div class="popupBox">
-    <h2>Archivio</h2>
-    <div id="archiveList"></div>
-    <button id="archiveCloseBtn" class="popupBtn">Chiudi</button>
-  </div>
-</div>
-
-<div id="infoPopup">
-  <div class="popupBox">
-    <h2>Info App</h2>
-    <p>Versione: 2.0</p>
-    <p>Autore: Sandro</p>
-    <button id="infoCloseBtn" class="popupBtn">Chiudi</button>
-  </div>
-</div>
-
-<div id="resetPopup">
-  <div class="popupBox">
-    <h2>Reset App</h2>
-    <p>Questa azione cancellerà tutte le note e le impostazioni.</p>
-    <button id="resetConfirmBtn" class="popupBtn">Conferma</button>
-    <button id="resetCancelBtn" class="popupBtn">Annulla</button>
-  </div>
-</div>
-
-<div id="settingsPanel">
-  <div id="settingsSheet">
-
-    <div class="settingsTitle">Impostazioni</div>
-
-    <div class="settingsSection">Aspetto</div>
-    <button class="settingsItem" id="settingsTheme">Tema (Chiaro/Scuro)</button>
-    <button class="settingsItem" id="settingsAmoled">Tema AMOLED</button>
-
-    <div class="settingsSection">Sistema</div>
-    <button class="settingsItem" id="settingsResetApp">Reset App</button>
-    <button class="settingsItem" id="settingsInfo">Info App</button>
-
-    <button class="settingsClose">Chiudi</button>
-
-  </div>
-</div>
-
 <script>
-const STORAGE_NOTES_KEY = "notes_v1";
-const STORAGE_THEME_KEY = "theme_v1";
-const STORAGE_AMOLED_KEY = "amoled_v1";
+/* ============================================================
+   BLOCCO 3.1 — PIN + TRADUZIONI + TEMA
+   ============================================================ */
 
-const notesList = document.getElementById("notesList");
-const addNoteBtn = document.getElementById("addNoteBtn");
-const noteEditor = document.getElementById("noteEditor");
-const editorTitle = document.getElementById("editorTitle");
-const noteText = document.getElementById("noteText");
-const deleteNoteBtn = document.getElementById("deleteNoteBtn");
-const cancelBtn = document.getElementById("cancelBtn");
-const saveBtn = document.getElementById("saveBtn");
+/* ------------------------------------------------------------
+   PIN SYSTEM — PIN iniziale 4618 + PIN personalizzabile
+   ------------------------------------------------------------ */
+let savedPIN = localStorage.getItem("appPIN") || "4618";
+let enteredPIN = "";
 
-const themeBtn = document.getElementById("themeBtn");
-const settingsBtn = document.getElementById("settingsBtn");
-const settingsPanel = document.getElementById("settingsPanel");
-const settingsSheet = document.getElementById("settingsSheet");
-const settingsClose = document.querySelector(".settingsClose");
-const settingsTheme = document.getElementById("settingsTheme");
-const settingsAmoled = document.getElementById("settingsAmoled");
-const settingsResetApp = document.getElementById("settingsResetApp");
-const settingsInfo = document.getElementById("settingsInfo");
+const pinOverlay = document.getElementById("pinOverlay");
+const pinCircles = document.querySelectorAll(".pinCircle");
+const pinError = document.getElementById("pinError");
 
-const archivePopup = document.getElementById("archivePopup");
-const archiveCloseBtn = document.getElementById("archiveCloseBtn");
-const infoPopup = document.getElementById("infoPopup");
-const infoCloseBtn = document.getElementById("infoCloseBtn");
-const resetPopup = document.getElementById("resetPopup");
-const resetConfirmBtn = document.getElementById("resetConfirmBtn");
-const resetCancelBtn = document.getElementById("resetCancelBtn");
-const bannerMsg = document.getElementById("bannerMsg");
-
-let notes = [];
-let editingIndex = null;
-
-/* NOTE */
-function loadNotes() {
-  try {
-    const raw = localStorage.getItem(STORAGE_NOTES_KEY);
-    notes = raw ? JSON.parse(raw) : [];
-  } catch {
-    notes = [];
-  }
-}
-
-function saveNotes() {
-  localStorage.setItem(STORAGE_NOTES_KEY, JSON.stringify(notes));
-}
-
-function renderNotes() {
-  notesList.innerHTML = "";
-  notes.forEach((n, i) => {
-    const div = document.createElement("div");
-    div.className = "noteItem";
-    div.textContent = n.text || "";
-    div.addEventListener("click", () => openEditor(i));
-    notesList.appendChild(div);
+function updatePinCircles() {
+  pinCircles.forEach((c, i) => {
+    c.classList.toggle("filled", i < enteredPIN.length);
   });
 }
 
-function openEditor(index = null) {
-  editingIndex = index;
-  if (index === null) {
-    editorTitle.textContent = "Neue Notiz";
-    noteText.value = "";
+function checkPIN() {
+  if (enteredPIN === savedPIN) {
+    pinOverlay.style.display = "none";
+    enteredPIN = "";
+    updatePinCircles();
   } else {
-    editorTitle.textContent = "Notiz bearbeiten";
-    noteText.value = notes[index].text;
+    pinError.textContent = "Falscher PIN";
+    pinError.style.opacity = 1;
+    setTimeout(() => {
+      pinError.style.opacity = 0;
+      enteredPIN = "";
+      updatePinCircles();
+    }, 900);
   }
-  noteEditor.style.display = "flex";
 }
 
-function closeEditor() {
-  noteEditor.style.display = "none";
-  editingIndex = null;
+document.querySelectorAll(".pinKey").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const digit = btn.dataset.digit;
+
+    if (digit) {
+      if (enteredPIN.length < 4) {
+        enteredPIN += digit;
+        updatePinCircles();
+        if (enteredPIN.length === 4) checkPIN();
+      }
+    }
+  });
+});
+
+document.getElementById("pinBackspace").addEventListener("click", () => {
+  enteredPIN = enteredPIN.slice(0, -1);
+  updatePinCircles();
+});
+
+/* Cambia PIN */
+function changePIN(newPIN) {
+  savedPIN = newPIN;
+  localStorage.setItem("appPIN", newPIN);
 }
 
-addNoteBtn.addEventListener("click", () => openEditor(null));
-cancelBtn.addEventListener("click", closeEditor);
+/* ------------------------------------------------------------
+   TRADUZIONI MULTILINGUE (DE / IT / EN)
+   ------------------------------------------------------------ */
+const translations = {
+  de: {
+    title: "Notizen",
+    premium: "Premium",
+    newNote: "Neue Notiz",
+    save: "Speichern",
+    cancel: "Abbrechen",
+    delete: "Löschen",
+    archive: "Archiv",
+    info: "Info",
+    reset: "App zurücksetzen",
+    theme: "Thema",
+    amoled: "AMOLED",
+    font: "Schriftart",
+    textSize: "Textgröße",
+    accent: "Akzentfarbe",
+    blur: "Hintergrund-Blur",
+    animations: "Animationen",
+    haptics: "Haptik",
+    export: "Exportieren",
+    import: "Importieren",
+    changePin: "PIN ändern"
+  },
 
-saveBtn.addEventListener("click", () => {
-  const text = noteText.value.trim();
-  if (!text) {
-    closeEditor();
-    return;
+  it: {
+    title: "Note",
+    premium: "Premium",
+    newNote: "Nuova nota",
+    save: "Salva",
+    cancel: "Annulla",
+    delete: "Elimina",
+    archive: "Archivio",
+    info: "Info",
+    reset: "Reset app",
+    theme: "Tema",
+    amoled: "AMOLED",
+    font: "Font",
+    textSize: "Dimensione testo",
+    accent: "Colore accento",
+    blur: "Sfocatura sfondo",
+    animations: "Animazioni",
+    haptics: "Feedback aptico",
+    export: "Esporta",
+    import: "Importa",
+    changePin: "Cambia PIN"
+  },
+
+  en: {
+    title: "Notes",
+    premium: "Premium",
+    newNote: "New Note",
+    save: "Save",
+    cancel: "Cancel",
+    delete: "Delete",
+    archive: "Archive",
+    info: "Info",
+    reset: "Reset App",
+    theme: "Theme",
+    amoled: "AMOLED",
+    font: "Font",
+    textSize: "Text Size",
+    accent: "Accent Color",
+    blur: "Background Blur",
+    animations: "Animations",
+    haptics: "Haptics",
+    export: "Export",
+    import: "Import",
+    changePin: "Change PIN"
   }
-  if (editingIndex === null) {
-    notes.unshift({ text });
-  } else {
-    notes[editingIndex].text = text;
-  }
-  saveNotes();
-  renderNotes();
-  closeEditor();
+};
+
+let currentLang = localStorage.getItem("appLang") || "de";
+
+function applyTranslations() {
+  const t = translations[currentLang];
+
+  document.getElementById("appTitle").childNodes[0].textContent = t.title;
+  document.querySelector("#appTitle .sub").textContent = t.premium;
+
+  document.getElementById("editorTitle").textContent = t.newNote;
+  document.getElementById("saveBtn").textContent = t.save;
+  document.getElementById("cancelBtn").textContent = t.cancel;
+  document.getElementById("deleteNoteBtn").textContent = "🗑 " + t.delete;
+
+  document.getElementById("settingsTheme").textContent = t.theme;
+  document.getElementById("settingsAmoled").textContent = t.amoled;
+  document.getElementById("settingsFont").textContent = t.font;
+  document.getElementById("settingsTextSize").textContent = t.textSize;
+  document.getElementById("settingsAccent").textContent = t.accent;
+  document.getElementById("settingsBlur").textContent = t.blur;
+  document.getElementById("settingsAnimations").textContent = t.animations;
+  document.getElementById("settingsHaptics").textContent = t.haptics;
+  document.getElementById("settingsExport").textContent = t.export;
+  document.getElementById("settingsImport").textContent = t.import;
+  document.getElementById("settingsChangePin").textContent = t.changePin;
+  document.getElementById("settingsArchive").textContent = t.archive;
+  document.getElementById("settingsInfo").textContent = t.info;
+  document.getElementById("settingsResetApp").textContent = t.reset;
+}
+
+document.getElementById("langBtn").addEventListener("click", () => {
+  currentLang = currentLang === "de" ? "it" : currentLang === "it" ? "en" : "de";
+  localStorage.setItem("appLang", currentLang);
+  applyTranslations();
 });
 
-deleteNoteBtn.addEventListener("click", () => {
-  if (editingIndex === null) {
-    closeEditor();
-    return;
-  }
-  notes.splice(editingIndex, 1);
-  saveNotes();
-  renderNotes();
-  closeEditor();
-});
+/* ------------------------------------------------------------
+   TEMA (CHIARO / SCURO) + AMOLED
+   ------------------------------------------------------------ */
+let theme = localStorage.getItem("theme") || "light";
+let amoled = localStorage.getItem("amoled") === "true";
 
-/* THEME */
 function applyTheme() {
-  const theme = localStorage.getItem(STORAGE_THEME_KEY) || "light";
-  const amoled = localStorage.getItem(STORAGE_AMOLED_KEY) === "1";
-  document.body.classList.toggle("dark", theme === "dark");
-  document.body.classList.toggle("amoled", amoled);
+  document.body.classList.remove("dark", "amoled");
+
+  if (amoled) {
+    document.body.classList.add("amoled");
+  } else if (theme === "dark") {
+    document.body.classList.add("dark");
+  }
 }
 
-themeBtn.addEventListener("click", () => {
-  const current = localStorage.getItem(STORAGE_THEME_KEY) || "light";
-  const next = current === "light" ? "dark" : "light";
-  localStorage.setItem(STORAGE_THEME_KEY, next);
+document.getElementById("themeBtn").addEventListener("click", () => {
+  theme = theme === "light" ? "dark" : "light";
+  localStorage.setItem("theme", theme);
   applyTheme();
 });
 
-/* SETTINGS PANEL */
-settingsBtn.addEventListener("click", () => {
-  settingsPanel.style.display = "flex";
-  setTimeout(() => settingsPanel.classList.add("show"), 10);
-});
-
-settingsClose.addEventListener("click", () => {
-  settingsPanel.classList.remove("show");
-  setTimeout(() => settingsPanel.style.display = "none", 300);
-});
-
-/* SETTINGS ACTIONS */
-settingsTheme.addEventListener("click", () => {
-  const current = localStorage.getItem(STORAGE_THEME_KEY) || "light";
-  const next = current === "light" ? "dark" : "light";
-  localStorage.setItem(STORAGE_THEME_KEY, next);
+document.getElementById("settingsAmoled").addEventListener("click", () => {
+  amoled = !amoled;
+  localStorage.setItem("amoled", amoled);
   applyTheme();
-  showBanner("Tema cambiato");
 });
 
-settingsAmoled.addEventListener("click", () => {
-  const current = localStorage.getItem(STORAGE_AMOLED_KEY) === "1";
-  localStorage.setItem(STORAGE_AMOLED_KEY, current ? "0" : "1");
-  applyTheme();
-  showBanner("AMOLED toggled");
-});
-
-settingsResetApp.addEventListener("click", () => {
-  resetPopup.style.display = "flex";
-});
-
-settingsInfo.addEventListener("click", () => {
-  infoPopup.style.display = "flex";
-});
-
-infoCloseBtn.addEventListener("click", () => {
-  infoPopup.style.display = "none";
-});
-
-resetCancelBtn.addEventListener("click", () => {
-  resetPopup.style.display = "none";
-});
-
-resetConfirmBtn.addEventListener("click", () => {
-  localStorage.clear();
-  location.reload();
-});
-
-/* BANNER */
-function showBanner(msg) {
-  bannerMsg.textContent = msg;
-  bannerMsg.classList.add("show");
-  setTimeout(() => bannerMsg.classList.remove("show"), 1500);
-}
-
-/* INIT */
-function init() {
-  applyTheme();
-  loadNotes();
-  renderNotes();
-}
-
-init();
+/* Avvio iniziale */
+applyTranslations();
+applyTheme();
 </script>
-</body>
-</html>
+<script>
+/* ============================================================
+   BLOCCO 3.2 — NOTE + EDITOR + PALETTE + ARCHIVIO
+   ============================================================ */
+
+let notes = JSON.parse(localStorage.getItem("notes") || "[]");
+let archive = JSON.parse(localStorage.getItem("archive") || "[]");
+
+let editingNoteId = null;
+let selectedColor = "#007aff";
+
+/* ------------------------------------------------------------
+   PALETTE COLORI
+   ------------------------------------------------------------ */
+const palettes = {
+  warm: ["#ff6b6b", "#ff9f43", "#ffa502", "#ff4757", "#eccc68"],
+  cool: ["#1e90ff", "#3742fa", "#2ed573", "#70a1ff", "#5352ed"],
+  pastel: ["#ffcccc", "#ffd3b6", "#dcedc1", "#a8e6cf", "#d4a5a5"],
+  mix: ["#ff6b6b", "#1e90ff", "#2ed573", "#ffa502", "#a55eea"]
+};
+
+function loadPalette(pal) {
+  const row = document.getElementById("colorRow");
+  row.innerHTML = "";
+
+  palettes[pal].forEach(color => {
+    const dot = document.createElement("div");
+    dot.className = "colorDot";
+    dot.style.background = color;
+
+    dot.addEventListener("click", () => {
+      selectedColor = color;
+      document.querySelectorAll(".colorDot").forEach(d => d.classList.remove("selected"));
+      dot.classList.add("selected");
+    });
+
+    row.appendChild(dot);
+  });
+}
+
+document.querySelectorAll(".paletteBtn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    loadPalette(btn.dataset.pal);
+  });
+});
+
+/* ------------------------------------------------------------
+   RENDER NOTE
+   ------------------------------------------------------------ */
+function renderNotes() {
+  const list = document.getElementById("notesList");
+  list.innerHTML = "";
+
+  const activeCat = document.querySelector(".cat.active").dataset.cat;
+
+  notes.forEach(note => {
+    if (activeCat !== "all" && note.category !== activeCat) return;
+
+    const item = document.createElement("div");
+    item.className = "noteItem";
+    item.style.borderLeftColor = note.color;
+
+    item.innerHTML = `
+      <div class="noteTitleRow">
+        <div class="noteTitle">${note.title || "Ohne Titel"}</div>
+        <div class="noteMeta">${note.date}</div>
+      </div>
+      <div class="noteTextPreview">${note.text.slice(0, 120)}</div>
+    `;
+
+    item.addEventListener("click", () => openEditor(note.id));
+
+    list.appendChild(item);
+  });
+}
+
+/* ------------------------------------------------------------
+   CATEGORIE
+   ------------------------------------------------------------ */
+document.querySelectorAll(".cat").forEach(cat => {
+  cat.addEventListener("click", () => {
+    document.querySelectorAll(".cat").forEach(c => c.classList.remove("active"));
+    cat.classList.add("active");
+    renderNotes();
+  });
+});
+
+/* ------------------------------------------------------------
+   APRI EDITOR
+   ------------------------------------------------------------ */
+function openEditor(id = null) {
+  editingNoteId = id;
+
+  if (id) {
+    const note = notes.find(n => n.id === id);
+    document.getElementById("noteTitleInput").value = note.title;
+    document.getElementById("noteText").value = note.text;
+    selectedColor = note.color;
+  } else {
+    document.getElementById("noteTitleInput").value = "";
+    document.getElementById("noteText").value = "";
+    selectedColor = "#007aff";
+  }
+
+  loadPalette("mix");
+  document.getElementById("noteEditor").style.display = "flex";
+}
+
+/* ------------------------------------------------------------
+   SALVA NOTA
+   ------------------------------------------------------------ */
+document.getElementById("saveBtn").addEventListener("click", () => {
+  const title = document.getElementById("noteTitleInput").value.trim();
+  const text = document.getElementById("noteText").value.trim();
+
+  if (!text) {
+    showBanner("Notiz ist leer");
+    return;
+  }
+
+  if (editingNoteId) {
+    const note = notes.find(n => n.id === editingNoteId);
+    note.title = title;
+    note.text = text;
+    note.color = selectedColor;
+    note.date = new Date().toLocaleDateString();
+  } else {
+    notes.push({
+      id: Date.now(),
+      title,
+      text,
+      color: selectedColor,
+      category: document.querySelector(".cat.active").dataset.cat,
+      date: new Date().toLocaleDateString()
+    });
+  }
+
+  localStorage.setItem("notes", JSON.stringify(notes));
+  document.getElementById("noteEditor").style.display = "none";
+  renderNotes();
+});
+
+/* ------------------------------------------------------------
+   CANCELLA NOTA
+   ------------------------------------------------------------ */
+document.getElementById("deleteNoteBtn").addEventListener("click", () => {
+  if (!editingNoteId) return;
+
+  const note = notes.find(n => n.id === editingNoteId);
+  archive.push(note);
+
+  notes = notes.filter(n => n.id !== editingNoteId);
+
+  localStorage.setItem("notes", JSON.stringify(notes));
+  localStorage.setItem("archive", JSON.stringify(archive));
+
+  document.getElementById("noteEditor").style.display = "none";
+  renderNotes();
+});
+
+/* ------------------------------------------------------------
+   CHIUDI EDITOR
+   ------------------------------------------------------------ */
+document.getElementById("cancelBtn").addEventListener("click", () => {
+  document.getElementById("noteEditor").style.display = "none";
+});
+
+/* ------------------------------------------------------------
+   ARCHIVIO
+   ------------------------------------------------------------ */
+document.getElementById("settingsArchive").addEventListener("click", () => {
+  const list = document.getElementById("archiveList");
+  list.innerHTML = "";
+
+  archive.forEach(n => {
+    const div = document.createElement("div");
+    div.style.marginBottom = "10px";
+    div.innerHTML = `<b>${n.title || "Ohne Titel"}</b><br>${n.text.slice(0, 100)}...`;
+    list.appendChild(div);
+  });
+
+  document.getElementById("archivePopup").style.display = "flex";
+});
+
+document.getElementById("archiveCloseBtn").addEventListener("click", () => {
+  document.getElementById("archivePopup").style.display = "none";
+});
+
+/* ------------------------------------------------------------
+   ADD NOTE BUTTON
+   ------------------------------------------------------------ */
+document.getElementById("addNoteBtn").addEventListener("click", () => {
+  openEditor(null);
+});
+
+/* ------------------------------------------------------------
+   BANNER
+   ------------------------------------------------------------ */
+function showBanner(msg) {
+  const b = document.getElementById("bannerMsg");
+  b.textContent = msg;
+  b.classList.add("show");
+  setTimeout(() => b.classList.remove("show"), 1500);
+}
+
+/* ------------------------------------------------------------
+   AVVIO
+   ------------------------------------------------------------ */
+renderNotes();
+</script>
+<script>
+/* ============================================================
+   BLOCCO 3.3.1 — BACKUP + EXPORT
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   BACKUP AUTOMATICO
+   ------------------------------------------------------------ */
+function autoBackup() {
+  const data = {
+    notes,
+    archive,
+    pin: savedPIN,
+    lang: currentLang,
+    theme,
+    amoled
+  };
+  localStorage.setItem("autoBackup", JSON.stringify(data));
+}
+
+setInterval(autoBackup, 5000); // backup ogni 5 secondi
+
+/* ------------------------------------------------------------
+   EXPORT — Scarica file JSON
+   ------------------------------------------------------------ */
+document.getElementById("settingsExport").addEventListener("click", () => {
+  const data = {
+    notes,
+    archive,
+    pin: savedPIN,
+    lang: currentLang,
+    theme,
+    amoled
+  };
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json"
+  });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "notizen_backup.json";
+  a.click();
+  URL.revokeObjectURL(url);
+
+  showBanner("Export erfolgreich");
+});
+</script>
+<script>
+/* ============================================================
+   BLOCCO 3.3.2 — IMPORT + RESET APP
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   IMPORT — Carica file JSON
+   ------------------------------------------------------------ */
+document.getElementById("settingsImport").addEventListener("click", () => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "application/json";
+
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = event => {
+      try {
+        const data = JSON.parse(event.target.result);
+
+        if (data.notes) notes = data.notes;
+        if (data.archive) archive = data.archive;
+        if (data.pin) {
+          savedPIN = data.pin;
+          localStorage.setItem("appPIN", savedPIN);
+        }
+        if (data.lang) {
+          currentLang = data.lang;
+          localStorage.setItem("appLang", currentLang);
+        }
+        if (data.theme) {
+          theme = data.theme;
+          localStorage.setItem("theme", theme);
+        }
+        if (typeof data.amoled !== "undefined") {
+          amoled = data.amoled;
+          localStorage.setItem("amoled", amoled);
+        }
+
+        localStorage.setItem("notes", JSON.stringify(notes));
+        localStorage.setItem("archive", JSON.stringify(archive));
+
+        applyTranslations();
+        applyTheme();
+        renderNotes();
+
+        showBanner("Import erfolgreich");
+      } catch (err) {
+        showBanner("Fehler beim Import");
+      }
+    };
+
+    reader.readAsText(file);
+  };
+
+  input.click();
+});
+
+/* ------------------------------------------------------------
+   RESET APP — Cancella tutto
+   ------------------------------------------------------------ */
+document.getElementById("settingsResetApp").addEventListener("click", () => {
+  document.getElementById("resetPopup").style.display = "flex";
+});
+
+document.getElementById("resetCancelBtn").addEventListener("click", () => {
+  document.getElementById("resetPopup").style.display = "none";
+});
+
+document.getElementById("resetConfirmBtn").addEventListener("click", () => {
+  localStorage.clear();
+
+  notes = [];
+  archive = [];
+  savedPIN = "4618";
+  currentLang = "de";
+  theme = "light";
+  amoled = false;
+
+  localStorage.setItem("appPIN", "4618");
+  localStorage.setItem("appLang", "de");
+  localStorage.setItem("theme", "light");
+  localStorage.setItem("amoled", "false");
+
+  applyTranslations();
+  applyTheme();
+  renderNotes();
+
+  document.getElementById("resetPopup").style.display = "none";
+  showBanner("App zurückgesetzt");
+});
+</script>
+<script>
+/* ============================================================
+   BLOCCO 3.3.3 — IMPOSTAZIONI AVANZATE
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   FONT SELECTOR
+   ------------------------------------------------------------ */
+let currentFont = localStorage.getItem("font") || "-apple-system";
+
+function applyFont() {
+  document.body.style.fontFamily = currentFont;
+}
+
+document.getElementById("settingsFont").addEventListener("click", () => {
+  const fonts = [
+    "-apple-system",
+    "Helvetica Neue",
+    "Arial",
+    "Georgia",
+    "Courier New"
+  ];
+
+  const next = (fonts.indexOf(currentFont) + 1) % fonts.length;
+  currentFont = fonts[next];
+
+  localStorage.setItem("font", currentFont);
+  applyFont();
+  showBanner("Font geändert");
+});
+
+/* ------------------------------------------------------------
+   TEXT SIZE
+   ------------------------------------------------------------ */
+let textSize = parseInt(localStorage.getItem("textSize") || "16");
+
+function applyTextSize() {
+  document.documentElement.style.setProperty("--text-size", textSize + "px");
+}
+
+document.getElementById("settingsTextSize").addEventListener("click", () => {
+  textSize += 1;
+  if (textSize > 22) textSize = 14;
+
+  localStorage.setItem("textSize", textSize);
+  applyTextSize();
+  showBanner("Textgröße: " + textSize);
+});
+
+/* ------------------------------------------------------------
+   ACCENT COLOR
+   ------------------------------------------------------------ */
+let accentColors = ["#007aff", "#ff3b30", "#ff9500", "#34c759", "#5856d6"];
+let accentIndex = 0;
+
+function applyAccent() {
+  document.documentElement.style.setProperty("--accent", accentColors[accentIndex]);
+  document.documentElement.style.setProperty("--accent-light", accentColors[accentIndex] + "55");
+  document.documentElement.style.setProperty("--accent-glow", accentColors[accentIndex] + "55");
+}
+
+document.getElementById("settingsAccent").addEventListener("click", () => {
+  accentIndex = (accentIndex + 1) % accentColors.length;
+  localStorage.setItem("accentIndex", accentIndex);
+  applyAccent();
+  showBanner("Akzentfarbe geändert");
+});
+
+/* Carica accento salvato */
+if (localStorage.getItem("accentIndex")) {
+  accentIndex = parseInt(localStorage.getItem("accentIndex"));
+  applyAccent();
+}
+
+/* ------------------------------------------------------------
+   BACKGROUND BLUR
+   ------------------------------------------------------------ */
+let blurAmount = parseInt(localStorage.getItem("blur") || "18");
+
+function applyBlur() {
+  document.documentElement.style.setProperty("--blur-amount", blurAmount + "px");
+}
+
+document.getElementById("settingsBlur").addEventListener("click", () => {
+  blurAmount += 2;
+  if (blurAmount > 30) blurAmount = 6;
+
+  localStorage.setItem("blur", blurAmount);
+  applyBlur();
+  showBanner("Blur: " + blurAmount);
+});
+
+/* ------------------------------------------------------------
+   ANIMAZIONI ON/OFF
+   ------------------------------------------------------------ */
+let animationsEnabled = localStorage.getItem("animations") !== "false";
+
+function applyAnimations() {
+  document.body.style.setProperty("--anim", animationsEnabled ? "1" : "0");
+}
+
+document.getElementById("settingsAnimations").addEventListener("click", () => {
+  animationsEnabled = !animationsEnabled;
+  localStorage.setItem("animations", animationsEnabled);
+  applyAnimations();
+  showBanner(animationsEnabled ? "Animationen an" : "Animationen aus");
+});
+
+/* ------------------------------------------------------------
+   HAPTIC FEEDBACK
+   ------------------------------------------------------------ */
+let hapticsEnabled = localStorage.getItem("haptics") !== "false";
+
+function vibrate(ms = 30) {
+  if (hapticsEnabled && navigator.vibrate) {
+    navigator.vibrate(ms);
+  }
+}
+
+document.getElementById("settingsHaptics").addEventListener("click", () => {
+  hapticsEnabled = !hapticsEnabled;
+  localStorage.setItem("haptics", hapticsEnabled);
+  showBanner(hapticsEnabled ? "Haptik an" : "Haptik aus");
+});
+
+/* ------------------------------------------------------------
+   CHIUSURA SETTINGS PANEL
+   ------------------------------------------------------------ */
+document.querySelector(".settingsClose").addEventListener("click", () => {
+  document.getElementById("settingsPanel").style.display = "none";
+});
+
+/* ------------------------------------------------------------
+   APERTURA SETTINGS PANEL
+   ------------------------------------------------------------ */
+document.getElementById("settingsBtn").addEventListener("click", () => {
+  document.getElementById("settingsPanel").style.display = "flex";
+});
+
+/* ------------------------------------------------------------
+   AVVIO
+   ------------------------------------------------------------ */
+applyFont();
+applyTextSize();
+applyAccent();
+applyBlur();
+applyAnimations();
+</script>
