@@ -307,7 +307,7 @@
     #manualRestoreBtn { background: #34c759; color: white; }
     #backupCloseBtn { background: #ccc; color: black; }
 
-    /* PIN OVERLAY (nuova funzionalità, non tocca il layout originale) */
+    /* PIN OVERLAY */
     #pinOverlay {
       position: fixed;
       inset: 0;
@@ -384,6 +384,66 @@
       opacity: 0;
       transition: opacity 0.2s ease;
     }
+
+    /* SETTINGS PANEL (NUOVO) */
+    #settingsPanel {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 2600;
+    }
+
+    #settingsSheet {
+      width: 100%;
+      max-width: 760px;
+      background: var(--card);
+      border-radius: 22px 22px 0 0;
+      padding: 20px;
+      box-shadow: 0 -6px 20px rgba(0,0,0,0.25);
+      transform: translateY(100%);
+      transition: transform 0.35s ease;
+    }
+
+    #settingsPanel.show #settingsSheet {
+      transform: translateY(0);
+    }
+
+    .settingsTitle {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .settingsItem {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 10px;
+      border-radius: 14px;
+      border: 1px solid #ccc;
+      background: var(--card);
+      color: var(--text);
+      font-size: 16px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .settingsClose {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      background: #ccc;
+      color: #000;
+      font-size: 16px;
+      border: none;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
   </style>
 </head>
 <body>
@@ -433,6 +493,7 @@
         <button id="themeBtn" class="iconBtn">🌙</button>
         <button id="langBtn" class="iconBtn">🌐</button>
         <button id="backupBtn" class="iconBtn">🛟</button>
+        <button id="settingsBtn" class="iconBtn">⚙️</button>
       </div>
     </header>
 
@@ -506,6 +567,23 @@
         <button id="manualRestoreBtn" class="backupAction"><span>Wiederherstellung manuell</span></button>
         <button id="backupCloseBtn" class="backupAction"><span>Schliessen</span></button>
       </div>
+
+    </div>
+  </div>
+
+  <!-- IMPOSTAZIONI (pannello iOS) -->
+  <div id="settingsPanel">
+    <div id="settingsSheet">
+
+      <div class="settingsTitle">Impostazioni</div>
+
+      <button class="settingsItem" id="settingsLang">🌐 Lingua</button>
+      <button class="settingsItem" id="settingsTheme">🌙 Tema</button>
+      <button class="settingsItem" id="settingsBackup">🛟 Backup</button>
+      <button class="settingsItem" id="settingsChangePin">🔐 Cambia PIN</button>
+      <button class="settingsItem" id="settingsResetPin">♻️ Ripristina PIN</button>
+
+      <button class="settingsClose">Chiudi</button>
 
     </div>
   </div>
@@ -881,6 +959,60 @@
     };
   });
 
+  /* IMPOSTAZIONI - apertura/chiusura */
+  const settingsPanel = document.getElementById("settingsPanel");
+
+  document.getElementById("settingsBtn").onclick = () => {
+    settingsPanel.style.display = "flex";
+    setTimeout(() => settingsPanel.classList.add("show"), 10);
+  };
+
+  document.querySelector(".settingsClose").onclick = () => {
+    settingsPanel.classList.remove("show");
+    setTimeout(() => settingsPanel.style.display = "none", 300);
+  };
+
+  settingsPanel.onclick = (e) => {
+    if (e.target.id === "settingsPanel") {
+      settingsPanel.classList.remove("show");
+      setTimeout(() => settingsPanel.style.display = "none", 300);
+    }
+  };
+
+  /* IMPOSTAZIONI - collegamento funzioni */
+  document.getElementById("settingsLang").onclick = () => {
+    settingsPanel.classList.remove("show");
+    setTimeout(() => settingsPanel.style.display = "none", 300);
+    document.getElementById("langPopup").style.display = "flex";
+  };
+
+  document.getElementById("settingsTheme").onclick = () => {
+    toggleTheme();
+  };
+
+  document.getElementById("settingsBackup").onclick = () => {
+    settingsPanel.classList.remove("show");
+    setTimeout(() => settingsPanel.style.display = "none", 300);
+    document.getElementById("backupPopup").style.display = "flex";
+  };
+
+  /* CAMBIA PIN */
+  document.getElementById("settingsChangePin").onclick = () => {
+    const nuovo = prompt("Inserisci il nuovo PIN (4 cifre):");
+    if (!nuovo || nuovo.length !== 4 || isNaN(nuovo)) {
+      alert("PIN non valido");
+      return;
+    }
+    localStorage.setItem("pinCode", nuovo);
+    alert("PIN aggiornato");
+  };
+
+  /* RIPRISTINA PIN */
+  document.getElementById("settingsResetPin").onclick = () => {
+    localStorage.setItem("pinCode", "4618");
+    alert("PIN ripristinato a 4618");
+  };
+
   /* PIN SYSTEM */
   let pinCode = null;
   let enteredPin = "";
@@ -888,7 +1020,7 @@
   function initPin() {
     let savedPin = localStorage.getItem("pinCode");
     if (!savedPin) {
-      savedPin = "4618"; 
+      savedPin = "4618";
       localStorage.setItem("pinCode", savedPin);
     }
     pinCode = savedPin;
