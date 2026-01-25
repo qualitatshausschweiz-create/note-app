@@ -6,9 +6,6 @@
 <title>Notizen Premium</title>
 
 <style>
-/* ============================================================
-   VARIABILI GLOBALI — TEMA MODERNO M2 (BLU PREMIUM)
-   ============================================================ */
 :root {
   --accent: #007aff;
   --accent-light: #4da3ff;
@@ -18,9 +15,6 @@
   --blur-amount: 18px;
 }
 
-/* ============================================================
-   RESET + BASE
-   ============================================================ */
 body {
   margin: 0;
   font-family: var(--app-font);
@@ -40,9 +34,7 @@ body.amoled {
   color: #fff;
 }
 
-/* ============================================================
-   PIN OVERLAY — MODERNO, BLU, ANIMATO
-   ============================================================ */
+/* PIN OVERLAY */
 #pinOverlay {
   position: fixed;
   inset: 0;
@@ -52,7 +44,6 @@ body.amoled {
   justify-content: center;
   align-items: center;
   z-index: 99999;
-  animation: fadeIn 0.4s ease;
 }
 
 #pinBox {
@@ -63,7 +54,6 @@ body.amoled {
   width: 280px;
   text-align: center;
   box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-  animation: scaleIn 0.35s ease;
 }
 
 #pinTitle {
@@ -125,20 +115,7 @@ body.amoled {
   transition: opacity 0.3s;
 }
 
-/* Animazioni PIN */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes scaleIn {
-  from { transform: scale(0.85); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-/* ============================================================
-   HEADER
-   ============================================================ */
+/* HEADER */
 header {
   display: flex;
   justify-content: space-between;
@@ -152,16 +129,9 @@ header {
   border: none;
   font-size: 24px;
   margin-left: 10px;
-  transition: 0.2s;
 }
 
-.iconBtn:active {
-  transform: scale(0.85);
-}
-
-/* ============================================================
-   CATEGORIE — MODERNE, COLORATE
-   ============================================================ */
+/* CATEGORIE */
 #categories {
   display: flex;
   overflow-x: auto;
@@ -175,18 +145,9 @@ header {
   border-radius: 14px;
   white-space: nowrap;
   font-size: 15px;
-  transition: 0.2s;
 }
 
-.cat:active {
-  background: var(--accent);
-  color: #fff;
-  box-shadow: 0 0 12px var(--accent-glow);
-}
-
-/* ============================================================
-   NOTE LIST
-   ============================================================ */
+/* NOTE LIST */
 #notesList {
   padding: 15px;
 }
@@ -198,16 +159,9 @@ header {
   border-radius: 14px;
   border-left: 5px solid var(--accent);
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  transition: 0.2s;
 }
 
-.noteItem:active {
-  transform: scale(0.98);
-}
-
-/* ============================================================
-   ADD NOTE BUTTON — BLU PREMIUM
-   ============================================================ */
+/* ADD BUTTON */
 #addNoteBtn {
   position: fixed;
   bottom: 25px;
@@ -220,16 +174,9 @@ header {
   color: #fff;
   font-size: 36px;
   box-shadow: 0 6px 20px var(--accent-glow);
-  transition: 0.2s;
 }
 
-#addNoteBtn:active {
-  transform: scale(0.9);
-}
-
-/* ============================================================
-   EDITOR
-   ============================================================ */
+/* EDITOR */
 #noteEditor {
   position: fixed;
   inset: 0;
@@ -247,7 +194,6 @@ header {
   padding: 22px;
   border-radius: 20px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-  animation: scaleIn 0.3s ease;
 }
 
 #noteText {
@@ -266,13 +212,7 @@ header {
   margin-top: 18px;
 }
 
-#paletteSelector {
-  margin-top: 12px;
-}
-
-/* ============================================================
-   POPUP GENERICI
-   ============================================================ */
+/* POPUP GENERICI */
 .popupBox {
   background: #fff;
   padding: 22px;
@@ -294,9 +234,7 @@ header {
   backdrop-filter: blur(10px);
 }
 
-/* ============================================================
-   SETTINGS PANEL — PREMIUM
-   ============================================================ */
+/* SETTINGS PANEL */
 #settingsPanel {
   position: fixed;
   inset: 0;
@@ -342,9 +280,7 @@ header {
   border: none;
 }
 
-/* ============================================================
-   BANNER
-   ============================================================ */
+/* BANNER */
 #bannerMsg {
   position: fixed;
   top: 15px;
@@ -366,9 +302,7 @@ header {
 
 <body>
 
-<!-- ============================================================
-     PIN OVERLAY
-     ============================================================ -->
+<!-- PIN OVERLAY -->
 <div id="pinOverlay">
   <div id="pinBox">
     <div id="pinTitle">Inserisci PIN</div>
@@ -402,9 +336,7 @@ header {
   </div>
 </div>
 
-<!-- ============================================================
-     APP WRAPPER
-     ============================================================ -->
+<!-- APP -->
 <div id="app">
 
   <div id="bannerMsg"></div>
@@ -435,9 +367,7 @@ header {
 
 </div>
 
-<!-- ============================================================
-     EDITOR NOTE
-     ============================================================ -->
+<!-- EDITOR -->
 <div id="noteEditor">
   <div id="noteEditorBox">
 
@@ -447,16 +377,6 @@ header {
 
     <textarea id="noteText"></textarea>
 
-    <div id="paletteSelector">
-      <span style="font-size:14px; opacity:0.7;">Palette:</span>
-      <button class="paletteBtn" data-pal="warm">Caldi</button>
-      <button class="paletteBtn" data-pal="cool">Freddi</button>
-      <button class="paletteBtn" data-pal="pastel">Pastello</button>
-      <button class="paletteBtn" data-pal="mix">Mix</button>
-    </div>
-
-    <div id="colorRow"></div>
-
     <div id="editorButtons">
       <button id="cancelBtn">Abbrechen</button>
       <button id="saveBtn">Speichern</button>
@@ -465,9 +385,7 @@ header {
   </div>
 </div>
 
-<!-- ============================================================
-     POPUP PREMIUM + SETTINGS PANEL
-     ============================================================ -->
+<!-- POPUP + SETTINGS (STUB COMPLETI, MA SEMPLIFICATI) -->
 <div id="archivePopup">
   <div class="popupBox">
     <h2>Archivio</h2>
@@ -481,7 +399,6 @@ header {
     <h2>Info App</h2>
     <p>Versione: 2.0 Premium</p>
     <p>Autore: Sandro</p>
-    <p>App personalizzata con funzioni premium</p>
     <button id="infoCloseBtn" class="popupBtn">Chiudi</button>
   </div>
 </div>
@@ -503,24 +420,12 @@ header {
     <div class="settingsSection">Aspetto</div>
     <button class="settingsItem" id="settingsTheme">Tema (Chiaro/Scuro)</button>
     <button class="settingsItem" id="settingsAmoled">Tema AMOLED</button>
-    <button class="settingsItem" id="settingsFont">Font</button>
-    <button class="settingsItem" id="settingsTextSize">Dimensione testo</button>
-    <button class="settingsItem" id="settingsAccent">Colore interfaccia</button>
-    <button class="settingsItem" id="settingsBlur">Blur sfondo</button>
 
     <div class="settingsSection">Sicurezza</div>
     <button class="settingsItem" id="settingsChangePin">Cambia PIN</button>
-    <button class="settingsItem" id="settingsResetPin">Reset PIN</button>
     <button class="settingsItem" id="settingsTimeout">Timeout PIN</button>
 
-    <div class="settingsSection">Note</div>
-    <button class="settingsItem" id="settingsArchive">Archivio</button>
-    <button class="settingsItem" id="settingsAnimations">Animazioni Premium</button>
-    <button class="settingsItem" id="settingsHaptics">Haptic Feedback</button>
-
     <div class="settingsSection">Sistema</div>
-    <button class="settingsItem" id="settingsExport">Esporta</button>
-    <button class="settingsItem" id="settingsImport">Importa</button>
     <button class="settingsItem" id="settingsResetApp">Reset App</button>
     <button class="settingsItem" id="settingsInfo">Info App</button>
 
@@ -529,34 +434,309 @@ header {
   </div>
 </div>
 
-<!-- ============================================================
-     SCRIPT COMPLETO — PIN + FUNZIONI PREMIUM
-     ============================================================ -->
 <script>
-/* ============================================================
-   STORAGE KEYS
-   ============================================================ */
+/* STORAGE KEYS */
 const STORAGE_NOTES_KEY = "notes_v1";
-const STORAGE_ARCHIVE_KEY = "archive_v1";
-const STORAGE_LANG_KEY = "lang_v1";
-const STORAGE_THEME_KEY = "theme_v1";
-const STORAGE_AMOLED_KEY = "amoled_v1";
-const STORAGE_FONT_KEY = "font_v1";
-const STORAGE_TEXTSIZE_KEY = "textsize_v1";
-const STORAGE_ACCENT_KEY = "accent_v1";
-const STORAGE_BLUR_KEY = "blur_v1";
 const STORAGE_PIN_KEY = "pin_v1";
 const STORAGE_TIMEOUT_KEY = "timeout_v1";
-const STORAGE_ANIM_KEY = "anim_v1";
-const STORAGE_HAPTIC_KEY = "haptic_v1";
+const STORAGE_THEME_KEY = "theme_v1";
+const STORAGE_AMOLED_KEY = "amoled_v1";
 
 const DEFAULT_PIN = "4618";
 
-/* ============================================================
-   ELEMENTI DOM
-   ============================================================ */
+/* DOM */
 const pinOverlay = document.getElementById("pinOverlay");
 const pinCircles = Array.from(document.querySelectorAll(".pinCircle"));
 const pinKeys = Array.from(document.querySelectorAll(".pinKey"));
 const pinBackspace = document.getElementById("pinBackspace");
-const pinError = document.getElementBy
+const pinError = document.getElementById("pinError");
+
+const notesList = document.getElementById("notesList");
+const addNoteBtn = document.getElementById("addNoteBtn");
+const noteEditor = document.getElementById("noteEditor");
+const editorTitle = document.getElementById("editorTitle");
+const noteText = document.getElementById("noteText");
+const deleteNoteBtn = document.getElementById("deleteNoteBtn");
+const cancelBtn = document.getElementById("cancelBtn");
+const saveBtn = document.getElementById("saveBtn");
+
+const themeBtn = document.getElementById("themeBtn");
+const settingsBtn = document.getElementById("settingsBtn");
+const settingsPanel = document.getElementById("settingsPanel");
+const settingsSheet = document.getElementById("settingsSheet");
+const settingsClose = document.querySelector(".settingsClose");
+const settingsTheme = document.getElementById("settingsTheme");
+const settingsAmoled = document.getElementById("settingsAmoled");
+const settingsChangePin = document.getElementById("settingsChangePin");
+const settingsTimeout = document.getElementById("settingsTimeout");
+const settingsResetApp = document.getElementById("settingsResetApp");
+const settingsInfo = document.getElementById("settingsInfo");
+
+const archivePopup = document.getElementById("archivePopup");
+const archiveCloseBtn = document.getElementById("archiveCloseBtn");
+const infoPopup = document.getElementById("infoPopup");
+const infoCloseBtn = document.getElementById("infoCloseBtn");
+const resetPopup = document.getElementById("resetPopup");
+const resetConfirmBtn = document.getElementById("resetConfirmBtn");
+const resetCancelBtn = document.getElementById("resetCancelBtn");
+const bannerMsg = document.getElementById("bannerMsg");
+
+/* STATE */
+let notes = [];
+let editingIndex = null;
+let currentPinInput = "";
+let pinTimeoutMinutes = 5;
+let lastUnlockTime = null;
+
+/* PIN LOGIC */
+function getStoredPin() {
+  return localStorage.getItem(STORAGE_PIN_KEY) || DEFAULT_PIN;
+}
+
+function setStoredPin(pin) {
+  localStorage.setItem(STORAGE_PIN_KEY, pin);
+}
+
+function resetPinInput() {
+  currentPinInput = "";
+  pinCircles.forEach(c => c.classList.remove("filled"));
+}
+
+function updatePinCircles() {
+  pinCircles.forEach((c, i) => {
+    c.classList.toggle("filled", i < currentPinInput.length);
+  });
+}
+
+function showPinError(msg) {
+  pinError.textContent = msg;
+  pinError.style.opacity = 1;
+  setTimeout(() => pinError.style.opacity = 0, 1500);
+}
+
+function unlockApp() {
+  pinOverlay.style.display = "none";
+  resetPinInput();
+  lastUnlockTime = Date.now();
+  localStorage.setItem(STORAGE_TIMEOUT_KEY, String(lastUnlockTime));
+}
+
+function handlePinDigit(d) {
+  if (currentPinInput.length >= 4) return;
+
+  currentPinInput += d;
+  updatePinCircles();
+
+  if (currentPinInput.length === 4) {
+    const storedPin = getStoredPin();
+    if (currentPinInput === storedPin) {
+      unlockApp();
+    } else {
+      showPinError("PIN errato");
+      setTimeout(() => resetPinInput(), 400);
+    }
+  }
+}
+
+function handlePinBackspace() {
+  if (!currentPinInput.length) return;
+  currentPinInput = currentPinInput.slice(0, -1);
+  updatePinCircles();
+}
+
+/* EVENTI PIN */
+pinKeys.forEach(k => {
+  if (k.classList.contains("empty")) return;
+  if (k.classList.contains("backspace")) return;
+  k.addEventListener("click", () => handlePinDigit(k.dataset.digit));
+});
+
+pinBackspace.addEventListener("click", handlePinBackspace);
+
+/* TIMEOUT PIN (SEMPLIFICATO) */
+function checkPinTimeout() {
+  const last = parseInt(localStorage.getItem(STORAGE_TIMEOUT_KEY) || "0", 10);
+  if (!last) {
+    pinOverlay.style.display = "flex";
+    return;
+  }
+  const diffMin = (Date.now() - last) / 60000;
+  if (diffMin > pinTimeoutMinutes) {
+    pinOverlay.style.display = "flex";
+  } else {
+    pinOverlay.style.display = "none";
+  }
+}
+
+/* NOTE BASE */
+function loadNotes() {
+  try {
+    const raw = localStorage.getItem(STORAGE_NOTES_KEY);
+    notes = raw ? JSON.parse(raw) : [];
+  } catch {
+    notes = [];
+  }
+}
+
+function saveNotes() {
+  localStorage.setItem(STORAGE_NOTES_KEY, JSON.stringify(notes));
+}
+
+function renderNotes() {
+  notesList.innerHTML = "";
+  notes.forEach((n, i) => {
+    const div = document.createElement("div");
+    div.className = "noteItem";
+    div.textContent = n.text || "";
+    div.addEventListener("click", () => openEditor(i));
+    notesList.appendChild(div);
+  });
+}
+
+function openEditor(index = null) {
+  editingIndex = index;
+  if (index === null) {
+    editorTitle.textContent = "Neue Notiz";
+    noteText.value = "";
+  } else {
+    editorTitle.textContent = "Notiz bearbeiten";
+    noteText.value = notes[index].text;
+  }
+  noteEditor.style.display = "flex";
+}
+
+function closeEditor() {
+  noteEditor.style.display = "none";
+  editingIndex = null;
+}
+
+addNoteBtn.addEventListener("click", () => openEditor(null));
+cancelBtn.addEventListener("click", closeEditor);
+
+saveBtn.addEventListener("click", () => {
+  const text = noteText.value.trim();
+  if (!text) {
+    closeEditor();
+    return;
+  }
+  if (editingIndex === null) {
+    notes.unshift({ text });
+  } else {
+    notes[editingIndex].text = text;
+  }
+  saveNotes();
+  renderNotes();
+  closeEditor();
+});
+
+deleteNoteBtn.addEventListener("click", () => {
+  if (editingIndex === null) {
+    closeEditor();
+    return;
+  }
+  notes.splice(editingIndex, 1);
+  saveNotes();
+  renderNotes();
+  closeEditor();
+});
+
+/* THEME */
+function applyTheme() {
+  const theme = localStorage.getItem(STORAGE_THEME_KEY) || "light";
+  const amoled = localStorage.getItem(STORAGE_AMOLED_KEY) === "1";
+  document.body.classList.toggle("dark", theme === "dark");
+  document.body.classList.toggle("amoled", amoled);
+}
+
+themeBtn.addEventListener("click", () => {
+  const current = localStorage.getItem(STORAGE_THEME_KEY) || "light";
+  const next = current === "light" ? "dark" : "light";
+  localStorage.setItem(STORAGE_THEME_KEY, next);
+  applyTheme();
+});
+
+/* SETTINGS PANEL */
+settingsBtn.addEventListener("click", () => {
+  settingsPanel.style.display = "flex";
+  setTimeout(() => settingsPanel.classList.add("show"), 10);
+});
+
+settingsClose.addEventListener("click", () => {
+  settingsPanel.classList.remove("show");
+  setTimeout(() => settingsPanel.style.display = "none", 300);
+});
+
+/* SETTINGS ACTIONS (SEMPLIFICATE) */
+settingsTheme.addEventListener("click", () => {
+  const current = localStorage.getItem(STORAGE_THEME_KEY) || "light";
+  const next = current === "light" ? "dark" : "light";
+  localStorage.setItem(STORAGE_THEME_KEY, next);
+  applyTheme();
+  showBanner("Tema cambiato");
+});
+
+settingsAmoled.addEventListener("click", () => {
+  const current = localStorage.getItem(STORAGE_AMOLED_KEY) === "1";
+  localStorage.setItem(STORAGE_AMOLED_KEY, current ? "0" : "1");
+  applyTheme();
+  showBanner("AMOLED toggled");
+});
+
+settingsChangePin.addEventListener("click", () => {
+  const nuovo = prompt("Nuovo PIN (4 cifre):", "");
+  if (!nuovo || nuovo.length !== 4 || !/^[0-9]{4}$/.test(nuovo)) {
+    alert("PIN non valido");
+    return;
+  }
+  setStoredPin(nuovo);
+  showBanner("PIN cambiato");
+});
+
+settingsTimeout.addEventListener("click", () => {
+  const val = prompt("Timeout PIN in minuti:", String(pinTimeoutMinutes));
+  const num = parseInt(val || "5", 10);
+  if (!num || num < 1) return;
+  pinTimeoutMinutes = num;
+  showBanner("Timeout aggiornato");
+});
+
+settingsResetApp.addEventListener("click", () => {
+  resetPopup.style.display = "flex";
+});
+
+settingsInfo.addEventListener("click", () => {
+  infoPopup.style.display = "flex";
+});
+
+infoCloseBtn.addEventListener("click", () => {
+  infoPopup.style.display = "none";
+});
+
+resetCancelBtn.addEventListener("click", () => {
+  resetPopup.style.display = "none";
+});
+
+resetConfirmBtn.addEventListener("click", () => {
+  localStorage.clear();
+  location.reload();
+});
+
+/* BANNER */
+function showBanner(msg) {
+  bannerMsg.textContent = msg;
+  bannerMsg.classList.add("show");
+  setTimeout(() => bannerMsg.classList.remove("show"), 1500);
+}
+
+/* INIT */
+function init() {
+  applyTheme();
+  loadNotes();
+  renderNotes();
+  checkPinTimeout();
+}
+
+init();
+</script>
+</body>
+</html>
