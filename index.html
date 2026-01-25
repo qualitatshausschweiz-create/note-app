@@ -12,7 +12,6 @@
   --accent-glow: rgba(0,122,255,0.35);
   --app-font: -apple-system, system-ui, sans-serif;
   --text-size: 16px;
-  --blur-amount: 18px;
 }
 
 body {
@@ -32,87 +31,6 @@ body.dark {
 body.amoled {
   background: #000;
   color: #fff;
-}
-
-/* PIN OVERLAY */
-#pinOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.75);
-  backdrop-filter: blur(12px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 99999;
-}
-
-#pinBox {
-  background: rgba(255,255,255,0.9);
-  backdrop-filter: blur(20px);
-  padding: 28px;
-  border-radius: 22px;
-  width: 280px;
-  text-align: center;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-}
-
-#pinTitle {
-  font-size: 22px;
-  margin-bottom: 18px;
-  font-weight: 600;
-}
-
-#pinCircles {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 22px;
-}
-
-.pinCircle {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid var(--accent);
-  transition: 0.2s;
-}
-
-.pinCircle.filled {
-  background: var(--accent);
-  box-shadow: 0 0 10px var(--accent-glow);
-}
-
-#pinPad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-}
-
-.pinKey {
-  padding: 16px;
-  font-size: 20px;
-  border-radius: 14px;
-  border: none;
-  background: #e5e5ea;
-  transition: 0.15s;
-}
-
-.pinKey:active {
-  background: var(--accent-light);
-  color: #fff;
-  box-shadow: 0 0 12px var(--accent-glow);
-}
-
-.pinKey.backspace {
-  background: #ff3b30;
-  color: #fff;
-}
-
-#pinError {
-  margin-top: 12px;
-  color: red;
-  opacity: 0;
-  transition: opacity 0.3s;
 }
 
 /* HEADER */
@@ -302,41 +220,6 @@ header {
 
 <body>
 
-<!-- PIN OVERLAY -->
-<div id="pinOverlay">
-  <div id="pinBox">
-    <div id="pinTitle">Inserisci PIN</div>
-
-    <div id="pinCircles">
-      <div class="pinCircle"></div>
-      <div class="pinCircle"></div>
-      <div class="pinCircle"></div>
-      <div class="pinCircle"></div>
-    </div>
-
-    <div id="pinPad">
-      <button class="pinKey" data-digit="1">1</button>
-      <button class="pinKey" data-digit="2">2</button>
-      <button class="pinKey" data-digit="3">3</button>
-
-      <button class="pinKey" data-digit="4">4</button>
-      <button class="pinKey" data-digit="5">5</button>
-      <button class="pinKey" data-digit="6">6</button>
-
-      <button class="pinKey" data-digit="7">7</button>
-      <button class="pinKey" data-digit="8">8</button>
-      <button class="pinKey" data-digit="9">9</button>
-
-      <button class="pinKey empty"></button>
-      <button class="pinKey" data-digit="0">0</button>
-      <button class="pinKey backspace" id="pinBackspace">⌫</button>
-    </div>
-
-    <div id="pinError"></div>
-  </div>
-</div>
-
-<!-- APP -->
 <div id="app">
 
   <div id="bannerMsg"></div>
@@ -385,7 +268,7 @@ header {
   </div>
 </div>
 
-<!-- POPUP + SETTINGS (STUB COMPLETI, MA SEMPLIFICATI) -->
+<!-- POPUP + SETTINGS -->
 <div id="archivePopup">
   <div class="popupBox">
     <h2>Archivio</h2>
@@ -397,7 +280,7 @@ header {
 <div id="infoPopup">
   <div class="popupBox">
     <h2>Info App</h2>
-    <p>Versione: 2.0 Premium</p>
+    <p>Versione: 2.0</p>
     <p>Autore: Sandro</p>
     <button id="infoCloseBtn" class="popupBtn">Chiudi</button>
   </div>
@@ -421,10 +304,6 @@ header {
     <button class="settingsItem" id="settingsTheme">Tema (Chiaro/Scuro)</button>
     <button class="settingsItem" id="settingsAmoled">Tema AMOLED</button>
 
-    <div class="settingsSection">Sicurezza</div>
-    <button class="settingsItem" id="settingsChangePin">Cambia PIN</button>
-    <button class="settingsItem" id="settingsTimeout">Timeout PIN</button>
-
     <div class="settingsSection">Sistema</div>
     <button class="settingsItem" id="settingsResetApp">Reset App</button>
     <button class="settingsItem" id="settingsInfo">Info App</button>
@@ -435,21 +314,9 @@ header {
 </div>
 
 <script>
-/* STORAGE KEYS */
 const STORAGE_NOTES_KEY = "notes_v1";
-const STORAGE_PIN_KEY = "pin_v1";
-const STORAGE_TIMEOUT_KEY = "timeout_v1";
 const STORAGE_THEME_KEY = "theme_v1";
 const STORAGE_AMOLED_KEY = "amoled_v1";
-
-const DEFAULT_PIN = "4618";
-
-/* DOM */
-const pinOverlay = document.getElementById("pinOverlay");
-const pinCircles = Array.from(document.querySelectorAll(".pinCircle"));
-const pinKeys = Array.from(document.querySelectorAll(".pinKey"));
-const pinBackspace = document.getElementById("pinBackspace");
-const pinError = document.getElementById("pinError");
 
 const notesList = document.getElementById("notesList");
 const addNoteBtn = document.getElementById("addNoteBtn");
@@ -467,8 +334,6 @@ const settingsSheet = document.getElementById("settingsSheet");
 const settingsClose = document.querySelector(".settingsClose");
 const settingsTheme = document.getElementById("settingsTheme");
 const settingsAmoled = document.getElementById("settingsAmoled");
-const settingsChangePin = document.getElementById("settingsChangePin");
-const settingsTimeout = document.getElementById("settingsTimeout");
 const settingsResetApp = document.getElementById("settingsResetApp");
 const settingsInfo = document.getElementById("settingsInfo");
 
@@ -481,94 +346,10 @@ const resetConfirmBtn = document.getElementById("resetConfirmBtn");
 const resetCancelBtn = document.getElementById("resetCancelBtn");
 const bannerMsg = document.getElementById("bannerMsg");
 
-/* STATE */
 let notes = [];
 let editingIndex = null;
-let currentPinInput = "";
-let pinTimeoutMinutes = 5;
-let lastUnlockTime = null;
 
-/* PIN LOGIC */
-function getStoredPin() {
-  return localStorage.getItem(STORAGE_PIN_KEY) || DEFAULT_PIN;
-}
-
-function setStoredPin(pin) {
-  localStorage.setItem(STORAGE_PIN_KEY, pin);
-}
-
-function resetPinInput() {
-  currentPinInput = "";
-  pinCircles.forEach(c => c.classList.remove("filled"));
-}
-
-function updatePinCircles() {
-  pinCircles.forEach((c, i) => {
-    c.classList.toggle("filled", i < currentPinInput.length);
-  });
-}
-
-function showPinError(msg) {
-  pinError.textContent = msg;
-  pinError.style.opacity = 1;
-  setTimeout(() => pinError.style.opacity = 0, 1500);
-}
-
-function unlockApp() {
-  pinOverlay.style.display = "none";
-  resetPinInput();
-  lastUnlockTime = Date.now();
-  localStorage.setItem(STORAGE_TIMEOUT_KEY, String(lastUnlockTime));
-}
-
-function handlePinDigit(d) {
-  if (currentPinInput.length >= 4) return;
-
-  currentPinInput += d;
-  updatePinCircles();
-
-  if (currentPinInput.length === 4) {
-    const storedPin = getStoredPin();
-    if (currentPinInput === storedPin) {
-      unlockApp();
-    } else {
-      showPinError("PIN errato");
-      setTimeout(() => resetPinInput(), 400);
-    }
-  }
-}
-
-function handlePinBackspace() {
-  if (!currentPinInput.length) return;
-  currentPinInput = currentPinInput.slice(0, -1);
-  updatePinCircles();
-}
-
-/* EVENTI PIN */
-pinKeys.forEach(k => {
-  if (k.classList.contains("empty")) return;
-  if (k.classList.contains("backspace")) return;
-  k.addEventListener("click", () => handlePinDigit(k.dataset.digit));
-});
-
-pinBackspace.addEventListener("click", handlePinBackspace);
-
-/* TIMEOUT PIN (SEMPLIFICATO) */
-function checkPinTimeout() {
-  const last = parseInt(localStorage.getItem(STORAGE_TIMEOUT_KEY) || "0", 10);
-  if (!last) {
-    pinOverlay.style.display = "flex";
-    return;
-  }
-  const diffMin = (Date.now() - last) / 60000;
-  if (diffMin > pinTimeoutMinutes) {
-    pinOverlay.style.display = "flex";
-  } else {
-    pinOverlay.style.display = "none";
-  }
-}
-
-/* NOTE BASE */
+/* NOTE */
 function loadNotes() {
   try {
     const raw = localStorage.getItem(STORAGE_NOTES_KEY);
@@ -666,7 +447,7 @@ settingsClose.addEventListener("click", () => {
   setTimeout(() => settingsPanel.style.display = "none", 300);
 });
 
-/* SETTINGS ACTIONS (SEMPLIFICATE) */
+/* SETTINGS ACTIONS */
 settingsTheme.addEventListener("click", () => {
   const current = localStorage.getItem(STORAGE_THEME_KEY) || "light";
   const next = current === "light" ? "dark" : "light";
@@ -680,24 +461,6 @@ settingsAmoled.addEventListener("click", () => {
   localStorage.setItem(STORAGE_AMOLED_KEY, current ? "0" : "1");
   applyTheme();
   showBanner("AMOLED toggled");
-});
-
-settingsChangePin.addEventListener("click", () => {
-  const nuovo = prompt("Nuovo PIN (4 cifre):", "");
-  if (!nuovo || nuovo.length !== 4 || !/^[0-9]{4}$/.test(nuovo)) {
-    alert("PIN non valido");
-    return;
-  }
-  setStoredPin(nuovo);
-  showBanner("PIN cambiato");
-});
-
-settingsTimeout.addEventListener("click", () => {
-  const val = prompt("Timeout PIN in minuti:", String(pinTimeoutMinutes));
-  const num = parseInt(val || "5", 10);
-  if (!num || num < 1) return;
-  pinTimeoutMinutes = num;
-  showBanner("Timeout aggiornato");
 });
 
 settingsResetApp.addEventListener("click", () => {
@@ -733,7 +496,6 @@ function init() {
   applyTheme();
   loadNotes();
   renderNotes();
-  checkPinTimeout();
 }
 
 init();
