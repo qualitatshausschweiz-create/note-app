@@ -67,4 +67,57 @@ function openEditor(id = null) {
   editingId = id;
 
   const editor = document.getElementById("editor");
-  const
+  const title = document.getElementById("noteTitle");
+  const text = document.getElementById("noteText");
+
+  if (id) {
+    const n = notes.find(x => x.id === id);
+    title.value = n.title;
+    text.value = n.text;
+  } else {
+    title.value = "";
+    text.value = "";
+  }
+
+  editor.classList.remove("hidden");
+}
+
+document.getElementById("addNoteBtn").onclick = () => openEditor(null);
+
+document.getElementById("saveNote").onclick = () => {
+  const title = document.getElementById("noteTitle").value.trim();
+  const text = document.getElementById("noteText").value.trim();
+
+  if (!text) return;
+
+  if (editingId) {
+    const n = notes.find(x => x.id === editingId);
+    n.title = title;
+    n.text = text;
+  } else {
+    notes.push({
+      id: Date.now(),
+      title,
+      text
+    });
+  }
+
+  saveNotes();
+  renderNotes();
+  document.getElementById("editor").classList.add("hidden");
+};
+
+document.getElementById("cancelEdit").onclick = () => {
+  document.getElementById("editor").classList.add("hidden");
+};
+
+document.getElementById("deleteNote").onclick = () => {
+  if (!editingId) return;
+
+  notes = notes.filter(n => n.id !== editingId);
+  saveNotes();
+  renderNotes();
+  document.getElementById("editor").classList.add("hidden");
+};
+
+renderNotes();
