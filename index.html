@@ -1,516 +1,946 @@
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Notizen</title>
+<!-- ============================
+     BOX 2.1 — PIN OVERLAY
+     ============================ -->
+<div id="pinOverlay">
+  <div id="pinBox">
+    <div id="pinTitle">Inserisci PIN</div>
 
-  <style>
-    :root {
-      --bg: #f2f2f7;
-      --card: #ffffff;
-      --text: #000000;
+    <div id="pinCircles">
+      <div class="pinCircle"></div>
+      <div class="pinCircle"></div>
+      <div class="pinCircle"></div>
+      <div class="pinCircle"></div>
+    </div>
 
-      --accent: #007aff;
-      --accent-dark: #0051a8;
+    <div id="pinPad">
+      <button class="pinKey" data-digit="1">1</button>
+      <button class="pinKey" data-digit="2">2</button>
+      <button class="pinKey" data-digit="3">3</button>
 
-      --sheet-bg: var(--card);
-      --sheet-text: var(--text);
+      <button class="pinKey" data-digit="4">4</button>
+      <button class="pinKey" data-digit="5">5</button>
+      <button class="pinKey" data-digit="6">6</button>
 
-      --section-line: rgba(0,0,0,0.15);
-      --section-title: rgba(0,0,0,0.45);
+      <button class="pinKey" data-digit="7">7</button>
+      <button class="pinKey" data-digit="8">8</button>
+      <button class="pinKey" data-digit="9">9</button>
 
-      --blur-amount: 12px;
-      --font-size: 16px;
-      --radius: 16px;
-    }
+      <button class="pinKey empty"></button>
+      <button class="pinKey" data-digit="0">0</button>
+      <button class="pinKey backspace" id="pinBackspace">⌫</button>
+    </div>
 
-    body.dark {
-      --bg: #000000;
-      --card: #1c1c1e;
-      --text: #ffffff;
+    <div id="pinError"></div>
+  </div>
+</div>
+<!-- ============================
+     BOX 2.2 — APP WRAPPER
+     ============================ -->
+<div id="app">
 
-      --section-line: rgba(255,255,255,0.18);
-      --section-title: rgba(255,255,255,0.45);
-    }
+  <div id="bannerMsg"></div>
 
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      font-size: var(--font-size);
-    }
+  <!-- HEADER -->
+  <header>
+    <div id="appTitle">Notizen</div>
+    <div>
+      <button id="themeBtn" class="iconBtn">🌙</button>
+      <button id="langBtn" class="iconBtn">🌐</button>
+      <button id="backupBtn" class="iconBtn">🛟</button>
+      <button id="settingsBtn" class="iconBtn">⚙️</button>
+    </div>
+  </header>
 
-    #app {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 16px;
-    }
+  <!-- CATEGORIE -->
+  <div id="categories">
+    <div class="cat" data-cat="favorite"><span class="catLabel">Favoriten</span></div>
+    <div class="cat" data-cat="alle"><span class="catLabel">Alle</span></div>
+    <div class="cat" data-cat="arbeit"><span class="catLabel">Arbeit</span></div>
+    <div class="cat" data-cat="einkauf"><span class="catLabel">Einkauf</span></div>
+    <div class="cat" data-cat="zuhause"><span class="catLabel">Zuhause</span></div>
+    <div class="cat" data-cat="ideen"><span class="catLabel">Ideen</span></div>
+    <div class="cat" data-cat="personlich"><span class="catLabel">Persönlich</span></div>
+  </div>
 
-    /* HEADER */
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-    #appTitle {
-      font-size: 24px;
-      font-weight: 700;
-    }
-    .iconBtn {
-      border: none;
-      background: none;
-      font-size: 22px;
-      cursor: pointer;
-      margin-left: 8px;
-      color: var(--text);
-    }
+  <!-- LISTA NOTE -->
+  <div id="notesList"></div>
 
-    /* BANNER */
-    #bannerMsg {
-      position: fixed;
-      top: -60px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.85);
-      color: #fff;
-      padding: 10px 18px;
-      border-radius: 14px;
-      font-size: 15px;
-      z-index: 2000;
-      opacity: 0;
-      transition: all 0.35s ease;
-    }
-    #bannerMsg.show {
-      top: 20px;
-      opacity: 1;
-    }
+  <!-- BOTTONE + -->
+  <button id="addNoteBtn">+</button>
 
-    /* SEZIONI IMPOSTAZIONI — STILE B1 (Minimal Apple) */
-    .settingsSectionTitle {
-      text-align: center;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      color: var(--section-title);
-      margin: 18px 0 6px;
-    }
+</div>
+<!-- ============================
+     BOX 2.3 — EDITOR NOTE
+     ============================ -->
+<div id="noteEditor">
+  <div id="noteEditorBox">
 
-    .settingsDivider {
-      width: 100%;
-      height: 1px;
-      background: var(--section-line);
-      margin: 6px 0 14px;
-    }
+    <button id="deleteNoteBtn">🗑</button>
 
-    /* SETTINGS PANEL */
-    #settingsPanel {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.35);
-      backdrop-filter: blur(6px);
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-      z-index: 2600;
-    }
+    <h2 id="editorTitle">Neue Notiz</h2>
 
-    #settingsSheet {
-      width: 100%;
-      max-width: 760px;
-      background: var(--sheet-bg);
-      color: var(--sheet-text);
-      border-radius: 22px 22px 0 0;
-      padding: 20px;
-      box-shadow: 0 -6px 20px rgba(0,0,0,0.25);
-      transform: translateY(100%);
-      transition: transform 0.35s ease;
-    }
+    <textarea id="noteText"></textarea>
 
-    #settingsPanel.show #settingsSheet {
-      transform: translateY(0);
-    }
+    <div id="paletteSelector">
+      <span style="font-size:14px; opacity:0.7;">Palette:</span>
+      <button class="paletteBtn" data-pal="warm">Caldi</button>
+      <button class="paletteBtn" data-pal="cool">Freddi</button>
+      <button class="paletteBtn" data-pal="pastel">Pastello</button>
+      <button class="paletteBtn" data-pal="mix">Mix</button>
+    </div>
 
-    .settingsItem {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 10px;
-      border-radius: var(--radius);
-      border: 1px solid rgba(0,0,0,0.15);
-      background: var(--card);
-      color: var(--text);
-      font-size: 16px;
-      text-align: left;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
+    <div id="colorRow"></div>
 
-    .settingsItem:active {
-      background: rgba(0,0,0,0.08);
-    }
+    <div id="editorButtons">
+      <button id="cancelBtn">Abbrechen</button>
+      <button id="saveBtn">Speichern</button>
+    </div>
 
-    .settingsClose {
-      width: 100%;
-      padding: 14px;
-      border-radius: var(--radius);
-      background: #ccc;
-      color: #000;
-      font-size: 16px;
-      border: none;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-    /* AMOLED THEME */
-    body.amoled {
-      --bg: #000000;
-      --card: #0a0a0a;
-      --text: #ffffff;
-      --section-line: rgba(255,255,255,0.18);
-      --section-title: rgba(255,255,255,0.45);
-    }
+  </div>
+</div>
+<!-- ============================
+     BOX 2.4 — POPUP PREMIUM + SETTINGS PANEL
+     ============================ -->
 
-    /* FONT SELECTOR */
-    .fontSelect {
-      width: 100%;
-      padding: 12px;
-      border-radius: var(--radius);
-      border: 1px solid rgba(0,0,0,0.15);
-      background: var(--card);
-      color: var(--text);
-      font-size: 16px;
-      margin-bottom: 12px;
-    }
+<!-- POPUP ARCHIVIO -->
+<div id="archivePopup">
+  <div id="archiveBox" class="popupBox">
+    <h2>Archivio</h2>
+    <div id="archiveList"></div>
+    <button id="archiveCloseBtn" class="popupBtn">Chiudi</button>
+  </div>
+</div>
 
-    /* SLIDER iOS */
-    .iosSlider {
-      width: 100%;
-      margin: 10px 0 20px;
-      -webkit-appearance: none;
-      height: 6px;
-      border-radius: 6px;
-      background: rgba(0,0,0,0.2);
-      outline: none;
-    }
-    .iosSlider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 26px;
-      height: 26px;
-      background: var(--accent);
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
+<!-- POPUP INFO APP -->
+<div id="infoPopup">
+  <div id="infoBox" class="popupBox">
+    <h2>Info App</h2>
+    <p>Versione: 2.0 Premium</p>
+    <p>Autore: Sandro</p>
+    <p>App personalizzata con funzioni premium</p>
+    <button id="infoCloseBtn" class="popupBtn">Chiudi</button>
+  </div>
+</div>
 
-    /* TOGGLE iOS */
-    .toggleRow {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px;
-      border-radius: var(--radius);
-      background: var(--card);
-      border: 1px solid rgba(0,0,0,0.15);
-      margin-bottom: 10px;
-      cursor: pointer;
-    }
+<!-- POPUP RESET APP -->
+<div id="resetPopup">
+  <div id="resetBox" class="popupBox">
+    <h2>Reset App</h2>
+    <p>Questa azione cancellerà tutte le note e le impostazioni.</p>
+    <button id="resetConfirmBtn" class="popupBtn">Conferma</button>
+    <button id="resetCancelBtn" class="popupBtn">Annulla</button>
+  </div>
+</div>
 
-    .toggleSwitch {
-      width: 48px;
-      height: 28px;
-      background: #ccc;
-      border-radius: 20px;
-      position: relative;
-      transition: background 0.25s ease;
-    }
+<!-- SETTINGS PANEL PREMIUM -->
+<div id="settingsPanel">
+  <div id="settingsSheet">
 
-    .toggleSwitch::after {
-      content: "";
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      width: 22px;
-      height: 22px;
-      background: #fff;
-      border-radius: 50%;
-      transition: transform 0.25s ease;
-    }
+    <div class="settingsTitle">Impostazioni</div>
 
-    .toggleSwitch.active {
-      background: var(--accent);
-    }
+    <!-- ASPETTO -->
+    <div class="settingsSection">Aspetto</div>
+    <button class="settingsItem" id="settingsTheme">Tema (Chiaro/Scuro)</button>
+    <button class="settingsItem" id="settingsAmoled">Tema AMOLED</button>
+    <button class="settingsItem" id="settingsFont">Font</button>
+    <button class="settingsItem" id="settingsTextSize">Dimensione testo</button>
+    <button class="settingsItem" id="settingsAccent">Colore interfaccia</button>
+    <button class="settingsItem" id="settingsBlur">Blur sfondo</button>
 
-    .toggleSwitch.active::after {
-      transform: translateX(20px);
-    }
+    <!-- SICUREZZA -->
+    <div class="settingsSection">Sicurezza</div>
+    <button class="settingsItem" id="settingsChangePin">Cambia PIN</button>
+    <button class="settingsItem" id="settingsResetPin">Reset PIN</button>
+    <button class="settingsItem" id="settingsTimeout">Timeout PIN</button>
 
-    /* BLUR REGOLABILE */
-    .blurPreview {
-      width: 100%;
-      height: 40px;
-      border-radius: var(--radius);
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(var(--blur-amount));
-      margin-bottom: 12px;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
+    <!-- NOTE -->
+    <div class="settingsSection">Note</div>
+    <button class="settingsItem" id="settingsArchive">Archivio</button>
+    <button class="settingsItem" id="settingsAnimations">Animazioni Premium</button>
+    <button class="settingsItem" id="settingsHaptics">Haptic Feedback</button>
 
-    /* ANIMAZIONI PREMIUM */
-    .smooth {
-      transition: all 0.25s ease;
-    }
-    .spring {
-      transition: all 0.35s cubic-bezier(0.25, 1.25, 0.5, 1);
-    }
-    .fade {
-      transition: opacity 0.3s ease;
-    }
+    <!-- SISTEMA -->
+    <div class="settingsSection">Sistema</div>
+    <button class="settingsItem" id="settingsExport">Esporta</button>
+    <button class="settingsItem" id="settingsImport">Importa</button>
+    <button class="settingsItem" id="settingsResetApp">Reset App</button>
+    <button class="settingsItem" id="settingsInfo">Info App</button>
 
-    /* MODALITÀ COMPATTA */
-    body.compact .noteItem {
-      padding: 8px;
-      margin-bottom: 6px;
-      font-size: calc(var(--font-size) - 2px);
-    }
+    <button class="settingsClose">Chiudi</button>
 
-    /* ARCHIVIO NOTE */
-    #archiveList {
-      display: none;
-      margin-top: 20px;
-    }
-    .archivedItem {
-      background: var(--card);
-      padding: 12px;
-      border-radius: var(--radius);
-      margin-bottom: 10px;
-      opacity: 0.6;
-    }
+  </div>
+</div>
+<!-- ============================
+     BOX 3.1 — COSTANTI + STATO APP
+     ============================ -->
+<script>
+/* ============================================================
+   COSTANTI STORAGE
+   ============================================================ */
+const STORAGE_NOTES_KEY = "notes_v1";
+const STORAGE_ARCHIVE_KEY = "archive_v1";
+const STORAGE_LANG_KEY = "lang_v1";
+const STORAGE_THEME_KEY = "theme_v1";
+const STORAGE_AMOLED_KEY = "amoled_v1";
+const STORAGE_FONT_KEY = "font_v1";
+const STORAGE_TEXTSIZE_KEY = "textsize_v1";
+const STORAGE_ACCENT_KEY = "accent_v1";
+const STORAGE_BLUR_KEY = "blur_v1";
+const STORAGE_PIN_KEY = "pin_v1";
+const STORAGE_TIMEOUT_KEY = "timeout_v1";
+const STORAGE_ANIM_KEY = "anim_v1";
+const STORAGE_HAPTIC_KEY = "haptic_v1";
 
-    /* COLORE INTERFACCIA */
-    .accentPicker {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .accentDot {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: transform 0.2s ease;
-    }
-    .accentDot:hover {
-      transform: scale(1.1);
-    }
-    .accentDot.selected {
-      border-color: var(--accent);
-      transform: scale(1.15);
-    }
+/* PIN di default */
+const DEFAULT_PIN = "4618";
 
-    /* PALETTE PERSONALIZZATE */
-    .paletteCustomRow {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    .paletteInput {
-      width: 60px;
-      height: 34px;
-      border-radius: 8px;
-      border: 1px solid rgba(0,0,0,0.2);
-      cursor: pointer;
-    }
-    /* POPUP INFO APP */
-    #infoPopup {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      backdrop-filter: blur(6px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 3000;
-    }
+/* ============================================================
+   ELEMENTI DOM
+   ============================================================ */
+const pinOverlay = document.getElementById("pinOverlay");
+const pinCircles = Array.from(document.querySelectorAll(".pinCircle"));
+const pinKeys = Array.from(document.querySelectorAll(".pinKey"));
+const pinBackspace = document.getElementById("pinBackspace");
+const pinError = document.getElementById("pinError");
 
-    #infoBox {
-      width: 88%;
-      max-width: 420px;
-      background: var(--card);
-      color: var(--text);
-      padding: 22px;
-      border-radius: 20px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-      text-align: center;
-      animation: fadeIn 0.25s ease;
-    }
+const bannerMsg = document.getElementById("bannerMsg");
 
-    #infoBox h2 {
-      margin-top: 0;
-      font-size: 20px;
-      font-weight: 700;
-    }
+const notesList = document.getElementById("notesList");
+const addNoteBtn = document.getElementById("addNoteBtn");
 
-    #infoBox p {
-      font-size: 15px;
-      opacity: 0.8;
-      line-height: 1.4;
-    }
+const noteEditor = document.getElementById("noteEditor");
+const noteEditorBox = document.getElementById("noteEditorBox");
+const editorTitle = document.getElementById("editorTitle");
+const noteText = document.getElementById("noteText");
+const deleteNoteBtn = document.getElementById("deleteNoteBtn");
+const cancelBtn = document.getElementById("cancelBtn");
+const saveBtn = document.getElementById("saveBtn");
 
-    #infoClose {
-      margin-top: 16px;
-      padding: 10px 18px;
-      border-radius: 12px;
-      border: none;
-      background: var(--accent);
-      color: #fff;
-      font-size: 15px;
-      cursor: pointer;
-    }
+const paletteBtns = Array.from(document.querySelectorAll(".paletteBtn"));
+const colorRow = document.getElementById("colorRow");
 
-    /* IMPORTA / ESPORTA */
-    #importExportPopup {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      backdrop-filter: blur(6px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 3000;
-    }
+const langPopup = document.getElementById("langPopup");
+const langChoices = Array.from(document.querySelectorAll(".langChoice"));
 
-    #importExportBox {
-      width: 88%;
-      max-width: 420px;
-      background: var(--card);
-      color: var(--text);
-      padding: 22px;
-      border-radius: 20px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-      animation: fadeIn 0.25s ease;
-    }
+const backupPopup = document.getElementById("backupPopup");
+const autoBackupBtn = document.getElementById("autoBackupBtn");
+const manualBackupBtn = document.getElementById("manualBackupBtn");
+const autoRestoreBtn = document.getElementById("autoRestoreBtn");
+const manualRestoreBtn = document.getElementById("manualRestoreBtn");
+const backupCloseBtn = document.getElementById("backupCloseBtn");
 
-    .importBtn,
-    .exportBtn {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 12px;
-      border-radius: var(--radius);
-      border: 1px solid rgba(0,0,0,0.15);
-      background: var(--card);
-      color: var(--text);
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
+const themeBtn = document.getElementById("themeBtn");
+const langBtn = document.getElementById("langBtn");
+const backupBtn = document.getElementById("backupBtn");
+const settingsBtn = document.getElementById("settingsBtn");
 
-    .importBtn:active,
-    .exportBtn:active {
-      background: rgba(0,0,0,0.08);
-    }
+const settingsPanel = document.getElementById("settingsPanel");
+const settingsSheet = document.getElementById("settingsSheet");
+const settingsClose = document.querySelector(".settingsClose");
 
-    #importFileInput {
-      display: none;
-    }
+const settingsTheme = document.getElementById("settingsTheme");
+const settingsAmoled = document.getElementById("settingsAmoled");
+const settingsFont = document.getElementById("settingsFont");
+const settingsTextSize = document.getElementById("settingsTextSize");
+const settingsAccent = document.getElementById("settingsAccent");
+const settingsBlur = document.getElementById("settingsBlur");
 
-    /* TIMEOUT PIN */
-    .timeoutSelect {
-      width: 100%;
-      padding: 12px;
-      border-radius: var(--radius);
-      border: 1px solid rgba(0,0,0,0.15);
-      background: var(--card);
-      color: var(--text);
-      font-size: 16px;
-      margin-bottom: 12px;
-    }
+const settingsChangePin = document.getElementById("settingsChangePin");
+const settingsResetPin = document.getElementById("settingsResetPin");
+const settingsTimeout = document.getElementById("settingsTimeout");
 
-    /* SELETTORI AVANZATI */
-    .selectRow {
-      width: 100%;
-      padding: 12px;
-      border-radius: var(--radius);
-      border: 1px solid rgba(0,0,0,0.15);
-      background: var(--card);
-      color: var(--text);
-      font-size: 16px;
-      margin-bottom: 12px;
-    }
+const settingsArchive = document.getElementById("settingsArchive");
+const settingsAnimations = document.getElementById("settingsAnimations");
+const settingsHaptics = document.getElementById("settingsHaptics");
 
-    /* PULSANTI PREMIUM */
-    .premiumBtn {
-      width: 100%;
-      padding: 14px;
-      border-radius: var(--radius);
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-      margin-bottom: 12px;
-      transition: background 0.2s ease;
-    }
+const settingsExport = document.getElementById("settingsExport");
+const settingsImport = document.getElementById("settingsImport");
+const settingsResetApp = document.getElementById("settingsResetApp");
+const settingsInfo = document.getElementById("settingsInfo");
 
-    .premiumBtn:active {
-      background: var(--accent-dark);
-    }
+const archivePopup = document.getElementById("archivePopup");
+const archiveList = document.getElementById("archiveList");
+const archiveCloseBtn = document.getElementById("archiveCloseBtn");
 
-    /* POPUP DI CONFERMA */
-    #confirmPopup {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      backdrop-filter: blur(6px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 3000;
-    }
+const infoPopup = document.getElementById("infoPopup");
+const infoCloseBtn = document.getElementById("infoCloseBtn");
 
-    #confirmBox {
-      width: 88%;
-      max-width: 420px;
-      background: var(--card);
-      color: var(--text);
-      padding: 22px;
-      border-radius: 20px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-      text-align: center;
-      animation: fadeIn 0.25s ease;
-    }
+const resetPopup = document.getElementById("resetPopup");
+const resetConfirmBtn = document.getElementById("resetConfirmBtn");
+const resetCancelBtn = document.getElementById("resetCancelBtn");
 
-    #confirmBox h3 {
-      margin-top: 0;
-      font-size: 18px;
-      font-weight: 700;
-    }
+const categories = Array.from(document.querySelectorAll(".cat"));
 
-    #confirmYes,
-    #confirmNo {
-      width: 100%;
-      padding: 12px;
-      border-radius: var(--radius);
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
+/* ============================================================
+   STATO APP
+   ============================================================ */
+let notes = [];
+let archive = [];
+let currentNoteId = null;
+let currentColor = "#ffd60a";
+let currentPalette = "warm";
+let currentCategoryFilter = "alle";
+let currentLang = "de";
+let currentTheme = "light";
+let currentAmoled = false;
+let currentFont = "";
+let currentTextSize = 16;
+let currentAccent = "#007aff";
+let currentBlur = 18;
+let currentPinInput = "";
+let currentTimeout = 0;
+let currentAnimations = true;
+let currentHaptics = true;
+/* ============================================================
+   UTILS
+   ============================================================ */
+function showBanner(msg) {
+  bannerMsg.textContent = msg;
+  bannerMsg.classList.add("show");
+  setTimeout(() => bannerMsg.classList.remove("show"), 2000);
+}
 
-    #confirmYes {
-      background: var(--accent);
-      color: #fff;
-    }
+function haptic() {
+  if (!currentHaptics) return;
+  if (navigator.vibrate) navigator.vibrate(10);
+}
 
-    #confirmNo {
-      background: #ccc;
-      color: #000;
-    }
+/* ============================================================
+   STORAGE
+   ============================================================ */
+function saveAll() {
+  localStorage.setItem(STORAGE_NOTES_KEY, JSON.stringify(notes));
+  localStorage.setItem(STORAGE_ARCHIVE_KEY, JSON.stringify(archive));
+}
 
-    /* ANIMAZIONE POPUP */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to   { opacity: 1; transform: scale(1); }
+function loadAll() {
+  notes = JSON.parse(localStorage.getItem(STORAGE_NOTES_KEY) || "[]");
+  archive = JSON.parse(localStorage.getItem(STORAGE_ARCHIVE_KEY) || "[]");
+
+  currentLang = localStorage.getItem(STORAGE_LANG_KEY) || "de";
+  currentTheme = localStorage.getItem(STORAGE_THEME_KEY) || "light";
+  currentAmoled = localStorage.getItem(STORAGE_AMOLED_KEY) === "true";
+  currentFont = localStorage.getItem(STORAGE_FONT_KEY) || "";
+  currentTextSize = parseInt(localStorage.getItem(STORAGE_TEXTSIZE_KEY) || "16");
+  currentAccent = localStorage.getItem(STORAGE_ACCENT_KEY) || "#007aff";
+  currentBlur = parseInt(localStorage.getItem(STORAGE_BLUR_KEY) || "18");
+  currentTimeout = parseInt(localStorage.getItem(STORAGE_TIMEOUT_KEY) || "0");
+  currentAnimations = localStorage.getItem(STORAGE_ANIM_KEY) !== "false";
+  currentHaptics = localStorage.getItem(STORAGE_HAPTIC_KEY) !== "false";
+
+  if (currentTheme === "dark") document.body.classList.add("dark");
+  if (currentAmoled) document.body.classList.add("amoled");
+  if (currentFont) document.documentElement.style.setProperty("--app-font", currentFont);
+  document.documentElement.style.setProperty("--text-size", currentTextSize + "px");
+  document.documentElement.style.setProperty("--accent", currentAccent);
+  document.documentElement.style.setProperty("--blur-amount", currentBlur + "px");
+
+  if (!localStorage.getItem(STORAGE_PIN_KEY)) {
+    localStorage.setItem(STORAGE_PIN_KEY, DEFAULT_PIN);
+  }
+}
+
+/* ============================================================
+   RENDER NOTE
+   ============================================================ */
+function renderNotes() {
+  notesList.innerHTML = "";
+
+  const filtered = notes.filter(n => {
+    if (currentCategoryFilter === "alle") return true;
+    if (currentCategoryFilter === "favorite") return n.favorite;
+    return n.category === currentCategoryFilter;
+  });
+
+  filtered.forEach(n => {
+    const div = document.createElement("div");
+    div.className = "noteItem";
+    div.dataset.id = n.id;
+    div.style.borderLeft = `4px solid ${n.color}`;
+    div.textContent = n.text;
+    notesList.appendChild(div);
+  });
+}
+
+/* ============================================================
+   EDITOR
+   ============================================================ */
+function openEditor(id = null) {
+  currentNoteId = id;
+
+  if (id) {
+    const note = notes.find(n => n.id === id);
+    editorTitle.textContent = "Notiz bearbeiten";
+    noteText.value = note.text;
+    currentColor = note.color;
+    currentPalette = note.palette;
+    deleteNoteBtn.style.display = "block";
+  } else {
+    editorTitle.textContent = "Neue Notiz";
+    noteText.value = "";
+    currentColor = "#ffd60a";
+    currentPalette = "warm";
+    deleteNoteBtn.style.display = "none";
+  }
+
+  updatePaletteUI();
+  noteEditor.style.display = "flex";
+  haptic();
+}
+
+function closeEditor() {
+  noteEditor.style.display = "none";
+  currentNoteId = null;
+}
+
+/* ============================================================
+   NOTE CRUD
+   ============================================================ */
+function createNote(text) {
+  notes.unshift({
+    id: Date.now().toString(),
+    text,
+    color: currentColor,
+    palette: currentPalette,
+    category: "alle",
+    favorite: false
+  });
+  saveAll();
+  renderNotes();
+}
+
+function updateNote(id, text) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  note.text = text;
+  note.color = currentColor;
+  note.palette = currentPalette;
+  saveAll();
+  renderNotes();
+}
+
+function deleteNote(id) {
+  notes = notes.filter(n => n.id !== id);
+  saveAll();
+  renderNotes();
+}
+
+/* ============================================================
+   PALETTE COLORI
+   ============================================================ */
+const palettes = {
+  warm: ["#ffd60a", "#ff9f1c", "#ff6b6b", "#ff4d6d"],
+  cool: ["#4dabf7", "#4361ee", "#3a86ff", "#00b4d8"],
+  pastel: ["#ffc8dd", "#bde0fe", "#caffbf", "#ffafcc"],
+  mix: ["#ffd60a", "#4dabf7", "#ffafcc", "#caffbf"]
+};
+
+function updatePaletteUI() {
+  paletteBtns.forEach(b => b.classList.toggle("active", b.dataset.pal === currentPalette));
+
+  colorRow.innerHTML = "";
+  palettes[currentPalette].forEach(c => {
+    const dot = document.createElement("div");
+    dot.className = "colorDot show";
+    dot.style.background = c;
+    if (c === currentColor) dot.classList.add("selected");
+    dot.addEventListener("click", () => {
+      currentColor = c;
+      updatePaletteUI();
+    });
+    colorRow.appendChild(dot);
+  });
+}
+/* ============================================================
+   ARCHIVIO (PREMIUM)
+   ============================================================ */
+function openArchive() {
+  archiveList.innerHTML = "";
+
+  archive.forEach(n => {
+    const div = document.createElement("div");
+    div.className = "noteItem";
+    div.textContent = n.text;
+    div.style.borderLeft = `4px solid ${n.color}`;
+    div.addEventListener("click", () => restoreFromArchive(n.id));
+    archiveList.appendChild(div);
+  });
+
+  archivePopup.style.display = "flex";
+}
+
+function restoreFromArchive(id) {
+  const note = archive.find(n => n.id === id);
+  if (!note) return;
+  archive = archive.filter(n => n.id !== id);
+  notes.unshift(note);
+  saveAll();
+  renderNotes();
+  openArchive();
+}
+
+function moveToArchive(id) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  notes = notes.filter(n => n.id !== id);
+  archive.unshift(note);
+  saveAll();
+  renderNotes();
+}
+
+/* ============================================================
+   LINGUA
+   ============================================================ */
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem(STORAGE_LANG_KEY, lang);
+  showBanner("Sprache geändert");
+}
+
+/* ============================================================
+   TEMA
+   ============================================================ */
+function toggleTheme() {
+  if (currentTheme === "light") {
+    currentTheme = "dark";
+    document.body.classList.add("dark");
+  } else {
+    currentTheme = "light";
+    document.body.classList.remove("dark");
+  }
+  localStorage.setItem(STORAGE_THEME_KEY, currentTheme);
+}
+
+function toggleAmoled() {
+  currentAmoled = !currentAmoled;
+  if (currentAmoled) document.body.classList.add("amoled");
+  else document.body.classList.remove("amoled");
+  localStorage.setItem(STORAGE_AMOLED_KEY, currentAmoled);
+}
+
+/* ============================================================
+   FONT SELECTOR
+   ============================================================ */
+function chooseFont() {
+  const f = prompt("Inserisci nome font (es: 'Georgia', 'Arial')");
+  if (!f) return;
+  currentFont = f;
+  document.documentElement.style.setProperty("--app-font", f);
+  localStorage.setItem(STORAGE_FONT_KEY, f);
+}
+
+/* ============================================================
+   DIMENSIONE TESTO
+   ============================================================ */
+function chooseTextSize() {
+  const s = prompt("Dimensione testo (12–26):", currentTextSize);
+  if (!s) return;
+  const size = parseInt(s);
+  if (size < 12 || size > 26) return;
+  currentTextSize = size;
+  document.documentElement.style.setProperty("--text-size", size + "px");
+  localStorage.setItem(STORAGE_TEXTSIZE_KEY, size);
+}
+
+/* ============================================================
+   COLORE ACCENTO
+   ============================================================ */
+function chooseAccent() {
+  const c = prompt("Colore accento (es: #ff0000):", currentAccent);
+  if (!c) return;
+  currentAccent = c;
+  document.documentElement.style.setProperty("--accent", c);
+  localStorage.setItem(STORAGE_ACCENT_KEY, c);
+}
+
+/* ============================================================
+   BLUR
+   ============================================================ */
+function chooseBlur() {
+  const b = prompt("Blur sfondo (0–40):", currentBlur);
+  if (!b) return;
+  const val = parseInt(b);
+  if (val < 0 || val > 40) return;
+  currentBlur = val;
+  document.documentElement.style.setProperty("--blur-amount", val + "px");
+  localStorage.setItem(STORAGE_BLUR_KEY, val);
+}
+
+/* ============================================================
+   BACKUP
+   ============================================================ */
+function autoBackup() {
+  const data = {
+    notes,
+    archive,
+    lang: currentLang,
+    theme: currentTheme,
+    amoled: currentAmoled,
+    font: currentFont,
+    textSize: currentTextSize,
+    accent: currentAccent,
+    blur: currentBlur
+  };
+  localStorage.setItem("backup_v1", JSON.stringify(data));
+  showBanner("Backup salvato");
+}
+
+function autoRestore() {
+  const raw = localStorage.getItem("backup_v1");
+  if (!raw) return showBanner("Nessun backup");
+  try {
+    const data = JSON.parse(raw);
+    notes = data.notes || [];
+    archive = data.archive || [];
+    currentLang = data.lang || "de";
+    currentTheme = data.theme || "light";
+    currentAmoled = data.amoled || false;
+    currentFont = data.font || "";
+    currentTextSize = data.textSize || 16;
+    currentAccent = data.accent || "#007aff";
+    currentBlur = data.blur || 18;
+
+    saveAll();
+    loadAll();
+    renderNotes();
+    showBanner("Backup ripristinato");
+  } catch {
+    showBanner("Errore ripristino");
+  }
+}
+
+function manualBackup() {
+  const data = {
+    notes,
+    archive,
+    lang: currentLang,
+    theme: currentTheme,
+    amoled: currentAmoled,
+    font: currentFont,
+    textSize: currentTextSize,
+    accent: currentAccent,
+    blur: currentBlur
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "notizen-backup.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function manualRestore() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "application/json";
+  input.addEventListener("change", () => {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        notes = data.notes || [];
+        archive = data.archive || [];
+        currentLang = data.lang || "de";
+        currentTheme = data.theme || "light";
+        currentAmoled = data.amoled || false;
+        currentFont = data.font || "";
+        currentTextSize = data.textSize || 16;
+        currentAccent = data.accent || "#007aff";
+        currentBlur = data.blur || 18;
+
+        saveAll();
+        loadAll();
+        renderNotes();
+        showBanner("Backup importato");
+      } catch {
+        showBanner("Errore import");
+      }
+    };
+    reader.readAsText(file);
+  });
+  input.click();
+}
+
+/* ============================================================
+   PIN (4 CIFRE, 4618)
+   ============================================================ */
+function getStoredPin() {
+  return localStorage.getItem(STORAGE_PIN_KEY) || DEFAULT_PIN;
+}
+
+function resetPinInput() {
+  currentPinInput = "";
+  pinCircles.forEach(c => c.classList.remove("filled"));
+}
+
+function updatePinCircles() {
+  pinCircles.forEach((c, i) => {
+    c.classList.toggle("filled", i < currentPinInput.length);
+  });
+}
+
+function showPinError(msg) {
+  pinError.textContent = msg;
+  pinError.style.opacity = 1;
+  setTimeout(() => pinError.style.opacity = 0, 1500);
+}
+
+function handlePinDigit(d) {
+  if (currentPinInput.length >= 4) return;
+
+  currentPinInput += d;
+  updatePinCircles();
+  haptic();
+
+  if (currentPinInput.length === 4) {
+    const storedPin = getStoredPin();
+    if (currentPinInput === storedPin) {
+      pinOverlay.style.display = "none";
+      resetPinInput();
+      startPinTimeout();
+    } else {
+      showPinError("PIN falsch");
+      setTimeout(() => resetPinInput(), 400);
     }
-    /* FINE CSS AVANZATO — CHIUSURA STYLE */
-  </style>
-</head>
+  }
+}
+
+function handlePinBackspace() {
+  if (!currentPinInput.length) return;
+  currentPinInput = currentPinInput.slice(0, -1);
+  updatePinCircles();
+  haptic();
+}
+
+/* CAMBIO PIN */
+function changePinFlow() {
+  const oldPin = prompt("Inserisci PIN attuale:");
+  if (!oldPin) return;
+
+  if (oldPin !== getStoredPin()) {
+    alert("PIN errato");
+    return;
+  }
+
+  const newPin = prompt("Nuovo PIN (4 cifre):");
+  if (!newPin || newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
+    alert("PIN non valido");
+    return;
+  }
+
+  localStorage.setItem(STORAGE_PIN_KEY, newPin);
+  alert("PIN aggiornato");
+}
+
+/* RESET PIN */
+function resetPinToDefault() {
+  localStorage.setItem(STORAGE_PIN_KEY, DEFAULT_PIN);
+  alert("PIN ripristinato (4618)");
+}
+
+/* ============================================================
+   TIMEOUT PIN (PREMIUM)
+   ============================================================ */
+let pinTimeoutTimer = null;
+
+function startPinTimeout() {
+  if (currentTimeout <= 0) return;
+
+  if (pinTimeoutTimer) clearTimeout(pinTimeoutTimer);
+
+  pinTimeoutTimer = setTimeout(() => {
+    pinOverlay.style.display = "flex";
+    resetPinInput();
+  }, currentTimeout * 60000);
+}
+
+function chooseTimeout() {
+  const t = prompt("Timeout PIN in minuti (0 = disattivato):", currentTimeout);
+  if (t === null) return;
+
+  const val = parseInt(t);
+  if (val < 0 || val > 120) return;
+
+  currentTimeout = val;
+  localStorage.setItem(STORAGE_TIMEOUT_KEY, val);
+
+  showBanner("Timeout aggiornato");
+}
+
+/* ============================================================
+   RESET APP (PREMIUM)
+   ============================================================ */
+function resetApp() {
+  localStorage.clear();
+  location.reload();
+}
+/* ============================================================
+   EVENT LISTENERS
+   ============================================================ */
+
+/* NOTE LIST CLICK */
+notesList.addEventListener("click", e => {
+  const item = e.target.closest(".noteItem");
+  if (!item) return;
+  const id = item.dataset.id;
+  openEditor(id);
+});
+
+/* ADD NOTE */
+addNoteBtn.addEventListener("click", () => openEditor(null));
+
+/* CANCEL EDITOR */
+cancelBtn.addEventListener("click", closeEditor);
+
+/* SAVE NOTE */
+saveBtn.addEventListener("click", () => {
+  const text = noteText.value.trim();
+  if (!text) return;
+
+  if (currentNoteId) updateNote(currentNoteId, text);
+  else createNote(text);
+
+  closeEditor();
+});
+
+/* DELETE NOTE */
+deleteNoteBtn.addEventListener("click", () => {
+  if (!currentNoteId) return;
+  moveToArchive(currentNoteId);
+  closeEditor();
+});
+
+/* PALETTE BUTTONS */
+paletteBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    currentPalette = btn.dataset.pal;
+    updatePaletteUI();
+  });
+});
+
+/* CATEGORY FILTER */
+categories.forEach(cat => {
+  cat.addEventListener("click", () => {
+    currentCategoryFilter = cat.dataset.cat;
+    renderNotes();
+  });
+});
+
+/* LANGUAGE POPUP */
+langBtn.addEventListener("click", () => {
+  langPopup.style.display = "flex";
+});
+
+langChoices.forEach(btn => {
+  btn.addEventListener("click", () => {
+    setLanguage(btn.dataset.lang);
+    langPopup.style.display = "none";
+  });
+});
+
+/* BACKUP POPUP */
+backupBtn.addEventListener("click", () => {
+  backupPopup.style.display = "flex";
+});
+
+backupCloseBtn.addEventListener("click", () => {
+  backupPopup.style.display = "none";
+});
+
+autoBackupBtn.addEventListener("click", autoBackup);
+manualBackupBtn.addEventListener("click", manualBackup);
+autoRestoreBtn.addEventListener("click", autoRestore);
+manualRestoreBtn.addEventListener("click", manualRestore);
+
+/* SETTINGS PANEL */
+settingsBtn.addEventListener("click", () => {
+  settingsPanel.style.display = "flex";
+  setTimeout(() => settingsPanel.classList.add("show"), 10);
+});
+
+settingsClose.addEventListener("click", () => {
+  settingsPanel.classList.remove("show");
+  setTimeout(() => settingsPanel.style.display = "none", 300);
+});
+
+/* SETTINGS ACTIONS */
+settingsTheme.addEventListener("click", toggleTheme);
+settingsAmoled.addEventListener("click", toggleAmoled);
+settingsFont.addEventListener("click", chooseFont);
+settingsTextSize.addEventListener("click", chooseTextSize);
+settingsAccent.addEventListener("click", chooseAccent);
+settingsBlur.addEventListener("click", chooseBlur);
+
+settingsArchive.addEventListener("click", openArchive);
+archiveCloseBtn.addEventListener("click", () => archivePopup.style.display = "none");
+
+settingsAnimations.addEventListener("click", () => {
+  currentAnimations = !currentAnimations;
+  localStorage.setItem(STORAGE_ANIM_KEY, currentAnimations);
+  showBanner("Animazioni aggiornate");
+});
+
+settingsHaptics.addEventListener("click", () => {
+  currentHaptics = !currentHaptics;
+  localStorage.setItem(STORAGE_HAPTIC_KEY, currentHaptics);
+  showBanner("Haptic aggiornato");
+});
+
+settingsChangePin.addEventListener("click", changePinFlow);
+settingsResetPin.addEventListener("click", resetPinToDefault);
+settingsTimeout.addEventListener("click", chooseTimeout);
+
+settingsExport.addEventListener("click", manualBackup);
+settingsImport.addEventListener("click", manualRestore);
+
+settingsResetApp.addEventListener("click", () => {
+  resetPopup.style.display = "flex";
+});
+
+resetCancelBtn.addEventListener("click", () => {
+  resetPopup.style.display = "none";
+});
+
+resetConfirmBtn.addEventListener("click", () => {
+  resetApp();
+});
+
+settingsInfo.addEventListener("click", () => {
+  infoPopup.style.display = "flex";
+});
+
+infoCloseBtn.addEventListener("click", () => {
+  infoPopup.style.display = "none";
+});
+
+/* PIN KEYPAD */
+pinKeys.forEach(k => {
+  if (k.classList.contains("empty")) return;
+  if (k.classList.contains("backspace")) return;
+
+  k.addEventListener("click", () => handlePinDigit(k.dataset.digit));
+});
+
+pinBackspace.addEventListener("click", handlePinBackspace);
+/* ============================================================
+   INIT APP
+   ============================================================ */
+function init() {
+  loadAll();
+  renderNotes();
+
+  // Mostra PIN all'avvio
+  pinOverlay.style.display = "flex";
+  resetPinInput();
+}
+
+init();
+</script>
+<!-- ============================
+     BOX 4.1 — CHIUSURA FINALE
+     ============================ -->
+</body>
+</html>
