@@ -12,6 +12,7 @@ body {
   padding: 20px;
 }
 
+/* HEADER */
 header {
   display: flex;
   justify-content: space-between;
@@ -35,6 +36,7 @@ header h1 {
   cursor: pointer;
 }
 
+/* LISTA NOTE */
 #notesList {
   display: flex;
   flex-direction: column;
@@ -47,6 +49,11 @@ header h1 {
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.noteItem:active {
+  transform: scale(0.97);
 }
 
 .noteItem h3 {
@@ -59,6 +66,7 @@ header h1 {
   color: #555;
 }
 
+/* EDITOR */
 #editor {
   position: fixed;
   inset: 0;
@@ -70,6 +78,14 @@ header h1 {
 
 #editor.hidden {
   display: none;
+}
+
+.editorBox {
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 420px;
 }
 
 #editor input,
@@ -117,6 +133,7 @@ header h1 {
   color: #fff;
 }
 
+/* PIN */
 #pinOverlay {
   position: fixed;
   inset: 0;
