@@ -4,22 +4,29 @@
   <meta charset="UTF-8">
   <title>Note</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- COLLEGAMENTO AL CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- PIN OVERLAY -->
+<!-- ============================
+     OVERLAY PIN
+============================= -->
 <div id="pinOverlay">
   <div class="pinBox">
     <h2>Inserisci PIN</h2>
+
     <div class="pinCircles">
       <div class="circle"></div>
       <div class="circle"></div>
       <div class="circle"></div>
       <div class="circle"></div>
     </div>
+
     <div id="pinError"></div>
+
     <div class="pinPad">
       <button data-num="1">1</button>
       <button data-num="2">2</button>
@@ -37,19 +44,26 @@
   </div>
 </div>
 
-<!-- HEADER -->
+<!-- ============================
+     HEADER
+============================= -->
 <header>
   <h1>Note</h1>
   <button id="addNoteBtn">＋</button>
 </header>
 
-<!-- LISTA NOTE -->
+<!-- ============================
+     LISTA NOTE
+============================= -->
 <div id="notesList"></div>
 
-<!-- EDITOR -->
+<!-- ============================
+     EDITOR
+============================= -->
 <div id="editor" class="hidden">
   <input id="noteTitle" placeholder="Titolo">
   <textarea id="noteText" placeholder="Scrivi..."></textarea>
+
   <div class="editorButtons">
     <button id="saveNote">Salva</button>
     <button id="cancelEdit">Annulla</button>
@@ -57,6 +71,10 @@
   </div>
 </div>
 
+<!-- ============================
+     COLLEGAMENTO AL JAVASCRIPT
+============================= -->
 <script src="script.js"></script>
+
 </body>
 </html>
