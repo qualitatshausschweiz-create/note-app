@@ -1,184 +1,346 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <title>Note Sandro</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Le Mie Note</title>
+
+    <!-- ============================
+         CSS PRINCIPALE
+    ============================= -->
+    <link rel="stylesheet" href="style.css" />
 </head>
-<body class="light-theme">
-  <div class="app-container">
 
-    <!-- HEADER -->
-    <header class="app-header">
-      <div class="header-left">
-        <h1 class="app-title">Le mie note</h1>
-        <span class="app-subtitle">Categorie, cestino, backup, tutto sotto controllo</span>
-      </div>
-      <div class="header-right">
-        <button id="themeToggle" class="icon-button" title="Tema chiaro/scuro">
-          🌞
-        </button>
-        <button id="settingsButton" class="icon-button" title="Impostazioni">
-          ⚙️
-        </button>
-        <button id="trashPageButton" class="icon-button" title="Cestino">
-          🗑️
-        </button>
-        <button id="lifebuoyButton" class="lifebuoy-button" title="Salvagente">
-          🛟
-        </button>
-      </div>
-    </header>
+<body>
 
-    <!-- MAIN LAYOUT -->
-    <main class="main-layout">
-      <!-- SIDEBAR CATEGORIES -->
-      <aside class="sidebar">
-        <div class="sidebar-header">
-          <h2>Categorie</h2>
-          <button id="addCategoryButton" class="small-button">+</button>
-        </div>
-        <ul id="categoryList" class="category-list">
-          <!-- Categorie generate da JS -->
-        </ul>
-      </aside>
+    <!-- ============================================================
+         APP WRAPPER — Contiene tutta l'app
+    ============================================================= -->
+    <div id="app">
 
-      <!-- NOTES AREA -->
-      <section class="notes-section">
-        <div class="notes-header">
-          <input
-            type="text"
-            id="noteTitleInput"
-            class="note-title-input"
-            placeholder="Titolo della nota..."
-          />
-          <select id="noteCategorySelect" class="note-category-select"></select>
-        </div>
-        <textarea
-          id="noteContentInput"
-          class="note-content-input"
-          placeholder="Scrivi la tua nota qui..."
-        ></textarea>
-        <div class="notes-actions">
-          <button id="saveNoteButton" class="primary-button">Salva nota</button>
-          <button id="deleteNoteButton" class="secondary-button">Elimina nota</button>
-        </div>
+        <!-- ============================================================
+             SIDEBAR — Categorie, Cestino, Impostazioni
+        ============================================================= -->
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <h2>Le mie categorie</h2>
+                <button id="addCategoryBtn">+</button>
+            </div>
 
-        <div class="notes-list-header">
-          <h2>Le tue note</h2>
-        </div>
-        <ul id="notesList" class="notes-list">
-          <!-- Note generate da JS -->
-        </ul>
-      </section>
-    </main>
-  </div>
+            <ul id="categoryList">
+                <!-- Le categorie verranno generate via JS -->
+            </ul>
 
-  <!-- PAGINA CESTINO -->
-  <div id="trashPage" class="overlay-page hidden">
-    <div class="overlay-header">
-      <h2>Cestino</h2>
-      <button id="closeTrashPage" class="icon-button">✖️</button>
+            <div class="sidebar-footer">
+                <button id="trashBtn">Cestino</button>
+                <button id="settingsBtn">Impostazioni</button>
+            </div>
+        </aside>
+
+        <!-- ============================================================
+             AREA NOTE — Lista note + Editor
+        ============================================================= -->
+        <main id="mainArea">
+
+            <!-- Lista note -->
+            <div id="noteList">
+                <!-- Le note verranno generate via JS -->
+            </div>
+
+            <!-- Editor nota -->
+            <div id="noteEditor">
+                <input type="text" id="noteTitle" placeholder="Titolo della nota..." />
+                <textarea id="noteContent" placeholder="Scrivi qui..."></textarea>
+            </div>
+
+        </main>
+
     </div>
-    <ul id="trashList" class="notes-list">
-      <!-- Note eliminate -->
+
+    <!-- ============================================================
+         POPUP SALVAGENTE — Backup, ripristino, ecc.
+    ============================================================= -->
+    <div id="lifebuoyPopup" class="popup hidden">
+        <!-- Contenuto verrà aggiunto dopo -->
+    </div>
+
+    <!-- ============================================================
+         POPUP IMPOSTAZIONI — Tema, font, colori, ecc.
+    ============================================================= -->
+    <div id="settingsPopup" class="popup hidden">
+        <!-- Contenuto verrà aggiunto dopo -->
+    </div>
+
+    <!-- ============================================================
+         POPUP MENU “⋯” — Categorie e Note
+    ============================================================= -->
+    <div id="contextMenu" class="context-menu hidden">
+        <!-- Voci generate dinamicamente -->
+    </div>
+
+    <!-- ============================
+         SCRIPT PRINCIPALE
+    ============================= -->
+    <script src="script.js"></script>
+
+</body>
+</html>
+<!-- ============================================================
+     SIDEBAR — Categorie, Cestino, Impostazioni
+============================================================= -->
+<aside id="sidebar">
+
+    <!-- ============================
+         HEADER SIDEBAR
+         Titolo + pulsante aggiungi categoria
+    ============================= -->
+    <div class="sidebar-header">
+        <h2>Categorie</h2>
+        <button id="addCategoryBtn" class="icon-btn">+</button>
+    </div>
+
+    <!-- ============================
+         LISTA CATEGORIE
+         (Generata dinamicamente via JS)
+    ============================= -->
+    <ul id="categoryList" class="category-list">
+        <!-- Esempio struttura generata via JS:
+        <li class="category-item" data-id="123">
+            <span class="color-dot" style="background:#ff6b6b;"></span>
+            <span class="category-name">Lavoro</span>
+            <button class="category-menu-btn">⋯</button>
+        </li>
+        -->
     </ul>
-  </div>
 
-  <!-- PAGINA IMPOSTAZIONI -->
-  <div id="settingsPage" class="overlay-page hidden">
-    <div class="overlay-header">
-      <h2>Impostazioni</h2>
-      <button id="closeSettingsPage" class="icon-button">✖️</button>
+    <!-- ============================
+         FOOTER SIDEBAR
+         Cestino + Impostazioni
+    ============================= -->
+    <div class="sidebar-footer">
+        <button id="trashBtn" class="footer-btn">🗑️ Cestino</button>
+        <button id="settingsBtn" class="footer-btn">⚙️ Impostazioni</button>
     </div>
-    <div class="settings-content">
-      <section class="settings-section">
-        <h3>Tema</h3>
-        <button id="settingsThemeToggle" class="primary-button">
-          Passa a tema scuro
-        </button>
-      </section>
 
-      <section class="settings-section">
-        <h3>Categorie</h3>
-        <p>Gestisci le categorie e i loro colori.</p>
-        <ul id="settingsCategoryList" class="settings-category-list">
-          <!-- Categorie con gestione colori -->
-        </ul>
-      </section>
+</aside>
+<!-- ============================================================
+     AREA NOTE — Lista note + Editor
+============================================================= -->
+<main id="mainArea">
 
-      <section class="settings-section">
-        <h3>Backup & Ripristino</h3>
-        <p>Gestisci le opzioni di backup automatico.</p>
-        <label class="toggle-row">
-          <span>Backup automatico attivo</span>
-          <input type="checkbox" id="autoBackupToggle" />
-        </label>
-      </section>
+    <!-- ============================
+         HEADER AREA NOTE
+         Nome categoria + pulsanti
+    ============================= -->
+    <div id="notesHeader">
+        <h2 id="currentCategoryName">Tutte le note</h2>
+
+        <div class="notes-header-buttons">
+            <button id="addNoteBtn" class="icon-btn">+ Nota</button>
+            <button id="categoryMenuBtn" class="icon-btn">⋯</button>
+        </div>
     </div>
-  </div>
 
-  <!-- POPUP SALVAGENTE -->
-  <div id="lifebuoyOverlay" class="lifebuoy-overlay hidden">
-    <div id="lifebuoyBackdrop" class="lifebuoy-backdrop"></div>
-    <div class="lifebuoy-popup">
-      <div class="lifebuoy-header">
-        <h2>Salvagente 🛟</h2>
-        <button id="closeLifebuoyButton" class="icon-button">✖️</button>
-      </div>
-
-      <div class="lifebuoy-section">
-        <h3>Backup</h3>
-        <div class="lifebuoy-buttons">
-          <button id="manualBackupButton" class="lifebuoy-primary">
-            Backup manuale (file JSON)
-          </button>
-          <button id="autoBackupNowButton" class="lifebuoy-secondary">
-            Esegui backup automatico ora
-          </button>
+    <!-- ============================
+         LISTA NOTE
+         (Generata dinamicamente via JS)
+    ============================= -->
+    <div id="noteList" class="note-list">
+        <!-- Esempio struttura generata via JS:
+        <div class="note-item" data-id="456">
+            <div class="note-color" style="background:#ffd93d;"></div>
+            <div class="note-text">
+                <h3>Titolo nota</h3>
+                <p>Anteprima contenuto...</p>
+            </div>
+            <button class="note-menu-btn">⋯</button>
         </div>
-      </div>
-
-      <div class="lifebuoy-section">
-        <h3>Ripristino</h3>
-        <div class="lifebuoy-buttons">
-          <button id="manualRestoreFileButton" class="lifebuoy-primary">
-            Ripristino manuale da file
-          </button>
-          <button id="manualRestoreListButton" class="lifebuoy-secondary">
-            Ripristino da lista backup
-          </button>
-          <button id="autoRestoreButton" class="lifebuoy-secondary">
-            Ripristino automatico ultimo backup
-          </button>
-        </div>
-      </div>
-
-      <div class="lifebuoy-section">
-        <h3>Lista backup interni</h3>
-        <ul id="backupList" class="backup-list">
-          <!-- Lista backup automatici -->
-        </ul>
-      </div>
-
-      <div class="lifebuoy-section">
-        <h3>iCloud (funzione futura)</h3>
-        <div class="lifebuoy-buttons">
-          <button class="lifebuoy-disabled">
-            Salva note su iCloud (non attivo in versione web)
-          </button>
-          <button class="lifebuoy-disabled">
-            Ripristina note da iCloud (non attivo in versione web)
-          </button>
-        </div>
-      </div>
+        -->
     </div>
-  </div>
 
-  <!-- INPUT FILE NASCOSTO PER RIPRISTINO MANUALE -->
-  <input type="file" id="restoreFileInput" accept="application/json" style="display:none" />
+    <!-- ============================
+         EDITOR NOTA
+         Titolo + contenuto
+    ============================= -->
+    <div id="noteEditor" class="hidden">
+        <input 
+            type="text" 
+            id="noteTitle" 
+            placeholder="Titolo della nota..." 
+            autocomplete="off"
+        />
 
-  <script src="script.js"></script>
+        <textarea 
+            id="noteContent" 
+            placeholder="Scrivi qui..." 
+            autocomplete="off"
+        ></textarea>
+
+        <!-- Pulsanti editor -->
+        <div id="editorButtons">
+            <button id="saveNoteBtn" class="primary-btn">Salva</button>
+            <button id="cancelEditBtn" class="secondary-btn">Annulla</button>
+        </div>
+    </div>
+
+</main>
+<!-- ============================================================
+     POPUP SALVAGENTE — Backup, ripristino, lista backup
+============================================================= -->
+<div id="lifebuoyPopup" class="popup hidden">
+
+    <!-- Overlay vetro-opaco -->
+    <div class="popup-overlay"></div>
+
+    <!-- Contenitore centrale -->
+    <div class="popup-content lifebuoy-content">
+
+        <!-- Header -->
+        <div class="popup-header">
+            <h2>Backup & Ripristino</h2>
+            <button id="closeLifebuoyBtn" class="close-btn">✕</button>
+        </div>
+
+        <!-- Descrizione -->
+        <p class="popup-description">
+            Gestisci i tuoi backup, ripristina versioni precedenti o importa un file.
+        </p>
+
+        <!-- Lista backup (generata via JS) -->
+        <div id="backupList" class="backup-list">
+            <!-- Esempio generato via JS:
+            <div class="backup-item">
+                <span class="backup-date">12/01/2026 - 14:32</span>
+                <button class="restoreBackupBtn">Ripristina</button>
+            </div>
+            -->
+        </div>
+
+        <!-- Pulsanti principali -->
+        <div class="popup-buttons">
+
+            <button id="createBackupBtn" class="primary-btn">
+                Crea nuovo backup
+            </button>
+
+            <button id="importBackupBtn" class="secondary-btn">
+                Ripristina da file
+            </button>
+
+        </div>
+
+    </div>
+</div>
+<!-- ============================================================
+     POPUP IMPOSTAZIONI — Tema, font, colori, layout
+============================================================= -->
+<div id="settingsPopup" class="popup hidden">
+
+    <!-- Overlay vetro-opaco -->
+    <div class="popup-overlay"></div>
+
+    <!-- Contenitore centrale -->
+    <div class="popup-content settings-content">
+
+        <!-- Header -->
+        <div class="popup-header">
+            <h2>Impostazioni</h2>
+            <button id="closeSettingsBtn" class="close-btn">✕</button>
+        </div>
+
+        <!-- ============================
+             SEZIONE: Tema
+        ============================= -->
+        <div class="settings-section">
+            <h3>Tema</h3>
+
+            <div class="settings-row">
+                <label for="themeSelect">Modalità</label>
+                <select id="themeSelect">
+                    <option value="auto">Automatico</option>
+                    <option value="light">Chiaro</option>
+                    <option value="dark">Scuro</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- ============================
+             SEZIONE: Font App
+        ============================= -->
+        <div class="settings-section">
+            <h3>Font dell’app</h3>
+
+            <div class="settings-row">
+                <label for="fontSelect">Seleziona font</label>
+                <select id="fontSelect">
+                    <option value="system-ui">iOS (San Francisco)</option>
+                    <option value="Inter">Inter</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Courier New">Monospace</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- ============================
+             SEZIONE: Colori
+        ============================= -->
+        <div class="settings-section">
+            <h3>Colore principale</h3>
+
+            <div id="colorPalette" class="color-palette">
+                <!-- Generata via JS:
+                <div class="color-swatch" data-color="#ff6b6b" style="background:#ff6b6b;"></div>
+                -->
+            </div>
+        </div>
+
+        <!-- ============================
+             SEZIONE: Opzioni avanzate
+        ============================= -->
+        <div class="settings-section">
+            <h3>Avanzate</h3>
+
+            <div class="settings-row">
+                <button id="exportDataBtn" class="secondary-btn">Esporta dati</button>
+            </div>
+
+            <div class="settings-row">
+                <button id="resetAppBtn" class="danger-btn">Ripristina app</button>
+            </div>
+        </div>
+
+        <!-- ============================
+             SEZIONE: Info App
+        ============================= -->
+        <div class="settings-section">
+            <h3>Info</h3>
+
+            <p class="info-text">
+                App Note — Versione 1.0  
+                Creata con cura e precisione.
+            </p>
+        </div>
+
+    </div>
+</div>
+<!-- ============================================================
+     MENU CONTESTUALE “⋯” — Azioni rapide per categorie e note
+============================================================= -->
+<div id="contextMenu" class="context-menu hidden">
+
+    <!-- Le voci vengono generate via JS.
+         Esempio struttura generata:
+         <button class="context-item" data-action="rename">Rinomina</button>
+         <button class="context-item" data-action="delete">Elimina</button>
+         <button class="context-item" data-action="color">Cambia colore</button>
+    -->
+
+</div>
+    <!-- ============================
+         SCRIPT PRINCIPALE
+    ============================= -->
+    <script src="script.js"></script>
+
 </body>
 </html>
