@@ -1,38 +1,183 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Note App Base</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Note Sandro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body data-theme="light">
-  <header id="top-bar">
-    <div id="left-icons">
-      <button id="theme-toggle-btn">🌞</button>
-    </div>
-    <div id="right-icons">
-      <button id="dummy-btn">🤖</button>
-      <button id="dummy2-btn">🛟</button>
-    </div>
-  </header>
+<body class="light-theme">
+  <div class="app-container">
 
-  <main id="main-content">
-    <div id="notes-container"></div>
-  </main>
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="app-title">Le mie note</h1>
+        <span class="app-subtitle">Categorie, cestino, backup, tutto sotto controllo</span>
+      </div>
+      <div class="header-right">
+        <button id="themeToggle" class="icon-button" title="Tema chiaro/scuro">
+          🌞
+        </button>
+        <button id="settingsButton" class="icon-button" title="Impostazioni">
+          ⚙️
+        </button>
+        <button id="trashPageButton" class="icon-button" title="Cestino">
+          🗑️
+        </button>
+        <button id="lifebuoyButton" class="lifebuoy-button" title="Salvagente">
+          🛟
+        </button>
+      </div>
+    </header>
 
-  <button id="add-note-btn">+</button>
+    <!-- MAIN LAYOUT -->
+    <main class="main-layout">
+      <!-- SIDEBAR CATEGORIES -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2>Categorie</h2>
+          <button id="addCategoryButton" class="small-button">+</button>
+        </div>
+        <ul id="categoryList" class="category-list">
+          <!-- Categorie generate da JS -->
+        </ul>
+      </aside>
 
-  <div id="editor-panel">
-    <div id="editor-header">
-      <button id="close-editor-btn">✖</button>
+      <!-- NOTES AREA -->
+      <section class="notes-section">
+        <div class="notes-header">
+          <input
+            type="text"
+            id="noteTitleInput"
+            class="note-title-input"
+            placeholder="Titolo della nota..."
+          />
+          <select id="noteCategorySelect" class="note-category-select"></select>
+        </div>
+        <textarea
+          id="noteContentInput"
+          class="note-content-input"
+          placeholder="Scrivi la tua nota qui..."
+        ></textarea>
+        <div class="notes-actions">
+          <button id="saveNoteButton" class="primary-button">Salva nota</button>
+          <button id="deleteNoteButton" class="secondary-button">Elimina nota</button>
+        </div>
+
+        <div class="notes-list-header">
+          <h2>Le tue note</h2>
+        </div>
+        <ul id="notesList" class="notes-list">
+          <!-- Note generate da JS -->
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <!-- PAGINA CESTINO -->
+  <div id="trashPage" class="overlay-page hidden">
+    <div class="overlay-header">
+      <h2>Cestino</h2>
+      <button id="closeTrashPage" class="icon-button">✖️</button>
     </div>
-    <input id="note-title-input" placeholder="Titolo">
-    <textarea id="note-content-input" placeholder="Scrivi qui..."></textarea>
-    <div id="editor-footer">
-      <button id="save-note-btn">Salva</button>
+    <ul id="trashList" class="notes-list">
+      <!-- Note eliminate -->
+    </ul>
+  </div>
+
+  <!-- PAGINA IMPOSTAZIONI -->
+  <div id="settingsPage" class="overlay-page hidden">
+    <div class="overlay-header">
+      <h2>Impostazioni</h2>
+      <button id="closeSettingsPage" class="icon-button">✖️</button>
+    </div>
+    <div class="settings-content">
+      <section class="settings-section">
+        <h3>Tema</h3>
+        <button id="settingsThemeToggle" class="primary-button">
+          Passa a tema scuro
+        </button>
+      </section>
+
+      <section class="settings-section">
+        <h3>Categorie</h3>
+        <p>Gestisci le categorie e i loro colori.</p>
+        <ul id="settingsCategoryList" class="settings-category-list">
+          <!-- Categorie con gestione colori -->
+        </ul>
+      </section>
+
+      <section class="settings-section">
+        <h3>Backup & Ripristino</h3>
+        <p>Gestisci le opzioni di backup automatico.</p>
+        <label class="toggle-row">
+          <span>Backup automatico attivo</span>
+          <input type="checkbox" id="autoBackupToggle" />
+        </label>
+      </section>
     </div>
   </div>
+
+  <!-- POPUP SALVAGENTE -->
+  <div id="lifebuoyOverlay" class="lifebuoy-overlay hidden">
+    <div id="lifebuoyBackdrop" class="lifebuoy-backdrop"></div>
+    <div class="lifebuoy-popup">
+      <div class="lifebuoy-header">
+        <h2>Salvagente 🛟</h2>
+        <button id="closeLifebuoyButton" class="icon-button">✖️</button>
+      </div>
+
+      <div class="lifebuoy-section">
+        <h3>Backup</h3>
+        <div class="lifebuoy-buttons">
+          <button id="manualBackupButton" class="lifebuoy-primary">
+            Backup manuale (file JSON)
+          </button>
+          <button id="autoBackupNowButton" class="lifebuoy-secondary">
+            Esegui backup automatico ora
+          </button>
+        </div>
+      </div>
+
+      <div class="lifebuoy-section">
+        <h3>Ripristino</h3>
+        <div class="lifebuoy-buttons">
+          <button id="manualRestoreFileButton" class="lifebuoy-primary">
+            Ripristino manuale da file
+          </button>
+          <button id="manualRestoreListButton" class="lifebuoy-secondary">
+            Ripristino da lista backup
+          </button>
+          <button id="autoRestoreButton" class="lifebuoy-secondary">
+            Ripristino automatico ultimo backup
+          </button>
+        </div>
+      </div>
+
+      <div class="lifebuoy-section">
+        <h3>Lista backup interni</h3>
+        <ul id="backupList" class="backup-list">
+          <!-- Lista backup automatici -->
+        </ul>
+      </div>
+
+      <div class="lifebuoy-section">
+        <h3>iCloud (funzione futura)</h3>
+        <div class="lifebuoy-buttons">
+          <button class="lifebuoy-disabled">
+            Salva note su iCloud (non attivo in versione web)
+          </button>
+          <button class="lifebuoy-disabled">
+            Ripristina note da iCloud (non attivo in versione web)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUT FILE NASCOSTO PER RIPRISTINO MANUALE -->
+  <input type="file" id="restoreFileInput" accept="application/json" style="display:none" />
 
   <script src="script.js"></script>
 </body>
