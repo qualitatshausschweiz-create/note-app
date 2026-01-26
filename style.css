@@ -3,10 +3,26 @@
   --bg: #f9f9f9;
   --bg-secondary: #ffffff;
   --text: #1c1c1e;
+  --border: #d1d1d6;
   --radius: 12px;
   --shadow: 0 4px 12px rgba(0,0,0,0.08);
-  --border: #d1d1d6;
   --app-font: system-ui;
+}
+
+/* Tema scuro */
+[data-theme="dark"] {
+  --bg: #1c1c1e;
+  --bg-secondary: #2c2c2e;
+  --text: #f2f2f7;
+  --border: #3a3a3c;
+}
+
+/* Fade premium */
+html, body, #app, .note-item, .popup-content, .settings-content {
+  transition: background-color 0.35s ease, 
+              color 0.35s ease,
+              border-color 0.35s ease,
+              box-shadow 0.35s ease;
 }
 
 body {
@@ -22,6 +38,7 @@ body {
   padding: 20px;
 }
 
+/* HEADER */
 header#topBar {
   text-align: center;
   margin-bottom: 20px;
@@ -29,7 +46,7 @@ header#topBar {
 
 header#topBar h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 26px;
 }
 
 .subtitle {
@@ -46,12 +63,13 @@ header#topBar h1 {
 }
 
 .top-icons button {
-  font-size: 20px;
+  font-size: 22px;
   background: none;
   border: none;
   cursor: pointer;
 }
 
+/* EDITOR */
 #noteEditor input,
 #noteEditor textarea,
 #noteEditor select {
@@ -62,6 +80,12 @@ header#topBar h1 {
   border-radius: var(--radius);
   font-size: 16px;
   background: var(--bg-secondary);
+  color: var(--text);
+}
+
+textarea {
+  height: 120px;
+  resize: none;
 }
 
 .editor-buttons {
@@ -87,12 +111,7 @@ header#topBar h1 {
   cursor: pointer;
 }
 
-#noteListSection h2,
-#categorySection h2 {
-  margin-top: 30px;
-  font-size: 20px;
-}
-
+/* NOTE */
 .note-item {
   background: var(--bg-secondary);
   border: 1px solid var(--border);
@@ -109,9 +128,28 @@ header#topBar h1 {
 .note-item p {
   margin: 0;
   font-size: 14px;
-  color: #444;
+  color: var(--text);
 }
 
+.note-footer {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.note-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e5e5ea;
+}
+
+.note-restore {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* CATEGORIE */
 .category-list {
   list-style: none;
   padding: 0;
@@ -127,6 +165,7 @@ header#topBar h1 {
   background: var(--bg-secondary);
   margin-bottom: 6px;
   cursor: pointer;
+  border: 1px solid var(--border);
 }
 
 .color-dot {
@@ -135,6 +174,7 @@ header#topBar h1 {
   border-radius: 50%;
 }
 
+/* POPUP */
 .popup {
   position: fixed;
   top: 0;
@@ -178,6 +218,7 @@ header#topBar h1 {
   cursor: pointer;
 }
 
+/* PALETTE COLORI */
 .color-palette {
   display: flex;
   gap: 10px;
@@ -185,8 +226,8 @@ header#topBar h1 {
 }
 
 .color-swatch {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   cursor: pointer;
   border: 2px solid transparent;
@@ -198,79 +239,4 @@ header#topBar h1 {
 
 .hidden {
   display: none !important;
-}
-.note-footer {
-  margin-top: 8px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  font-size: 13px;
-}
-
-.note-badge {
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: #e5e5ea;
-}
-
-.note-restore {
-  color: #34c759;
-  cursor: pointer;
-  font-weight: 600;
-}
-.color-swatch {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: border 0.2s ease;
-}
-
-.color-swatch.selected {
-  border-color: var(--accent);
-}
-/* Animazione premium cambio tema */
-html {
-  transition: background-color 0.35s ease, 
-              color 0.35s ease,
-              filter 0.35s ease;
-}
-
-body, #app, .note-item, .popup-content, .settings-content {
-  transition: background-color 0.35s ease, 
-              color 0.35s ease,
-              border-color 0.35s ease,
-              box-shadow 0.35s ease;
-}
-/* Tema chiaro (default) */
-:root {
-  --bg: #f9f9f9;
-  --bg-secondary: #ffffff;
-  --text: #1c1c1e;
-  --border: #d1d1d6;
-}
-
-/* Tema scuro */
-[data-theme="dark"] {
-  --bg: #1c1c1e;
-  --bg-secondary: #2c2c2e;
-  --text: #f2f2f7;
-  --border: #3a3a3c;
-}
-
-/* Applica i colori */
-body {
-  background: var(--bg);
-  color: var(--text);
-}
-
-#app,
-.note-item,
-.popup-content,
-.settings-content,
-.category-item {
-  background: var(--bg-secondary);
-  color: var(--text);
-  border-color: var(--border);
 }
