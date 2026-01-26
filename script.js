@@ -1,589 +1,403 @@
-// ===============================
-// COSTANTI STORAGE
-// ===============================
-const STORAGE_NOTES = "notes_v2";
-const STORAGE_TRASH = "trash_notes_v2";
-const STORAGE_BACKUP = "notes_backup_v2";
-const STORAGE_SETTINGS = "notes_settings_v2";
+/* ============================
+   VARIABILI GLOBALI
+============================ */
 
-// ===============================
-// STATO
-// ===============================
-let notes = JSON.parse(localStorage.getItem(STORAGE_NOTES) || "[]");
-let trashNotes = JSON.parse(localStorage.getItem(STORAGE_TRASH) || "[]");
-let editingId = null;
-let currentCategoryFilter = "all";
-let currentView = "notes"; // "notes" | "trash"
+let notes = JSON.parse(localStorage.getItem("notes")) || [];
+let trash = JSON.parse(localStorage.getItem("trash")) || [];
 
-let settings = {
-  theme: "light",
-  privacy: false,
-  font: "system",
-  textSize: 16,
-  animations: true,
-  animationSpeed: "normal",
-  transparency: false,
-  sortMode: "updated_desc",
-  autoBackup: false,
-  autoRestore: false
+let settings = JSON.parse(localStorage.getItem("settings")) || {
+    theme: "light",
+    language: "it",
+    font: "default",
+    textSize: 16,
+    privacy: false,
+    transparency: false,
+    animations: true,
+    animationSpeed: "normal",
+    autoBackup: true,
+    autoRestore: true
 };
 
-let backupData = JSON.parse(localStorage.getItem(STORAGE_BACKUP) || "null");
+let backupData = JSON.parse(localStorage.getItem("backupData")) || null;
 
-// ===============================
-// CARICA SETTINGS
-// ===============================
-function loadSettings() {
-  const saved = localStorage.getItem(STORAGE_SETTINGS);
-  if (saved) {
-    try {
-      const obj = JSON.parse(saved);
-      settings = { ...settings, ...obj };
-    } catch (e) {}
-  }
-  applySettingsToUI();
-  applySettingsToDOM();
+let editingNoteId = null;
+
+
+/* ============================
+   SALVATAGGI
+============================ */
+
+function saveNotes() {
+    localStorage.setItem("notes", JSON.stringify(notes));
+}
+
+function saveTrash() {
+    localStorage.setItem("trash", JSON.stringify(trash));
 }
 
 function saveSettings() {
-  localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
+    localStorage.setItem("settings", JSON.stringify(settings));
 }
 
-// ===============================
-// APPLICA SETTINGS AL DOM
-// ===============================
+function saveBackup() {
+    backupData = {
+        notes,
+        trash,
+        settings
+    };
+    localStorage.setItem("backupData", JSON.stringify(backupData));
+}
+
+
+/* ============================
+   APPLICAZIONE IMPOSTAZIONI
+============================ */
+
 function applySettingsToDOM() {
-  const body = document.body;
+    document.body.setAttribute("data-theme", settings.theme);
 
-  // Tema
-  body.setAttribute("data-theme", settings.theme);
+    document.getElementById("theme-toggle-btn").textContent =
+        settings.theme === "light" ? "🌞" : "🌙";
 
-  // Privacy
-  if (settings.privacy) body.classList.add("privacy-on");
-  else body.classList.remove("privacy-on");
+    document.getElementById("language-select").value = settings.language;
+    document.getElementById("font-select").value = settings.font;
+    document.getElementById("text-size-slider").value = settings.textSize;
+    document.getElementById("privacy-toggle").checked = settings.privacy;
+    document.getElementById("transparency-toggle").checked = settings.transparency;
+    document.getElementById("animation-speed-select").value = settings.animationSpeed;
 
-  // Font
-  body.classList.remove("font-serif", "font-mono");
-  if (settings.font === "serif") body.classList.add("font-serif");
-  if (settings.font === "mono") body.classList.add("font-mono");
+    document.documentElement.style.setProperty("--note-font-size", settings.textSize + "px");
 
-  // Dimensione testo
-  document.documentElement.style.setProperty("--note-font-size", settings.textSize + "px");
+    document.body.classList.remove("font-serif", "font-mono");
+    if (settings.font === "serif") document.body.classList.add("font-serif");
+    if (settings.font === "mono") document.body.classList.add("font-mono");
 
-  // Animazioni
-  if (!settings.animations) body.classList.add("no-animations");
-  else body.classList.remove("no-animations");
+    if (!settings.animations) document.body.classList.add("no-animations");
+    else document.body.classList.remove("no-animations");
 
-  // Velocità animazioni
-  let speed = "0.25s";
-  if (settings.animationSpeed === "fast") speed = "0.15s";
-  if (settings.animationSpeed === "slow") speed = "0.4s";
-  document.documentElement.style.setProperty("--transition-speed", speed);
-
-  // Trasparenze
-  if (settings.transparency) body.classList.add("transparency-on");
-  else body.classList.remove("transparency-on");
+    let speed = "0.25s";
+    if (settings.animationSpeed === "fast") speed = "0.15s";
+    if (settings.animationSpeed === "slow") speed = "0.4s";
+    document.documentElement.style.setProperty("--transition-speed", speed);
 }
 
-// ===============================
-// APPLICA SETTINGS ALLA UI
-// ===============================
-function applySettingsToUI() {
-  // Tema bottone
-  const themeBtn = document.getElementById("theme-toggle-btn");
-  themeBtn.textContent = settings.theme === "light" ? "🌞" : "🌙";
 
-  // Privacy
-  document.getElementById("privacy-toggle").checked = settings.privacy;
+/* ============================
+   RENDER NOTE
+============================ */
 
-  // Font
-  const fontSelect = document.getElementById("font-select");
-  fontSelect.value = settings.font;
-
-  // Text size
-  document.getElementById("text-size-range").value = settings.textSize;
-
-  // Animazioni
-  document.getElementById("animations-toggle").checked = settings.animations;
-
-  // Velocità
-  document.getElementById("animation-speed-select").value = settings.animationSpeed;
-
-  // Trasparenze
-  document.getElementById("transparency-toggle").checked = settings.transparency;
-
-  // Ordina
-  document.getElementById("sort-notes-select").value = settings.sortMode;
-
-  // Backup auto
-  const autoBackupBtn = document.getElementById("toggle-auto-backup-btn");
-  autoBackupBtn.textContent = "Backup automatico: " + (settings.autoBackup ? "ON" : "OFF");
-
-  const autoRestoreBtn = document.getElementById("toggle-auto-restore-btn");
-  autoRestoreBtn.textContent = "Ripristino automatico: " + (settings.autoRestore ? "ON" : "OFF");
-}
-
-// ===============================
-// SALVA NOTE
-// ===============================
-function persistNotes() {
-  localStorage.setItem(STORAGE_NOTES, JSON.stringify(notes));
-  localStorage.setItem(STORAGE_TRASH, JSON.stringify(trashNotes));
-  if (settings.autoBackup) {
-    quickBackup(false);
-  }
-}
-
-// ===============================
-// RENDER NOTE
-// ===============================
 function renderNotes() {
-  const container = document.getElementById("notes-container");
-  container.innerHTML = "";
+    const container = document.getElementById("notes-container");
+    container.innerHTML = "";
 
-  let list = currentView === "notes" ? notes : trashNotes;
+    notes.forEach(note => {
+        const div = document.createElement("div");
+        div.className = "note";
+        div.onclick = () => openEditor(note.id);
 
-  // filtro categoria solo in vista note
-  if (currentView === "notes" && currentCategoryFilter !== "all") {
-    list = list.filter(n => n.category === currentCategoryFilter);
-  }
+        div.innerHTML = `
+            <div class="note-title">${note.title}</div>
+            <div class="note-content">${note.content}</div>
+        `;
 
-  // ordinamento
-  list = [...list];
-  list.sort((a, b) => {
-    if (settings.sortMode === "updated_desc") {
-      return (b.updatedAt || b.createdAt) - (a.updatedAt || a.createdAt);
-    }
-    if (settings.sortMode === "updated_asc") {
-      return (a.updatedAt || a.createdAt) - (b.updatedAt || b.createdAt);
-    }
-    if (settings.sortMode === "title_asc") {
-      return (a.title || "").localeCompare(b.title || "");
-    }
-    return 0;
-  });
-
-  if (list.length === 0) {
-    const empty = document.createElement("p");
-    empty.className = "empty-text";
-    empty.textContent =
-      currentView === "notes"
-        ? "Nessuna nota in questa categoria."
-        : "Il cestino è vuoto.";
-    container.appendChild(empty);
-    return;
-  }
-
-  list.forEach(note => {
-    const card = document.createElement("div");
-    card.className = "note-card";
-    card.style.backgroundColor = note.color || "#fff9c4";
-
-    const title = document.createElement("h3");
-    title.className = "note-title";
-    title.textContent = note.title || "Senza titolo";
-
-    const text = document.createElement("p");
-    text.className = "note-body";
-    text.textContent = note.text || "";
-
-    const meta = document.createElement("div");
-    meta.className = "note-meta";
-    meta.textContent = formatDate(note.updatedAt || note.createdAt);
-
-    const actions = document.createElement("div");
-    actions.className = "note-actions";
-
-    const trashBtn = document.createElement("button");
-    trashBtn.className = "note-action-btn trash";
-    trashBtn.textContent = "🗑️";
-
-    const restoreBtn = document.createElement("button");
-    restoreBtn.className = "note-action-btn restore";
-    restoreBtn.textContent = "♻️";
-
-    if (currentView === "notes") {
-      // in vista note: cestino = sposta nel cestino, ripristina disabilitato
-      trashBtn.onclick = (e) => {
-        e.stopPropagation();
-        moveNoteToTrash(note.id);
-      };
-      restoreBtn.style.opacity = 0.3;
-      restoreBtn.style.pointerEvents = "none";
-    } else {
-      // in cestino: cestino = elimina definitivamente, ripristina = torna tra le note
-      trashBtn.onclick = (e) => {
-        e.stopPropagation();
-        deleteNoteForever(note.id);
-      };
-      restoreBtn.onclick = (e) => {
-        e.stopPropagation();
-        restoreNoteFromTrash(note.id);
-      };
-    }
-
-    actions.appendChild(trashBtn);
-    actions.appendChild(restoreBtn);
-
-    card.appendChild(title);
-    card.appendChild(text);
-    card.appendChild(meta);
-    card.appendChild(actions);
-
-    if (currentView === "notes") {
-      card.onclick = () => openEditor(note.id);
-    }
-
-    container.appendChild(card);
-  });
+        container.appendChild(div);
+    });
 }
 
-function formatDate(ts) {
-  const d = new Date(ts);
-  return d.toLocaleString("it-IT", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}
 
-// ===============================
-// EDITOR
-// ===============================
-const editor = document.getElementById("note-editor");
-const noteTitleInput = document.getElementById("note-title");
-const noteTextInput = document.getElementById("note-text");
-const noteCategorySelect = document.getElementById("note-category");
-const noteColorInput = document.getElementById("note-color");
+/* ============================
+   EDITOR
+============================ */
 
 function openEditor(id = null) {
-  if (currentView === "trash") return; // niente editing nel cestino
-  editingId = id;
+    editingNoteId = id;
 
-  if (id === null) {
-    noteTitleInput.value = "";
-    noteTextInput.value = "";
-    noteCategorySelect.value = "home";
-    noteColorInput.value = "#fff9c4";
-  } else {
-    const note = notes.find(n => n.id === id);
-    if (!note) return;
-    noteTitleInput.value = note.title || "";
-    noteTextInput.value = note.text || "";
-    noteCategorySelect.value = note.category || "home";
-    noteColorInput.value = note.color || "#fff9c4";
-  }
+    if (id) {
+        const note = notes.find(n => n.id === id);
+        document.getElementById("note-title-input").value = note.title;
+        document.getElementById("note-content-input").value = note.content;
+    } else {
+        document.getElementById("note-title-input").value = "";
+        document.getElementById("note-content-input").value = "";
+    }
 
-  editor.classList.remove("hidden");
+    document.getElementById("editor-panel").style.right = "0";
 }
 
 function closeEditor() {
-  editor.classList.add("hidden");
-  editingId = null;
+    document.getElementById("editor-panel").style.right = "-100%";
 }
 
-function saveNote() {
-  const title = noteTitleInput.value.trim();
-  const text = noteTextInput.value.trim();
-  const category = noteCategorySelect.value;
-  const color = noteColorInput.value || "#fff9c4";
-  const now = Date.now();
+document.getElementById("save-note-btn").onclick = () => {
+    const title = document.getElementById("note-title-input").value.trim();
+    const content = document.getElementById("note-content-input").value.trim();
 
-  if (!text && !title) {
-    closeEditor();
-    return;
-  }
+    if (!title && !content) return;
 
-  if (editingId === null) {
-    const newNote = {
-      id: Date.now(),
-      title,
-      text,
-      category,
-      color,
-      createdAt: now,
-      updatedAt: now
-    };
-    notes.unshift(newNote);
-  } else {
-    const idx = notes.findIndex(n => n.id === editingId);
-    if (idx !== -1) {
-      notes[idx].title = title;
-      notes[idx].text = text;
-      notes[idx].category = category;
-      notes[idx].color = color;
-      notes[idx].updatedAt = now;
+    if (editingNoteId) {
+        const note = notes.find(n => n.id === editingNoteId);
+        note.title = title;
+        note.content = content;
+    } else {
+        notes.push({
+            id: Date.now(),
+            title,
+            content
+        });
     }
-  }
 
-  persistNotes();
-  renderNotes();
-  closeEditor();
-}
-
-function deleteCurrentNote() {
-  if (editingId === null) {
-    closeEditor();
-    return;
-  }
-  moveNoteToTrash(editingId);
-  closeEditor();
-}
-
-// ===============================
-// CESTINO
-// ===============================
-function moveNoteToTrash(id) {
-  const idx = notes.findIndex(n => n.id === id);
-  if (idx === -1) return;
-  const [note] = notes.splice(idx, 1);
-  trashNotes.unshift(note);
-  persistNotes();
-  renderNotes();
-}
-
-function restoreNoteFromTrash(id) {
-  const idx = trashNotes.findIndex(n => n.id === id);
-  if (idx === -1) return;
-  const [note] = trashNotes.splice(idx, 1);
-  notes.unshift(note);
-  persistNotes();
-  renderNotes();
-}
-
-function deleteNoteForever(id) {
-  trashNotes = trashNotes.filter(n => n.id !== id);
-  persistNotes();
-  renderNotes();
-}
-
-// ===============================
-// CATEGORIE
-// ===============================
-document.querySelectorAll(".category-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    if (currentView === "trash") return;
-    document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    currentCategoryFilter = btn.dataset.category;
+    saveNotes();
     renderNotes();
-  });
-});
+    closeEditor();
 
-// ===============================
-// BACKUP
-// ===============================
-const backupPanel = document.getElementById("backup-panel");
-
-document.getElementById("backup-btn").onclick = () => {
-  backupPanel.classList.remove("hidden");
+    if (settings.autoBackup) saveBackup();
 };
 
-document.getElementById("close-backup-panel").onclick = () => {
-  backupPanel.classList.add("hidden");
-};
+document.getElementById("close-editor-btn").onclick = closeEditor;
+document.getElementById("add-note-btn").onclick = () => openEditor(null);
 
-function quickBackup(showAlert = true) {
-  const payload = {
-    notes,
-    trashNotes,
-    timestamp: Date.now()
-  };
-  backupData = payload;
-  localStorage.setItem(STORAGE_BACKUP, JSON.stringify(payload));
-  if (showAlert) alert("Backup veloce eseguito.");
+
+/* ============================
+   CESTINO
+============================ */
+
+function openTrash() {
+    const panel = document.getElementById("trash-panel");
+    panel.style.right = "0";
+
+    const container = document.getElementById("trash-container");
+    container.innerHTML = "";
+
+    trash.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "trash-item";
+
+        div.innerHTML = `
+            <div><strong>${item.title}</strong></div>
+            <div>${item.content}</div>
+            <button class="restore-btn">Ripristina</button>
+        `;
+
+        div.querySelector(".restore-btn").onclick = () => restoreFromTrash(item.id);
+
+        container.appendChild(div);
+    });
 }
 
-document.getElementById("quick-backup-btn").onclick = () => {
-  quickBackup(true);
-};
+function closeTrash() {
+    document.getElementById("trash-panel").style.right = "-100%";
+}
 
-document.getElementById("manual-backup-btn").onclick = () => {
-  quickBackup(true);
-};
+function restoreFromTrash(id) {
+    const item = trash.find(t => t.id === id);
+    notes.push(item);
+    trash = trash.filter(t => t.id !== id);
 
+    saveNotes();
+    saveTrash();
+    renderNotes();
+    openTrash();
+}
+
+document.getElementById("close-trash-btn").onclick = closeTrash;
+
+
+/* ============================
+   SALVAGENTE (BACKUP)
+============================ */
+
+document.getElementById("manual-backup-btn").onclick = () => saveBackup();
 document.getElementById("manual-restore-btn").onclick = () => {
-  if (!backupData) {
-    alert("Nessun backup trovato.");
-    return;
-  }
-  notes = backupData.notes || [];
-  trashNotes = backupData.trashNotes || [];
-  persistNotes();
-  renderNotes();
-  alert("Backup ripristinato.");
+    if (!backupData) return;
+
+    notes = backupData.notes;
+    trash = backupData.trash;
+    settings = backupData.settings;
+
+    saveNotes();
+    saveTrash();
+    saveSettings();
+
+    applySettingsToDOM();
+    renderNotes();
 };
 
 document.getElementById("toggle-auto-backup-btn").onclick = () => {
-  settings.autoBackup = !settings.autoBackup;
-  saveSettings();
-  applySettingsToUI();
+    settings.autoBackup = !settings.autoBackup;
+    saveSettings();
 };
 
 document.getElementById("toggle-auto-restore-btn").onclick = () => {
-  settings.autoRestore = !settings.autoRestore;
-  saveSettings();
-  applySettingsToUI();
+    settings.autoRestore = !settings.autoRestore;
+    saveSettings();
 };
 
-document.getElementById("export-notes-btn").onclick = () => {
-  let content = "";
-  notes.forEach(n => {
-    content += `Titolo: ${n.title || "Senza titolo"}\n`;
-    content += `Categoria: ${n.category}\n`;
-    content += `Data: ${formatDate(n.updatedAt || n.createdAt)}\n`;
-    content += `${n.text || ""}\n`;
-    content += `-----------------------------\n\n`;
-  });
-  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "note.txt";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+document.getElementById("delete-backup-btn").onclick = () => {
+    backupData = null;
+    localStorage.removeItem("backupData");
 };
 
-document.getElementById("clear-backups-btn").onclick = () => {
-  backupData = null;
-  localStorage.removeItem(STORAGE_BACKUP);
-  alert("Backup eliminato.");
+document.getElementById("close-lifebuoy-btn").onclick = () => {
+    document.getElementById("lifebuoy-panel").style.right = "-100%";
 };
 
-// Ripristino automatico all'avvio se attivo
-function autoRestoreIfNeeded() {
-  if (!settings.autoRestore) return;
-  if (notes.length === 0 && backupData && backupData.notes && backupData.notes.length > 0) {
-    notes = backupData.notes;
-    trashNotes = backupData.trashNotes || [];
-    persistNotes();
-  }
-}
 
-// ===============================
-// IMPOSTAZIONI
-// ===============================
-const settingsPanel = document.getElementById("settings-panel");
+/* ============================
+   IMPOSTAZIONI
+============================ */
 
 document.getElementById("settings-btn").onclick = () => {
-  settingsPanel.classList.remove("hidden");
+    document.getElementById("settings-panel").style.right = "0";
 };
 
-document.getElementById("close-settings-panel").onclick = () => {
-  settingsPanel.classList.add("hidden");
+document.getElementById("close-settings-btn").onclick = () => {
+    document.getElementById("settings-panel").style.right = "-100%";
 };
 
-document.getElementById("privacy-toggle").onchange = (e) => {
-  settings.privacy = e.target.checked;
-  saveSettings();
-  applySettingsToDOM();
-};
-
-document.getElementById("font-select").onchange = (e) => {
-  settings.font = e.target.value;
-  saveSettings();
-  applySettingsToDOM();
-};
-
-document.getElementById("text-size-range").oninput = (e) => {
-  settings.textSize = parseInt(e.target.value, 10);
-  saveSettings();
-  applySettingsToDOM();
-};
-
-document.getElementById("animations-toggle").onchange = (e) => {
-  settings.animations = e.target.checked;
-  saveSettings();
-  applySettingsToDOM();
-};
-
-document.getElementById("animation-speed-select").onchange = (e) => {
-  settings.animationSpeed = e.target.value;
-  saveSettings();
-  applySettingsToDOM();
-};
-
-document.getElementById("transparency-toggle").onchange = (e) => {
-  settings.transparency = e.target.checked;
-  saveSettings();
-  applySettingsToDOM();
-};
-
-document.getElementById("sort-notes-select").onchange = (e) => {
-  settings.sortMode = e.target.value;
-  saveSettings();
-  renderNotes();
-};
-
-document.getElementById("open-trash-view-btn").onclick = () => {
-  currentView = "trash";
-  settingsPanel.classList.add("hidden");
-  renderNotes();
-};
-
-// Ripristina layout
-document.getElementById("reset-layout-btn").onclick = () => {
-  settings.font = "system";
-  settings.textSize = 16;
-  settings.animations = true;
-  settings.animationSpeed = "normal";
-  settings.transparency = false;
-  settings.privacy = false;
-  settings.sortMode = "updated_desc";
-  saveSettings();
-  applySettingsToUI();
-  applySettingsToDOM();
-  renderNotes();
-};
-
-// Cancella tutte le note
-document.getElementById("delete-all-notes-btn").onclick = () => {
-  if (!confirm("Sei sicuro di voler cancellare tutte le note?")) return;
-  notes = [];
-  trashNotes = [];
-  persistNotes();
-  renderNotes();
-};
-
-// Reset totale app
-document.getElementById("full-reset-btn").onclick = () => {
-  if (!confirm("Reset totale app? Verrà cancellato tutto.")) return;
-  localStorage.removeItem(STORAGE_NOTES);
-  localStorage.removeItem(STORAGE_TRASH);
-  localStorage.removeItem(STORAGE_BACKUP);
-  localStorage.removeItem(STORAGE_SETTINGS);
-  location.reload();
-};
-
-// ===============================
-// TEMA SOLE/LUNA
-// ===============================
 document.getElementById("theme-toggle-btn").onclick = () => {
-  settings.theme = settings.theme === "light" ? "dark" : "light";
-  saveSettings();
-  applySettingsToUI();
-  applySettingsToDOM();
+    settings.theme = settings.theme === "light" ? "dark" : "light";
+    saveSettings();
+    applySettingsToDOM();
 };
 
-// ===============================
-// BOTTONI EDITOR
-// ===============================
-document.getElementById("add-note-btn").onclick = () => {
-  currentView = "notes";
-  renderNotes();
-  openEditor(null);
+document.getElementById("language-select").onchange = e => {
+    settings.language = e.target.value;
+    saveSettings();
 };
-document.getElementById("close-editor-btn").onclick = closeEditor;
-document.getElementById("save-note-btn").onclick = saveNote;
-document.getElementById("delete-note-btn").onclick = deleteCurrentNote;
 
-// ===============================
-// AVVIO
-// ===============================
-loadSettings();
-autoRestoreIfNeeded();
+document.getElementById("font-select").onchange = e => {
+    settings.font = e.target.value;
+    saveSettings();
+    applySettingsToDOM();
+};
+
+document.getElementById("text-size-slider").oninput = e => {
+    settings.textSize = parseInt(e.target.value);
+    saveSettings();
+    applySettingsToDOM();
+};
+
+document.getElementById("privacy-toggle").onchange = e => {
+    settings.privacy = e.target.checked;
+    saveSettings();
+};
+
+document.getElementById("transparency-toggle").onchange = e => {
+    settings.transparency = e.target.checked;
+    saveSettings();
+};
+
+document.getElementById("animation-speed-select").onchange = e => {
+    settings.animationSpeed = e.target.value;
+    saveSettings();
+    applySettingsToDOM();
+};
+
+document.getElementById("reset-layout-btn").onclick = () => {
+    settings.font = "default";
+    settings.textSize = 16;
+    settings.transparency = false;
+    settings.animations = true;
+    settings.animationSpeed = "normal";
+    saveSettings();
+    applySettingsToDOM();
+};
+
+document.getElementById("reset-app-btn").onclick = () => {
+    localStorage.clear();
+    location.reload();
+};
+
+
+/* ============================
+   PANNELLI
+============================ */
+
+document.getElementById("lifebuoy-btn").onclick = () => {
+    document.getElementById("lifebuoy-panel").style.right = "0";
+};
+
+document.getElementById("trash-btn")?.onclick = openTrash;
+
+
+/* ============================
+   CHAT AI LATERALE
+============================ */
+
+document.getElementById("ai-chat-btn").onclick = () => {
+    document.getElementById("ai-chat-panel").style.right = "0";
+};
+
+document.getElementById("close-ai-chat-btn").onclick = () => {
+    document.getElementById("ai-chat-panel").style.right = "-100%";
+};
+
+document.getElementById("ai-chat-send-btn").onclick = sendAIMessage;
+
+document.getElementById("ai-chat-input").addEventListener("keypress", e => {
+    if (e.key === "Enter") sendAIMessage();
+});
+
+function sendAIMessage() {
+    const input = document.getElementById("ai-chat-input");
+    const text = input.value.trim();
+    if (!text) return;
+
+    addUserMessage(text);
+    input.value = "";
+
+    setTimeout(() => {
+        addAIMessage("Risposta generata dall’AI (placeholder).");
+    }, 400);
+}
+
+function addUserMessage(text) {
+    const container = document.getElementById("ai-chat-messages");
+
+    const div = document.createElement("div");
+    div.className = "user-msg";
+
+    div.innerHTML = `
+        <div class="avatar avatar-user"></div>
+        <div>${text}</div>
+    `;
+
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+function addAIMessage(text) {
+    const container = document.getElementById("ai-chat-messages");
+
+    const div = document.createElement("div");
+    div.className = "ai-msg";
+
+    div.innerHTML = `
+        <div class="avatar avatar-ai"></div>
+        <div>${text}</div>
+    `;
+
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+
+/* ============================
+   AVVIO APP
+============================ */
+
+applySettingsToDOM();
 renderNotes();
+
+if (settings.autoRestore && backupData) {
+    notes = backupData.notes;
+    trash = backupData.trash;
+    settings = backupData.settings;
+
+    saveNotes();
+    saveTrash();
+    saveSettings();
+
+    applySettingsToDOM();
+    renderNotes();
+}
