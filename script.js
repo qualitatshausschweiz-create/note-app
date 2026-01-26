@@ -433,7 +433,6 @@ document.getElementById("save-note-btn").onclick = () => {
   const text = document.getElementById("note-text").value.trim();
   const category = document.getElementById("note-category").value;
 
-  // 👉 Ora salva SEMPRE, anche se il testo è vuoto
   if (editingId) {
     const n = notes.find(x => x.id === editingId);
     if (!n) return;
@@ -466,7 +465,6 @@ function deleteNoteById(id) {
   const note = notes.find(n => n.id === id);
   if (!note) return;
 
-  // 👉 Cestino = backup nota
   trash.push(note);
   localStorage.setItem("trash", JSON.stringify(trash));
 
@@ -489,7 +487,6 @@ document.getElementById("note-color").oninput = e => {
   selectedColor = e.target.value;
   document.querySelectorAll(".color-dot").forEach(d => d.classList.remove("selected"));
 };
-
 /* ============================================================
    BACKUP
 ============================================================ */
@@ -711,7 +708,6 @@ document.getElementById("sort-notes").onclick = () => {
   localStorage.setItem("sortMode", next);
   renderNotes();
 };
-
 /* ============================================================
    ARCHIVIO E CESTINO
 ============================================================ */
@@ -719,20 +715,56 @@ document.getElementById("open-archive").onclick = () => {
   alert("Archivio note in sviluppo.");
 };
 
-/* 👉 Cestino = ripristino nota eliminata */
+/* Mostra quante note ci sono nel cestino */
 document.getElementById("open-trash").onclick = () => {
   if (trash.length === 0) {
     alert("Cestino vuoto.");
+  } else {
+    let list = "Note nel cestino:\n\n";
+    trash.forEach((n, i) => {
+      const title = n.title && n.title.trim() ? n.title : getT().noTitle;
+      list += `${i + 1}) ${title}\n`;
+    });
+    alert(list);
+  }
+};
+
+/* ============================================================
+   RIPRISTINA NOTA (OPZIONE B — scegli quale ripristinare)
+============================================================ */
+document.getElementById("restore-note-btn").onclick = () => {
+  if (trash.length === 0) {
+    alert("Nessuna nota da ripristinare.");
     return;
   }
-  const last = trash.pop(); // ripristina l’ultima nota eliminata
-  notes.push(last);
+
+  let list = "Quale nota vuoi ripristinare?\n\n";
+  trash.forEach((n, i) => {
+    const title = n.title && n.title.trim() ? n.title : getT().noTitle;
+    list += `${i + 1}) ${title}\n`;
+  });
+
+  const choice = prompt(list + "\nScrivi il numero della nota:");
+  if (!choice) return;
+
+  const index = parseInt(choice, 10) - 1;
+  if (isNaN(index) || index < 0 || index >= trash.length) {
+    alert("Scelta non valida.");
+    return;
+  }
+
+  const noteToRestore = trash.splice(index, 1)[0];
+  notes.push(noteToRestore);
+
   localStorage.setItem("trash", JSON.stringify(trash));
   saveNotes();
   renderNotes();
-  alert("Nota ripristinata dal cestino.");
+  alert("Nota ripristinata.");
 };
 
+/* ============================================================
+   DUPLICA / UNISCI (placeholder)
+============================================================ */
 document.getElementById("duplicate-note").onclick = () => {
   alert("Duplica nota in sviluppo.");
 };
@@ -775,7 +807,31 @@ function updateStorageInfo() {
 }
 
 /* ============================================================
-   INIT
+   OTTIMIZZAZIONE / RESET (placeholder)
+============================================================ */
+document.getElementById("optimize-storage").onclick = () => {
+  alert("Ottimizzazione in sviluppo.");
+};
+
+document.getElementById("reset-layout").onclick = () => {
+  alert("Ripristino layout in sviluppo.");
+};
+
+document.getElementById("delete-all-notes-btn").onclick = () => {
+  if (!confirm("Vuoi davvero cancellare tutte le note?")) return;
+  notes = [];
+  saveNotes();
+  renderNotes();
+};
+
+document.getElementById("reset-app-btn").onclick = () => {
+  if (!confirm("Reset totale app? Tutto verrà cancellato.")) return;
+  localStorage.clear();
+  location.reload();
+};
+
+/* ============================================================
+   INIT FINALE
 ============================================================ */
 autoRestoreIfEmpty();
 applyTranslations();
