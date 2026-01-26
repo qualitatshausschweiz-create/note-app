@@ -3,61 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Note App Pro</title>
+  <title>Le tue note</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- Placeholder invisibile per futura attivazione FaceID -->
-  <div id="faceid-placeholder" style="display:none;"></div>
-
   <!-- TOP BAR -->
-  <header class="top-bar glass">
-    <h1 class="app-title" data-i18n="notesTitle">Le tue note</h1>
+  <header class="top-bar">
+    <h1 class="app-title">Le tue note</h1>
 
-    <div class="top-icons">
-
-      <!-- Lingue -->
-      <div class="lang-group">
-        <button class="lang-btn" data-lang="it">IT</button>
-        <button class="lang-btn" data-lang="en">EN</button>
-        <button class="lang-btn" data-lang="de">DE</button>
-        <button class="lang-btn" data-lang="es">ES</button>
-      </div>
-
-      <!-- Temi -->
-      <div class="theme-group">
-        <button id="theme-light" class="theme-btn">🌞</button>
-        <button id="theme-dark" class="theme-btn">🌙</button>
-      </div>
-
-      <!-- Backup -->
-      <button id="backup-btn" class="icon-btn">🛟</button>
-
-      <!-- Impostazioni -->
-      <button id="settings-btn" class="icon-btn">⚙️</button>
-
-      <!-- Cestino -->
-      <button id="open-trash" class="icon-btn">🗑️</button>
-
-      <!-- Ripristina nota -->
-      <button id="restore-note-btn" class="icon-btn">♻️</button>
-
-      <!-- Info App -->
-      <button id="info-btn" class="icon-btn">ℹ️</button>
-
+    <div class="top-actions">
+      <button id="backup-btn" class="icon-btn" title="Backup">🛟</button>
+      <button id="settings-btn" class="icon-btn" title="Impostazioni">⚙️</button>
     </div>
   </header>
 
   <!-- CATEGORIE -->
-  <div class="categories glass">
-    <button class="category-btn active" data-category="all">📁 <span data-i18n="catAll">Tutte</span></button>
-    <button class="category-btn cat-home" data-category="home">🏠 <span data-i18n="catHome">Casa</span></button>
-    <button class="category-btn cat-work" data-category="work">💼 <span data-i18n="catWork">Lavoro</span></button>
-    <button class="category-btn cat-ideas" data-category="ideas">💡 <span data-i18n="catIdeas">Idee</span></button>
-    <button class="category-btn cat-shopping" data-category="shopping">🛒 <span data-i18n="catShopping">Spesa</span></button>
-    <button class="category-btn cat-other" data-category="other">⭐ <span data-i18n="catOther">Altro</span></button>
-  </div>
+  <nav class="categories">
+    <button class="category-btn active" data-category="all">📁 Tutte</button>
+    <button class="category-btn" data-category="home">🏠 Casa</button>
+    <button class="category-btn" data-category="work">💼 Lavoro</button>
+    <button class="category-btn" data-category="ideas">💡 Idee</button>
+    <button class="category-btn" data-category="shopping">🛒 Spesa</button>
+    <button class="category-btn" data-category="other">⭐ Altro</button>
+  </nav>
 
   <!-- LISTA NOTE -->
   <main class="main-area">
@@ -70,135 +39,60 @@
   <!-- EDITOR NOTA -->
   <div id="note-editor" class="editor hidden">
     <div class="editor-backdrop"></div>
-    <div class="editor-content glass">
+    <div class="editor-content">
 
       <div class="editor-header">
-        <h2 data-i18n="editNote">Nota</h2>
+        <h2>Nota</h2>
         <button id="close-editor-btn" class="close-btn">✕</button>
       </div>
 
-      <input id="note-title" class="note-title-input" data-i18n-placeholder="titlePlaceholder" placeholder="Titolo" />
-
-      <textarea id="note-text" class="note-textarea" data-i18n-placeholder="textPlaceholder" placeholder="Scrivi la tua nota..."></textarea>
+      <input id="note-title" class="note-title-input" placeholder="Titolo" />
+      <textarea id="note-text" class="note-textarea" placeholder="Scrivi la tua nota..."></textarea>
 
       <div class="editor-row">
-
-        <!-- Categoria -->
         <div class="editor-field">
-          <label data-i18n="categoryLabel">Categoria</label>
+          <label>Categoria</label>
           <select id="note-category" class="note-category-select">
-            <option value="home" data-i18n="catHome">🏠 Casa</option>
-            <option value="work" data-i18n="catWork">💼 Lavoro</option>
-            <option value="ideas" data-i18n="catIdeas">💡 Idee</option>
-            <option value="shopping" data-i18n="catShopping">🛒 Spesa</option>
-            <option value="other" data-i18n="catOther">⭐ Altro</option>
+            <option value="home">🏠 Casa</option>
+            <option value="work">💼 Lavoro</option>
+            <option value="ideas">💡 Idee</option>
+            <option value="shopping">🛒 Spesa</option>
+            <option value="other">⭐ Altro</option>
           </select>
         </div>
 
-        <!-- Colore -->
         <div class="editor-field">
-          <label data-i18n="colorLabel">Colore nota</label>
-          <div class="color-row">
-            <input type="color" id="note-color" class="color-picker" />
-            <div class="color-palette">
-              <button class="color-dot" data-color="#ffffff" style="background:#ffffff;"></button>
-              <button class="color-dot" data-color="#ffe9a3" style="background:#ffe9a3;"></button>
-              <button class="color-dot" data-color="#ffd1dc" style="background:#ffd1dc;"></button>
-              <button class="color-dot" data-color="#c9f7ff" style="background:#c9f7ff;"></button>
-              <button class="color-dot" data-color="#d6ffb7" style="background:#d6ffb7;"></button>
-            </div>
-          </div>
+          <label>Colore nota</label>
+          <input type="color" id="note-color" class="color-picker" value="#fff9c4" />
         </div>
-
       </div>
 
       <div class="editor-buttons">
-        <button id="save-note-btn" class="save-btn" data-i18n="save">Salva</button>
-        <button id="delete-note-btn" class="delete-btn" data-i18n="delete">Elimina</button>
+        <button id="save-note-btn" class="save-btn">Salva</button>
+        <button id="delete-note-btn" class="delete-btn">Elimina</button>
       </div>
 
     </div>
   </div>
 
-  <!-- BACKUP PANEL -->
+  <!-- PANNELLO BACKUP SEMPLICE -->
   <div id="backup-panel" class="panel hidden">
     <div class="panel-backdrop"></div>
-    <div class="panel-box glass">
-
-      <h2 class="panel-title">🛟 <span data-i18n="backupTitle">Backup & Ripristino</span></h2>
-
-      <h3 class="panel-section" data-i18n="backupSection">Backup</h3>
-      <button class="panel-btn" id="quick-backup-btn" data-i18n="quickBackup">Backup veloce</button>
-      <button class="panel-btn" id="manual-backup-btn" data-i18n="manualBackup">Backup manuale</button>
-
-      <h3 class="panel-section">Automatico</h3>
-      <button class="panel-btn" id="toggle-auto-backup">Backup automatico</button>
-      <button class="panel-btn" id="toggle-auto-restore">Ripristino automatico</button>
-
-      <h3 class="panel-section" data-i18n="restoreSection">Ripristino</h3>
-      <button class="panel-btn" id="manual-restore-btn" data-i18n="manualRestore">Ripristino manuale</button>
-
-      <h3 class="panel-section" data-i18n="exportSection">Esporta / Importa</h3>
-      <button class="panel-btn" id="export-text-btn" data-i18n="exportText">Esporta note (.txt)</button>
-
-      <h3 class="panel-section" data-i18n="backupManageSection">Gestione backup</h3>
-      <button class="panel-btn danger" id="delete-backups-btn" data-i18n="deleteBackups">Cancella backup</button>
-
-      <button class="close-panel-btn" id="close-backup-panel" data-i18n="close">Chiudi</button>
-
+    <div class="panel-box">
+      <h2>🛟 Backup & Ripristino</h2>
+      <button id="quick-backup-btn" class="panel-btn">Backup veloce</button>
+      <button id="manual-restore-btn" class="panel-btn">Ripristina ultimo backup</button>
+      <button id="close-backup-panel" class="close-panel-btn">Chiudi</button>
     </div>
   </div>
 
-  <!-- SETTINGS PANEL -->
+  <!-- PANNELLO IMPOSTAZIONI SEMPLICE -->
   <div id="settings-panel" class="panel hidden">
     <div class="panel-backdrop"></div>
-    <div class="panel-box glass">
-
-      <h2 class="panel-title">⚙️ <span data-i18n="settingsTitle">Impostazioni</span></h2>
-
-      <h3 class="panel-section">🕶️ Privacy</h3>
-      <button class="panel-btn" id="toggle-privacy">Modalità privacy</button>
-
-      <h3 class="panel-section">🎨 Aspetto</h3>
-      <button class="panel-btn" id="change-font">Font app</button>
-      <button class="panel-btn" id="change-text-size">Dimensione testo</button>
-      <button class="panel-btn" id="toggle-animations">Animazioni ON/OFF</button>
-      <button class="panel-btn" id="change-animation-speed">Velocità animazioni</button>
-      <button class="panel-btn" id="toggle-transparency">Trasparenze iOS</button>
-
-      <h3 class="panel-section">🗂️ Gestione note</h3>
-      <button class="panel-btn" id="sort-notes">Ordinamento note</button>
-      <button class="panel-btn" id="open-archive">Archivio note</button>
-      <button class="panel-btn" id="open-trash">Cestino</button>
-      <button class="panel-btn" id="duplicate-note">Duplica nota</button>
-      <button class="panel-btn" id="merge-notes">Unisci note</button>
-
-      <h3 class="panel-section" data-i18n="maintenanceSection">🧼 Manutenzione</h3>
-      <button class="panel-btn" id="optimize-storage">Ottimizza spazio</button>
-      <button class="panel-btn" id="reset-layout">Ripristina layout</button>
-      <button class="panel-btn danger" id="delete-all-notes-btn" data-i18n="deleteAllNotes">Cancella tutte le note</button>
-      <button class="panel-btn danger" id="reset-app-btn" data-i18n="resetApp">Reset totale app</button>
-
-      <button class="close-panel-btn" id="close-settings-panel" data-i18n="close">Chiudi</button>
-
-    </div>
-  </div>
-
-  <!-- INFO PANEL -->
-  <div id="info-panel" class="panel hidden">
-    <div class="panel-backdrop"></div>
-    <div class="panel-box glass">
-
-      <h2 class="panel-title">ℹ️ Info App</h2>
-
-      <h3 class="panel-section">Debug</h3>
-      <p id="debug-info" class="info-text">Caricamento...</p>
-
-      <h3 class="panel-section">Stato memoria</h3>
-      <p id="storage-info" class="info-text">Caricamento...</p>
-
-      <button class="close-panel-btn" id="close-info-panel">Chiudi</button>
-
+    <div class="panel-box">
+      <h2>⚙️ Impostazioni</h2>
+      <button id="delete-all-notes-btn" class="panel-btn danger">Cancella tutte le note</button>
+      <button id="close-settings-panel" class="close-panel-btn">Chiudi</button>
     </div>
   </div>
 
