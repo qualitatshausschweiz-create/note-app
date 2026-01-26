@@ -8,10 +8,12 @@
 </head>
 <body>
   <div id="app">
-    <!-- Header -->
+
+    <!-- HEADER -->
     <header id="topBar">
       <h1>Le mie note</h1>
       <p class="subtitle">Categorie, cestino, backup, tutto sotto controllo</p>
+
       <div class="top-icons">
         <button id="themeToggleBtn">🌞</button>
         <button id="openSettingsBtn">⚙️</button>
@@ -20,45 +22,33 @@
       </div>
     </header>
 
-    <!-- Editor nota -->
+    <!-- EDITOR -->
     <section id="noteEditor">
       <input type="text" id="noteTitle" placeholder="Titolo della nota..." />
-      <select id="categorySelector">
-        <option value="personale">Personale</option>
-        <option value="lavoro" selected>Lavoro</option>
-        <option value="idee">Idee</option>
-        <option value="spesa">Spesa</option>
-        <option value="altro">Altro</option>
-      </select>
+      <select id="categorySelector"></select>
       <textarea id="noteContent" placeholder="Scrivi la tua nota qui..."></textarea>
+
       <div class="editor-buttons">
         <button id="saveNoteBtn" class="primary-btn">Salva nota</button>
         <button id="cancelEditBtn" class="secondary-btn">Elimina nota</button>
       </div>
     </section>
 
-    <!-- Lista note -->
+    <!-- NOTE -->
     <section id="noteListSection">
       <h2>Le tue note</h2>
       <div id="noteList" class="note-list"></div>
     </section>
 
-    <!-- Categorie -->
+    <!-- CATEGORIE -->
     <section id="categorySection">
       <h2>Categorie</h2>
-      <ul id="categoryList" class="category-list">
-        <li class="category-item" data-id="personale"><span class="color-dot" style="background:#ff9500;"></span> Personale</li>
-        <li class="category-item" data-id="lavoro"><span class="color-dot" style="background:#34c759;"></span> Lavoro</li>
-        <li class="category-item" data-id="idee"><span class="color-dot" style="background:#af52de;"></span> Idee</li>
-        <li class="category-item" data-id="spesa"><span class="color-dot" style="background:#007aff;"></span> Spesa</li>
-        <li class="category-item" data-id="tutte"><span class="color-dot" style="background:#8e8e93;"></span> Tutte</li>
-        <li class="category-item" data-id="altro"><span class="color-dot" style="background:#5ac8fa;"></span> Altro</li>
-      </ul>
+      <ul id="categoryList" class="category-list"></ul>
       <button id="addCategoryBtn" class="primary-btn">+ Aggiungi</button>
     </section>
   </div>
 
-  <!-- Popup Salvagente -->
+  <!-- POPUP SALVAGENTE -->
   <div id="lifebuoyPopup" class="popup hidden">
     <div class="popup-overlay"></div>
     <div class="popup-content">
@@ -66,17 +56,20 @@
         <h2>Backup</h2>
         <button id="closeLifebuoyBtn" class="close-btn">✕</button>
       </div>
-      <p class="popup-description">Gestisci i tuoi backup locali</p>
-      <div id="backupList" class="backup-list"></div>
+
+      <p class="popup-description">Backup locale e iCloud</p>
+
+      <div id="backupList"></div>
+
       <div class="popup-buttons">
-        <button id="createBackupBtn" class="primary-btn">Crea backup</button>
-        <button id="importBackupBtn" class="secondary-btn">Importa backup</button>
-        <button id="exportDataBtn" class="secondary-btn">Esporta dati</button>
+        <button id="createBackupBtn" class="primary-btn">Backup manuale</button>
+        <button id="importBackupBtn" class="secondary-btn">Ripristina da file</button>
+        <button id="exportDataBtn" class="secondary-btn">Esporta su iCloud</button>
       </div>
     </div>
   </div>
 
-  <!-- Popup Impostazioni -->
+  <!-- POPUP IMPOSTAZIONI -->
   <div id="settingsPopup" class="popup hidden">
     <div class="popup-overlay"></div>
     <div class="settings-content">
@@ -105,12 +98,19 @@
 
       <div class="settings-section">
         <h3>Colore principale</h3>
+
+        <!-- PALETTE COLORI -->
         <div class="color-palette">
           <div class="color-swatch" data-color="#007aff" style="background:#007aff;"></div>
           <div class="color-swatch" data-color="#ff6b6b" style="background:#ff6b6b;"></div>
           <div class="color-swatch" data-color="#34c759" style="background:#34c759;"></div>
           <div class="color-swatch" data-color="#ffcc00" style="background:#ffcc00;"></div>
+          <div class="color-swatch" data-color="#af52de" style="background:#af52de;"></div>
+          <div class="color-swatch" data-color="#5ac8fa" style="background:#5ac8fa;"></div>
         </div>
+
+        <!-- COLORE PERSONALIZZATO -->
+        <input type="color" id="customColorPicker" value="#007aff" />
       </div>
 
       <div class="settings-section">
@@ -119,9 +119,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Menu contestuale -->
-  <div id="contextMenu" class="context-menu hidden"></div>
 
   <script src="script.js"></script>
 </body>
