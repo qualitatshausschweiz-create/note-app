@@ -8,38 +8,8 @@
 </head>
 <body>
 
-  <!-- PIN OVERLAY -->
-  <div id="pinOverlay" class="pin-overlay">
-    <h2 data-i18n="enterPin">Inserisci PIN</h2>
-
-    <div class="pin-circles">
-      <div class="circle"></div>
-      <div class="circle"></div>
-      <div class="circle"></div>
-      <div class="circle"></div>
-    </div>
-
-    <div id="pinError" class="pin-error"></div>
-
-    <div class="pinPad">
-      <button data-num="1">1</button>
-      <button data-num="2">2</button>
-      <button data-num="3">3</button>
-      <button data-num="4">4</button>
-      <button data-num="5">5</button>
-      <button data-num="6">6</button>
-      <button data-num="7">7</button>
-      <button data-num="8">8</button>
-      <button data-num="9">9</button>
-      <button id="pinBack">⌫</button>
-      <button data-num="0">0</button>
-    </div>
-
-    <label class="remember-pin">
-      <input type="checkbox" id="rememberPin" />
-      <span data-i18n="rememberPin">Memorizza PIN su questo dispositivo</span>
-    </label>
-  </div>
+  <!-- Placeholder invisibile per futura attivazione FaceID -->
+  <div id="faceid-placeholder" style="display:none;"></div>
 
   <!-- TOP BAR -->
   <header class="top-bar glass">
@@ -185,10 +155,6 @@
     <div class="panel-box glass">
 
       <h2 class="panel-title">⚙️ <span data-i18n="settingsTitle">Impostazioni</span></h2>
-
-      <h3 class="panel-section" data-i18n="securitySection">🔐 Sicurezza</h3>
-      <input id="new-pin-input" class="panel-input" data-i18n-placeholder="newPinPlaceholder" placeholder="Nuovo PIN (4 cifre)" />
-      <button class="panel-btn" id="save-new-pin-btn" data-i18n="savePin">Salva nuovo PIN</button>
 
       <h3 class="panel-section">🕶️ Privacy</h3>
       <button class="panel-btn" id="toggle-privacy">Modalità privacy</button>
