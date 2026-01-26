@@ -1,10 +1,27 @@
-// ================== VARIABILI GLOBALI ==================
+/* ============================================================
+   VARIABILI GLOBALI
+============================================================ */
 let notes = JSON.parse(localStorage.getItem("notes") || "[]");
-let editingId = null;
-let currentCategoryFilter = "all";
-let selectedColor = "#ffffff";
+let trash = JSON.parse(localStorage.getItem("trash") || "[]");
+let archive = JSON.parse(localStorage.getItem("archive") || "[]");
 
-// ================== TRADUZIONI ==================
+let editingId = null;
+let selectedColor = "#ffffff";
+let currentCategoryFilter = "all";
+let currentLang = localStorage.getItem("appLang") || "it";
+let savedPIN = localStorage.getItem("appPIN") || "4618";
+
+let autoBackupEnabled = JSON.parse(localStorage.getItem("autoBackupEnabled") || "true");
+let autoRestoreEnabled = JSON.parse(localStorage.getItem("autoRestoreEnabled") || "true");
+
+let privacyMode = JSON.parse(localStorage.getItem("privacyMode") || "false");
+let animationsEnabled = JSON.parse(localStorage.getItem("animationsEnabled") || "true");
+let textSize = localStorage.getItem("textSize") || "medium";
+let fontMode = localStorage.getItem("fontMode") || "ios";
+
+/* ============================================================
+   TRADUZIONI
+============================================================ */
 const translations = {
   it: {
     notesTitle: "Le tue note",
@@ -49,172 +66,91 @@ const translations = {
     noBackupFound: "Nessun backup trovato.",
     pinFormat: "Il PIN deve avere 4 cifre.",
     pinChanged: "PIN cambiato."
-  },
-  en: {
-    notesTitle: "Your notes",
-    enterPin: "Enter PIN",
-    rememberPin: "Remember PIN on this device",
-    pinError: "Wrong PIN",
-    noTitle: "Untitled",
-    catAll: "All",
-    catHome: "Home",
-    catWork: "Work",
-    catIdeas: "Ideas",
-    catShopping: "Shopping",
-    catOther: "Other",
-    titlePlaceholder: "Title",
-    textPlaceholder: "Write your note...",
-    categoryLabel: "Category",
-    colorLabel: "Note color",
-    save: "Save",
-    delete: "Delete",
-    editNote: "Note",
-    backupTitle: "Backup & Restore",
-    backupSection: "Backup",
-    restoreSection: "Restore",
-    exportSection: "Export / Import",
-    backupManageSection: "Backup management",
-    quickBackup: "Quick backup",
-    manualBackup: "Manual backup",
-    manualRestore: "Manual restore",
-    exportText: "Export notes (.txt)",
-    deleteBackups: "Delete backups",
-    close: "Close",
-    settingsTitle: "Settings",
-    securitySection: "Security",
-    maintenanceSection: "Maintenance",
-    newPinPlaceholder: "New PIN (4 digits)",
-    savePin: "Save new PIN",
-    deleteAllNotes: "Delete all notes",
-    resetApp: "Reset app",
-    quickBackupDone: "Quick backup done.",
-    manualBackupDone: "Manual backup done.",
-    restoreDone: "Restore completed.",
-    noBackupFound: "No backup found.",
-    pinFormat: "PIN must be 4 digits.",
-    pinChanged: "PIN changed."
-  },
-  de: {
-    notesTitle: "Deine Notizen",
-    enterPin: "PIN eingeben",
-    rememberPin: "PIN auf diesem Gerät merken",
-    pinError: "Falscher PIN",
-    noTitle: "Ohne Titel",
-    catAll: "Alle",
-    catHome: "Zuhause",
-    catWork: "Arbeit",
-    catIdeas: "Ideen",
-    catShopping: "Einkauf",
-    catOther: "Sonstiges",
-    titlePlaceholder: "Titel",
-    textPlaceholder: "Notiz schreiben...",
-    categoryLabel: "Kategorie",
-    colorLabel: "Notizfarbe",
-    save: "Speichern",
-    delete: "Löschen",
-    editNote: "Notiz",
-    backupTitle: "Backup & Wiederherstellung",
-    backupSection: "Backup",
-    restoreSection: "Wiederherstellung",
-    exportSection: "Export / Import",
-    backupManageSection: "Backup-Verwaltung",
-    quickBackup: "Schnelles Backup",
-    manualBackup: "Manuelles Backup",
-    manualRestore: "Manuelle Wiederherstellung",
-    exportText: "Notizen exportieren (.txt)",
-    deleteBackups: "Backups löschen",
-    close: "Schließen",
-    settingsTitle: "Einstellungen",
-    securitySection: "Sicherheit",
-    maintenanceSection: "Wartung",
-    newPinPlaceholder: "Neuer PIN (4 Ziffern)",
-    savePin: "Neuen PIN speichern",
-    deleteAllNotes: "Alle Notizen löschen",
-    resetApp: "App zurücksetzen",
-    quickBackupDone: "Schnelles Backup durchgeführt.",
-    manualBackupDone: "Manuelles Backup durchgeführt.",
-    restoreDone: "Wiederherstellung abgeschlossen.",
-    noBackupFound: "Kein Backup gefunden.",
-    pinFormat: "PIN muss 4 Ziffern haben.",
-    pinChanged: "PIN geändert."
-  },
-  es: {
-    notesTitle: "Tus notas",
-    enterPin: "Introduce el PIN",
-    rememberPin: "Recordar PIN en este dispositivo",
-    pinError: "PIN incorrecto",
-    noTitle: "Sin título",
-    catAll: "Todas",
-    catHome: "Casa",
-    catWork: "Trabajo",
-    catIdeas: "Ideas",
-    catShopping: "Compras",
-    catOther: "Otros",
-    titlePlaceholder: "Título",
-    textPlaceholder: "Escribe tu nota...",
-    categoryLabel: "Categoría",
-    colorLabel: "Color de la nota",
-    save: "Guardar",
-    delete: "Eliminar",
-    editNote: "Nota",
-    backupTitle: "Copia y restauración",
-    backupSection: "Copia",
-    restoreSection: "Restauración",
-    exportSection: "Exportar / Importar",
-    backupManageSection: "Gestión de copias",
-    quickBackup: "Copia rápida",
-    manualBackup: "Copia manual",
-    manualRestore: "Restauración manual",
-    exportText: "Exportar notas (.txt)",
-    deleteBackups: "Eliminar copias",
-    close: "Cerrar",
-    settingsTitle: "Ajustes",
-    securitySection: "Seguridad",
-    maintenanceSection: "Mantenimiento",
-    newPinPlaceholder: "Nuevo PIN (4 dígitos)",
-    savePin: "Guardar nuevo PIN",
-    deleteAllNotes: "Eliminar todas las notas",
-    resetApp: "Restablecer app",
-    quickBackupDone: "Copia rápida realizada.",
-    manualBackupDone: "Copia manual realizada.",
-    restoreDone: "Restauración completada.",
-    noBackupFound: "No se encontró ninguna copia.",
-    pinFormat: "El PIN debe tener 4 dígitos.",
-    pinChanged: "PIN cambiado."
   }
 };
 
-let currentLang = localStorage.getItem("appLang") || "it";
-let currentTranslations = translations[currentLang];
+/* ============================================================
+   MULTILINGUA
+============================================================ */
+function applyTranslations() {
+  const t = translations[currentLang];
 
-// ================== PIN ==================
-let savedPIN = localStorage.getItem("appPIN") || "4618";
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (t[key]) el.textContent = t[key];
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const key = el.getAttribute("data-i18n-placeholder");
+    if (t[key]) el.placeholder = t[key];
+  });
+
+  updateCategoryButtons();
+  renderNotes();
+}
+
+function updateCategoryButtons() {
+  const t = translations[currentLang];
+  document.querySelector('[data-category="all"]').innerHTML = `📁 ${t.catAll}`;
+  document.querySelector('[data-category="home"]').innerHTML = `🏠 ${t.catHome}`;
+  document.querySelector('[data-category="work"]').innerHTML = `💼 ${t.catWork}`;
+  document.querySelector('[data-category="ideas"]').innerHTML = `💡 ${t.catIdeas}`;
+  document.querySelector('[data-category="shopping"]').innerHTML = `🛒 ${t.catShopping}`;
+  document.querySelector('[data-category="other"]').innerHTML = `⭐ ${t.catOther}`;
+}
+
+document.querySelectorAll(".lang-btn").forEach(btn => {
+  if (btn.dataset.lang === currentLang) btn.classList.add("active");
+  btn.onclick = () => {
+    document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentLang = btn.dataset.lang;
+    localStorage.setItem("appLang", currentLang);
+    applyTranslations();
+  };
+});
+
+/* ============================================================
+   TEMI
+============================================================ */
+function applyTheme(theme) {
+  document.body.classList.remove("light", "dark", "amoled");
+  document.body.classList.add(theme);
+  localStorage.setItem("appTheme", theme);
+}
+
+applyTheme(localStorage.getItem("appTheme") || "light");
+
+document.getElementById("theme-light").onclick = () => applyTheme("light");
+document.getElementById("theme-dark").onclick = () => applyTheme("dark");
+document.getElementById("theme-amoled").onclick = () => applyTheme("amoled");
+
+/* ============================================================
+   PIN
+============================================================ */
 let enteredPIN = "";
-
-const pinOverlay = document.getElementById("pinOverlay");
 const pinCircles = document.querySelectorAll(".circle");
-const pinError = document.getElementById("pinError");
+const pinOverlay = document.getElementById("pinOverlay");
 
 function updateCircles() {
-  pinCircles.forEach((c, i) => {
-    c.classList.toggle("filled", i < enteredPIN.length);
-  });
+  pinCircles.forEach((c, i) => c.classList.toggle("filled", i < enteredPIN.length));
 }
 
 function checkPIN() {
-  const remember = document.getElementById("rememberPin")?.checked;
+  const t = translations[currentLang];
   if (enteredPIN === savedPIN) {
     pinOverlay.classList.add("hidden");
-    if (remember) localStorage.setItem("rememberPIN", "1");
+    if (document.getElementById("rememberPin").checked)
+      localStorage.setItem("rememberPIN", "1");
   } else {
-    pinError.textContent = currentTranslations.pinError;
-    setTimeout(() => (pinError.textContent = ""), 1200);
+    document.getElementById("pinError").textContent = t.pinError;
+    setTimeout(() => (document.getElementById("pinError").textContent = ""), 1200);
   }
   enteredPIN = "";
   updateCircles();
 }
 
-document.querySelectorAll(".pinPad button").forEach((btn) => {
+document.querySelectorAll(".pinPad button").forEach(btn => {
   btn.onclick = () => {
     const num = btn.dataset.num;
     if (num !== undefined) {
@@ -236,79 +172,18 @@ if (localStorage.getItem("rememberPIN") === "1") {
   pinOverlay.classList.add("hidden");
 }
 
-// ================== TEMI ==================
-function applyTheme(theme) {
-  document.body.classList.remove("dark", "amoled");
-  if (theme === "dark") document.body.classList.add("dark");
-  if (theme === "amoled") document.body.classList.add("amoled");
-}
-
-let savedTheme = localStorage.getItem("appTheme") || "light";
-applyTheme(savedTheme);
-
-document.getElementById("theme-light").onclick = () => {
-  savedTheme = "light";
-  localStorage.setItem("appTheme", savedTheme);
-  applyTheme(savedTheme);
-};
-document.getElementById("theme-dark").onclick = () => {
-  savedTheme = "dark";
-  localStorage.setItem("appTheme", savedTheme);
-  applyTheme(savedTheme);
-};
-document.getElementById("theme-amoled").onclick = () => {
-  savedTheme = "amoled";
-  localStorage.setItem("appTheme", savedTheme);
-  applyTheme(savedTheme);
-};
-
-// ================== MULTILINGUA ==================
-function applyTranslations() {
-  currentTranslations = translations[currentLang];
-
-  document.querySelectorAll("[data-i18n]").forEach((el) => {
-    const key = el.getAttribute("data-i18n");
-    if (currentTranslations[key]) el.textContent = currentTranslations[key];
-  });
-
-  document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
-    const key = el.getAttribute("data-i18n-placeholder");
-    if (currentTranslations[key]) el.placeholder = currentTranslations[key];
-  });
-
-  // Aggiorna titolo app
-  const titleEl = document.querySelector(".app-title");
-  if (titleEl) titleEl.textContent = currentTranslations.notesTitle;
-
-  renderNotes();
-}
-
-document.querySelectorAll(".lang-btn").forEach((btn) => {
-  if (btn.dataset.lang === currentLang) btn.classList.add("active");
-  btn.onclick = () => {
-    document.querySelectorAll(".lang-btn").forEach((b) => b.classList.remove("active"));
-    btn.classList.add("active");
-    currentLang = btn.dataset.lang;
-    localStorage.setItem("appLang", currentLang);
-    applyTranslations();
-  };
-});
-
-// ================== NOTE ==================
+/* ============================================================
+   NOTE
+============================================================ */
 function getCategoryLabel(cat) {
-  switch (cat) {
-    case "home":
-      return currentTranslations.catHome;
-    case "work":
-      return currentTranslations.catWork;
-    case "ideas":
-      return currentTranslations.catIdeas;
-    case "shopping":
-      return currentTranslations.catShopping;
-    case "other":
-    default:
-      return currentTranslations.catOther;
-  }
+  const t = translations[currentLang];
+  return {
+    home: t.catHome,
+    work: t.catWork,
+    ideas: t.catIdeas,
+    shopping: t.catShopping,
+    other: t.catOther
+  }[cat] || t.catOther;
 }
 
 function renderNotes() {
@@ -316,18 +191,20 @@ function renderNotes() {
   container.innerHTML = "";
 
   notes
-    .filter((n) => currentCategoryFilter === "all" || n.category === currentCategoryFilter)
-    .forEach((n) => {
+    .filter(n => currentCategoryFilter === "all" || n.category === currentCategoryFilter)
+    .forEach(n => {
       const div = document.createElement("div");
       div.className = "note";
-      div.style.background = n.color || "#ffffff";
+      div.style.background = n.color;
 
-      const catLabel = getCategoryLabel(n.category);
+      if (privacyMode) {
+        div.style.filter = "blur(6px)";
+      }
 
       div.innerHTML = `
         <div class="note-header">
-          <div class="note-title">${n.title || currentTranslations.noTitle}</div>
-          <div class="note-category-tag">${catLabel}</div>
+          <div class="note-title">${n.title || translations[currentLang].noTitle}</div>
+          <div class="note-category-tag">${getCategoryLabel(n.category)}</div>
         </div>
         <div class="note-text">${(n.text || "").slice(0, 160)}</div>
         <div class="note-actions">
@@ -336,32 +213,40 @@ function renderNotes() {
         </div>
       `;
 
-      div.querySelector('[data-action="edit"]').onclick = (e) => {
+      div.onclick = () => {
+        if (privacyMode) div.style.filter = "none";
+        openEditor(n.id);
+      };
+
+      div.querySelector('[data-action="edit"]').onclick = e => {
         e.stopPropagation();
         openEditor(n.id);
       };
-      div.querySelector('[data-action="delete"]').onclick = (e) => {
+
+      div.querySelector('[data-action="delete"]').onclick = e => {
         e.stopPropagation();
         deleteNoteById(n.id);
       };
-
-      div.onclick = () => openEditor(n.id);
 
       container.appendChild(div);
     });
 }
 
-// ================== FILTRO CATEGORIE ==================
-document.querySelectorAll(".category-btn").forEach((btn) => {
+/* ============================================================
+   FILTRO CATEGORIE
+============================================================ */
+document.querySelectorAll(".category-btn").forEach(btn => {
   btn.onclick = () => {
-    document.querySelectorAll(".category-btn").forEach((b) => b.classList.remove("active"));
+    document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     currentCategoryFilter = btn.dataset.category;
     renderNotes();
   };
 });
 
-// ================== EDITOR ==================
+/* ============================================================
+   EDITOR
+============================================================ */
 function openEditor(id = null) {
   editingId = id;
 
@@ -372,12 +257,11 @@ function openEditor(id = null) {
   const colorPicker = document.getElementById("note-color");
 
   if (id) {
-    const n = notes.find((x) => x.id === id);
-    if (!n) return;
+    const n = notes.find(x => x.id === id);
     title.value = n.title;
     text.value = n.text;
     cat.value = n.category;
-    selectedColor = n.color || "#ffffff";
+    selectedColor = n.color;
   } else {
     title.value = "";
     text.value = "";
@@ -386,7 +270,8 @@ function openEditor(id = null) {
   }
 
   colorPicker.value = selectedColor;
-  document.querySelectorAll(".color-dot").forEach((d) => {
+
+  document.querySelectorAll(".color-dot").forEach(d => {
     d.classList.toggle("selected", d.dataset.color === selectedColor);
   });
 
@@ -407,8 +292,7 @@ document.getElementById("save-note-btn").onclick = () => {
   if (!text) return;
 
   if (editingId) {
-    const n = notes.find((x) => x.id === editingId);
-    if (!n) return;
+    const n = notes.find(x => x.id === editingId);
     n.title = title;
     n.text = text;
     n.category = category;
@@ -423,7 +307,7 @@ document.getElementById("save-note-btn").onclick = () => {
     });
   }
 
-  saveNotes(true);
+  saveNotes();
   renderNotes();
   document.getElementById("note-editor").classList.add("hidden");
 };
@@ -435,30 +319,36 @@ document.getElementById("delete-note-btn").onclick = () => {
 };
 
 function deleteNoteById(id) {
-  notes = notes.filter((n) => n.id !== id);
-  saveNotes(true);
+  const note = notes.find(n => n.id === id);
+  trash.push(note);
+  localStorage.setItem("trash", JSON.stringify(trash));
+
+  notes = notes.filter(n => n.id !== id);
+  saveNotes();
   renderNotes();
 }
 
-// Colori rapidi
-document.querySelectorAll(".color-dot").forEach((dot) => {
+/* Colori rapidi */
+document.querySelectorAll(".color-dot").forEach(dot => {
   dot.onclick = () => {
     selectedColor = dot.dataset.color;
     document.getElementById("note-color").value = selectedColor;
-    document.querySelectorAll(".color-dot").forEach((d) => d.classList.remove("selected"));
+    document.querySelectorAll(".color-dot").forEach(d => d.classList.remove("selected"));
     dot.classList.add("selected");
   };
 });
 
-document.getElementById("note-color").oninput = (e) => {
+document.getElementById("note-color").oninput = e => {
   selectedColor = e.target.value;
-  document.querySelectorAll(".color-dot").forEach((d) => d.classList.remove("selected"));
+  document.querySelectorAll(".color-dot").forEach(d => d.classList.remove("selected"));
 };
 
-// ================== BACKUP ==================
-function saveNotes(autoBackup = true) {
+/* ============================================================
+   BACKUP — PARTE 1
+============================================================ */
+function saveNotes() {
   localStorage.setItem("notes", JSON.stringify(notes));
-  if (autoBackup) autoBackupNotes();
+  if (autoBackupEnabled) autoBackupNotes();
 }
 
 function autoBackupNotes() {
@@ -466,18 +356,21 @@ function autoBackupNotes() {
 }
 
 function autoRestoreIfEmpty() {
+  if (!autoRestoreEnabled) return;
   if (notes.length === 0) {
     const backup = localStorage.getItem("notesBackup");
     if (backup) {
       notes = JSON.parse(backup);
-      saveNotes(false);
+      saveNotes();
     }
   }
 }
-
+/* ============================================================
+   BACKUP — PARTE 2
+============================================================ */
 document.getElementById("quick-backup-btn").onclick = () => {
   localStorage.setItem("notesBackup", JSON.stringify(notes));
-  alert(currentTranslations.quickBackupDone);
+  alert(translations[currentLang].quickBackupDone);
 };
 
 document.getElementById("manual-backup-btn").onclick = () => {
@@ -489,7 +382,7 @@ document.getElementById("manual-backup-btn").onclick = () => {
   a.download = "note-backup.json";
   a.click();
   URL.revokeObjectURL(url);
-  alert(currentTranslations.manualBackupDone);
+  alert(translations[currentLang].manualBackupDone);
 };
 
 document.getElementById("manual-restore-btn").onclick = () => {
@@ -497,15 +390,15 @@ document.getElementById("manual-restore-btn").onclick = () => {
   input.type = "file";
   input.accept = "application/json";
 
-  input.onchange = (e) => {
+  input.onchange = e => {
     const file = e.target.files[0];
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = event => {
       try {
         notes = JSON.parse(event.target.result);
-        saveNotes(false);
+        saveNotes();
         renderNotes();
-        alert(currentTranslations.restoreDone);
+        alert(translations[currentLang].restoreDone);
       } catch {
         alert("File non valido.");
       }
@@ -518,10 +411,8 @@ document.getElementById("manual-restore-btn").onclick = () => {
 
 document.getElementById("export-text-btn").onclick = () => {
   let content = "";
-  notes.forEach((n) => {
-    content += `Titolo: ${n.title}\nCategoria: ${getCategoryLabel(n.category)}\nColore: ${
-      n.color
-    }\n${n.text}\n\n---\n\n`;
+  notes.forEach(n => {
+    content += `Titolo: ${n.title}\nCategoria: ${getCategoryLabel(n.category)}\nColore: ${n.color}\n${n.text}\n\n---\n\n`;
   });
   const blob = new Blob([content], { type: "text/plain" });
   const url = URL.createObjectURL(blob);
@@ -534,56 +425,208 @@ document.getElementById("export-text-btn").onclick = () => {
 
 document.getElementById("delete-backups-btn").onclick = () => {
   localStorage.removeItem("notesBackup");
-  alert(currentTranslations.noBackupFound);
+  alert(translations[currentLang].noBackupFound);
 };
 
-// ================== PANNELLI ==================
-const backupPanel = document.getElementById("backup-panel");
-const settingsPanel = document.getElementById("settings-panel");
+/* Backup automatico ON/OFF */
+document.getElementById("toggle-auto-backup").onclick = () => {
+  autoBackupEnabled = !autoBackupEnabled;
+  localStorage.setItem("autoBackupEnabled", autoBackupEnabled);
+  alert("Backup automatico " + (autoBackupEnabled ? "attivato" : "disattivato"));
+};
 
+/* Ripristino automatico ON/OFF */
+document.getElementById("toggle-auto-restore").onclick = () => {
+  autoRestoreEnabled = !autoRestoreEnabled;
+  localStorage.setItem("autoRestoreEnabled", autoRestoreEnabled);
+  alert("Ripristino automatico " + (autoRestoreEnabled ? "attivato" : "disattivato"));
+};
+
+/* ============================================================
+   PANNELLI
+============================================================ */
 document.getElementById("backup-btn").onclick = () => {
-  backupPanel.classList.remove("hidden");
+  document.getElementById("backup-panel").classList.remove("hidden");
 };
 
 document.getElementById("settings-btn").onclick = () => {
-  settingsPanel.classList.remove("hidden");
+  document.getElementById("settings-panel").classList.remove("hidden");
+};
+
+document.getElementById("info-btn").onclick = () => {
+  updateDebugInfo();
+  updateStorageInfo();
+  document.getElementById("info-panel").classList.remove("hidden");
 };
 
 document.getElementById("close-backup-panel").onclick = () => {
-  backupPanel.classList.add("hidden");
+  document.getElementById("backup-panel").classList.add("hidden");
 };
 
 document.getElementById("close-settings-panel").onclick = () => {
-  settingsPanel.classList.add("hidden");
+  document.getElementById("settings-panel").classList.add("hidden");
 };
 
-// ================== IMPOSTAZIONI ==================
+document.getElementById("close-info-panel").onclick = () => {
+  document.getElementById("info-panel").classList.add("hidden");
+};
+
+/* ============================================================
+   IMPOSTAZIONI AVANZATE
+============================================================ */
+
+/* Cambio PIN */
 document.getElementById("save-new-pin-btn").onclick = () => {
   const newPin = document.getElementById("new-pin-input").value.trim();
-  if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
-    alert(currentTranslations.pinFormat);
+  if (!/^\d{4}$/.test(newPin)) {
+    alert(translations[currentLang].pinFormat);
     return;
   }
   savedPIN = newPin;
   localStorage.setItem("appPIN", newPin);
-  document.getElementById("new-pin-input").value = "";
-  alert(currentTranslations.pinChanged);
+  alert(translations[currentLang].pinChanged);
 };
 
-document.getElementById("delete-all-notes-btn").onclick = () => {
-  if (!confirm(currentTranslations.deleteAllNotes + "?")) return;
-  notes = [];
-  saveNotes(true);
+/* Modalità privacy */
+document.getElementById("toggle-privacy").onclick = () => {
+  privacyMode = !privacyMode;
+  localStorage.setItem("privacyMode", privacyMode);
   renderNotes();
 };
 
-document.getElementById("reset-app-btn").onclick = () => {
-  if (!confirm(currentTranslations.resetApp + "?")) return;
-  localStorage.clear();
-  location.reload();
+/* Font */
+document.getElementById("change-font").onclick = () => {
+  const fonts = ["ios", "modern", "mono"];
+  const next = fonts[(fonts.indexOf(fontMode) + 1) % fonts.length];
+  fontMode = next;
+  localStorage.setItem("fontMode", next);
+
+  document.body.style.fontFamily =
+    next === "modern"
+      ? "Inter, sans-serif"
+      : next === "mono"
+      ? "Menlo, monospace"
+      : "-apple-system, BlinkMacSystemFont, sans-serif";
 };
 
-// ================== INIT ==================
+/* Dimensione testo */
+document.getElementById("change-text-size").onclick = () => {
+  const sizes = ["small", "medium", "large"];
+  const next = sizes[(sizes.indexOf(textSize) + 1) % sizes.length];
+  textSize = next;
+  localStorage.setItem("textSize", next);
+
+  document.documentElement.style.setProperty(
+    "--note-text-size",
+    next === "small" ? "12px" : next === "large" ? "16px" : "14px"
+  );
+
+  renderNotes();
+};
+
+/* Animazioni ON/OFF */
+document.getElementById("toggle-animations").onclick = () => {
+  animationsEnabled = !animationsEnabled;
+  localStorage.setItem("animationsEnabled", animationsEnabled);
+  document.body.style.setProperty("--animations", animationsEnabled ? "1" : "0");
+};
+
+/* Velocità animazioni */
+document.getElementById("change-animation-speed").onclick = () => {
+  const speeds = ["slow", "normal", "fast"];
+  const current = document.body.dataset.animSpeed || "normal";
+  const next = speeds[(speeds.indexOf(current) + 1) % speeds.length];
+  document.body.dataset.animSpeed = next;
+
+  document.documentElement.style.setProperty(
+    "--anim-speed",
+    next === "slow" ? "0.6s" : next === "fast" ? "0.2s" : "0.35s"
+  );
+};
+
+/* Trasparenze */
+document.getElementById("toggle-transparency").onclick = () => {
+  const current = document.body.dataset.transparency || "on";
+  const next = current === "on" ? "off" : "on";
+  document.body.dataset.transparency = next;
+
+  document.documentElement.style.setProperty(
+    "--glass",
+    next === "off" ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.6)"
+  );
+};
+
+/* ============================================================
+   ORDINAMENTO NOTE
+============================================================ */
+document.getElementById("sort-notes").onclick = () => {
+  const modes = ["date", "title", "category"];
+  const current = localStorage.getItem("sortMode") || "date";
+  const next = modes[(modes.indexOf(current) + 1) % modes.length];
+  localStorage.setItem("sortMode", next);
+
+  if (next === "title") notes.sort((a, b) => a.title.localeCompare(b.title));
+  if (next === "category") notes.sort((a, b) => a.category.localeCompare(b.category));
+  if (next === "date") notes.sort((a, b) => b.id - a.id);
+
+  renderNotes();
+};
+
+/* ============================================================
+   ARCHIVIO E CESTINO
+============================================================ */
+document.getElementById("open-archive").onclick = () => {
+  alert("Archivio note in sviluppo.");
+};
+
+document.getElementById("open-trash").onclick = () => {
+  alert("Cestino note in sviluppo.");
+};
+
+document.getElementById("duplicate-note").onclick = () => {
+  alert("Duplica nota in sviluppo.");
+};
+
+document.getElementById("merge-notes").onclick = () => {
+  alert("Unisci note in sviluppo.");
+};
+
+/* ============================================================
+   DEBUG INFO
+============================================================ */
+function updateDebugInfo() {
+  const debug = document.getElementById("debug-info");
+  debug.innerHTML = `
+    Note totali: ${notes.length}<br>
+    Archivio: ${archive.length}<br>
+    Cestino: ${trash.length}<br>
+    Backup automatico: ${autoBackupEnabled}<br>
+    Ripristino automatico: ${autoRestoreEnabled}<br>
+    Privacy: ${privacyMode}<br>
+    Animazioni: ${animationsEnabled}<br>
+    Font: ${fontMode}<br>
+    Dimensione testo: ${textSize}
+  `;
+}
+
+/* ============================================================
+   STATO MEMORIA
+============================================================ */
+function updateStorageInfo() {
+  const used = JSON.stringify(localStorage).length;
+  const max = 5 * 1024 * 1024; // 5MB
+  const percent = ((used / max) * 100).toFixed(1);
+
+  document.getElementById("storage-info").innerHTML = `
+    Spazio usato: ${(used / 1024).toFixed(1)} KB<br>
+    Percentuale: ${percent}%<br>
+    Limite: 5 MB
+  `;
+}
+
+/* ============================================================
+   INIT
+============================================================ */
 autoRestoreIfEmpty();
 applyTranslations();
 renderNotes();
