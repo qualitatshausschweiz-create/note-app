@@ -11,6 +11,7 @@
     <!-- Header -->
     <header id="topBar">
       <h1>Le mie note</h1>
+      <p class="subtitle">Categorie, cestino, backup, tutto sotto controllo</p>
       <div class="top-icons">
         <button id="themeToggleBtn">🌞</button>
         <button id="openSettingsBtn">⚙️</button>
@@ -24,9 +25,10 @@
       <input type="text" id="noteTitle" placeholder="Titolo della nota..." />
       <select id="categorySelector">
         <option value="personale">Personale</option>
-        <option value="lavoro">Lavoro</option>
+        <option value="lavoro" selected>Lavoro</option>
         <option value="idee">Idee</option>
         <option value="spesa">Spesa</option>
+        <option value="altro">Altro</option>
       </select>
       <textarea id="noteContent" placeholder="Scrivi la tua nota qui..."></textarea>
       <div class="editor-buttons">
@@ -44,7 +46,14 @@
     <!-- Categorie -->
     <section id="categorySection">
       <h2>Categorie</h2>
-      <ul id="categoryList" class="category-list"></ul>
+      <ul id="categoryList" class="category-list">
+        <li class="category-item" data-id="personale"><span class="color-dot" style="background:#ff9500;"></span> Personale</li>
+        <li class="category-item" data-id="lavoro"><span class="color-dot" style="background:#34c759;"></span> Lavoro</li>
+        <li class="category-item" data-id="idee"><span class="color-dot" style="background:#af52de;"></span> Idee</li>
+        <li class="category-item" data-id="spesa"><span class="color-dot" style="background:#007aff;"></span> Spesa</li>
+        <li class="category-item" data-id="tutte"><span class="color-dot" style="background:#8e8e93;"></span> Tutte</li>
+        <li class="category-item" data-id="altro"><span class="color-dot" style="background:#5ac8fa;"></span> Altro</li>
+      </ul>
       <button id="addCategoryBtn" class="primary-btn">+ Aggiungi</button>
     </section>
   </div>
