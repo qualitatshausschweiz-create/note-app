@@ -1,4 +1,7 @@
-/* ========== STATE ========== */
+/* ===========================
+   STATE
+=========================== */
+
 let notes = [];
 let deletedNotes = [];
 let archivedNotes = [];
@@ -14,7 +17,10 @@ let categories = [
 let showTrash = false;
 let showArchive = false;
 
-/* ========== ELEMENTS ========== */
+/* ===========================
+   ELEMENTS
+=========================== */
+
 const noteTitle = document.getElementById("noteTitle");
 const noteContent = document.getElementById("noteContent");
 const categorySelector = document.getElementById("categorySelector");
@@ -23,7 +29,6 @@ const categoryList = document.getElementById("categoryList");
 const searchInput = document.getElementById("searchInput");
 
 const themeToggleBtn = document.getElementById("themeToggleBtn");
-const themeSelect = document.getElementById("themeSelect");
 const customColorPicker = document.getElementById("customColorPicker");
 
 const openSettingsBtn = document.getElementById("openSettingsBtn");
@@ -45,12 +50,16 @@ const backupList = document.getElementById("backupList");
 const addCategoryBtn = document.getElementById("addCategoryBtn");
 const saveNoteBtn = document.getElementById("saveNoteBtn");
 
-/* ========== STORAGE ========== */
+/* ===========================
+   STORAGE
+=========================== */
+
 function saveAll() {
   localStorage.setItem("notes", JSON.stringify(notes));
   localStorage.setItem("deletedNotes", JSON.stringify(deletedNotes));
   localStorage.setItem("archivedNotes", JSON.stringify(archivedNotes));
   localStorage.setItem("categories", JSON.stringify(categories));
+
   const settings = {
     theme: document.documentElement.getAttribute("data-theme") || "light",
     accent: getComputedStyle(document.documentElement).getPropertyValue("--accent").trim()
@@ -62,6 +71,7 @@ function loadAll() {
   notes = JSON.parse(localStorage.getItem("notes") || "[]");
   deletedNotes = JSON.parse(localStorage.getItem("deletedNotes") || "[]");
   archivedNotes = JSON.parse(localStorage.getItem("archivedNotes") || "[]");
+
   const storedCats = localStorage.getItem("categories");
   if (storedCats) categories = JSON.parse(storedCats);
 
@@ -71,16 +81,18 @@ function loadAll() {
     if (settings.theme) {
       document.documentElement.setAttribute("data-theme", settings.theme);
       themeToggleBtn.textContent = settings.theme === "dark" ? "🌙" : "🌞";
-      if (themeSelect) themeSelect.value = settings.theme;
     }
     if (settings.accent) {
       document.documentElement.style.setProperty("--accent", settings.accent);
-      if (customColorPicker) customColorPicker.value = settings.accent;
+      customColorPicker.value = settings.accent;
     }
   }
 }
 
-/* ========== NOTES ========== */
+/* ===========================
+   NOTES
+=========================== */
+
 function saveNote() {
   const title = noteTitle.value.trim();
   const content = noteContent.value.trim();
@@ -101,7 +113,8 @@ function saveNote() {
   saveAll();
   renderNotes();
 }
-saveNoteBtn.addEventListener("click", saveNote);
+
+saveNoteBtn.onclick = saveNote;
 
 function deleteNote(id) {
   const n = notes.find(x => x.id === id);
@@ -139,7 +152,10 @@ function unarchiveNote(id) {
   renderNotes();
 }
 
-/* ========== RENDER NOTES ========== */
+/* ===========================
+   RENDER NOTES
+=========================== */
+
 function renderNotes() {
   noteList.innerHTML = "";
 
@@ -197,12 +213,14 @@ function renderNotes() {
   applyAccent();
 }
 
-/* ========== CATEGORIES ========== */
+/* ===========================
+   CATEGORIES
+=========================== */
+
 function renderCategories() {
   categoryList.innerHTML = "";
   categorySelector.innerHTML = "";
 
-  // voce "Tutte"
   const allOpt = document.createElement("option");
   allOpt.value = "tutte";
   allOpt.textContent = "Tutte";
@@ -231,8 +249,10 @@ function filterCategory(id) {
     renderNotes();
     return;
   }
+
   noteList.innerHTML = "";
   const baseList = showTrash ? deletedNotes : showArchive ? archivedNotes : notes;
+
   baseList
     .filter(n => n.category === id)
     .forEach(n => {
@@ -241,6 +261,7 @@ function filterCategory(id) {
       div.innerHTML = `<h3>${n.title}</h3><p>${n.content}</p>`;
       noteList.appendChild(div);
     });
+
   applyAccent();
 }
 
@@ -253,7 +274,10 @@ addCategoryBtn.onclick = () => {
   renderCategories();
 };
 
-/* ========== THEME & PALETTE ========== */
+/* ===========================
+   THEME & PALETTE
+=========================== */
+
 themeToggleBtn.onclick = () => {
   const t = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
   document.documentElement.setAttribute("data-theme", t);
@@ -278,7 +302,7 @@ function renderAdvancedPalette() {
     swatch.style.background = color;
     swatch.onclick = () => {
       document.documentElement.style.setProperty("--accent", color);
-      if (customColorPicker) customColorPicker.value = color;
+      customColorPicker.value = color;
       applyAccent();
       saveAll();
     };
@@ -299,14 +323,20 @@ function applyAccent() {
   });
 }
 
-/* ========== POPUP ========== */
+/* ===========================
+   POPUPS
+=========================== */
+
 openSettingsBtn.onclick = () => settingsPopup.classList.remove("hidden");
 closeSettingsBtn.onclick = () => settingsPopup.classList.add("hidden");
 
 openLifebuoyBtn.onclick = () => lifebuoyPopup.classList.remove("hidden");
 closeLifebuoyBtn.onclick = () => lifebuoyPopup.classList.add("hidden");
 
-/* ========== TRASH & ARCHIVE ========== */
+/* ===========================
+   TRASH & ARCHIVE
+=========================== */
+
 openTrashBtn.onclick = () => {
   showTrash = !showTrash;
   if (showTrash) showArchive = false;
@@ -319,7 +349,10 @@ openArchiveBtn.onclick = () => {
   renderNotes();
 };
 
-/* ========== BACKUP ========== */
+/* ===========================
+   BACKUP
+=========================== */
+
 function renderBackupList() {
   backupList.innerHTML = "";
   const backups = JSON.parse(localStorage.getItem("backups") || "[]");
@@ -347,6 +380,7 @@ function createBackup() {
   localStorage.setItem("backups", JSON.stringify(backups));
   renderBackupList();
 }
+
 createBackupBtn.onclick = createBackup;
 
 function restoreBackup(i) {
@@ -374,7 +408,10 @@ exportDataBtn.onclick = () => {
   URL.revokeObjectURL(url);
 };
 
-/* ========== INIT ========== */
+/* ===========================
+   INIT
+=========================== */
+
 loadAll();
 renderCategories();
 renderNotes();
