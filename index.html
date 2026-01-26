@@ -1,155 +1,195 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Note App Pro</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Note App Pro</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
 
-    <!-- PIN OVERLAY -->
-    <div id="pinOverlay" class="pin-overlay">
-        <h2 data-i18n="enterPin">Inserisci PIN</h2>
+  <!-- PIN OVERLAY -->
+  <div id="pinOverlay" class="pin-overlay">
+    <h2 data-i18n="enterPin">Inserisci PIN</h2>
 
-        <div class="pin-circles">
-            <div class="circle"></div>
-            <div class="circle"></div>
-            <div class="circle"></div>
-            <div class="circle"></div>
-        </div>
-
-        <div id="pinError" class="pin-error"></div>
-
-        <div class="pinPad">
-            <button data-num="1">1</button>
-            <button data-num="2">2</button>
-            <button data-num="3">3</button>
-            <button data-num="4">4</button>
-            <button data-num="5">5</button>
-            <button data-num="6">6</button>
-            <button data-num="7">7</button>
-            <button data-num="8">8</button>
-            <button data-num="9">9</button>
-            <button id="pinBack">⌫</button>
-            <button data-num="0">0</button>
-        </div>
-
-        <label class="remember-pin">
-            <input type="checkbox" id="rememberPin">
-            <span data-i18n="rememberPin">Memorizza PIN su questo dispositivo</span>
-        </label>
+    <div class="pin-circles">
+      <div class="circle"></div>
+      <div class="circle"></div>
+      <div class="circle"></div>
+      <div class="circle"></div>
     </div>
 
-    <!-- TOP BAR -->
-    <header class="top-bar">
-        <h1 class="app-title">Le Tue Note</h1>
+    <div id="pinError" class="pin-error"></div>
 
-        <div class="top-icons">
-            <!-- Lingue -->
-            <button class="lang-btn" data-lang="it">IT</button>
-            <button class="lang-btn" data-lang="en">EN</button>
-            <button class="lang-btn" data-lang="de">DE</button>
-            <button class="lang-btn" data-lang="es">ES</button>
-
-            <!-- Temi -->
-            <button id="theme-light" class="theme-btn">🌞</button>
-            <button id="theme-dark" class="theme-btn">🌙</button>
-            <button id="theme-amoled" class="theme-btn">⬛</button>
-
-            <!-- Backup -->
-            <button id="backup-btn" class="icon-btn">🛟</button>
-
-            <!-- Impostazioni -->
-            <button id="settings-btn" class="icon-btn">⚙️</button>
-        </div>
-    </header>
-
-    <!-- CATEGORIE -->
-    <div class="categories">
-        <button class="category-btn active" data-category="all">📁 Tutte</button>
-        <button class="category-btn" data-category="casa">🏠 Casa</button>
-        <button class="category-btn" data-category="lavoro">💼 Lavoro</button>
-        <button class="category-btn" data-category="idee">💡 Idee</button>
-        <button class="category-btn" data-category="spesa">🛒 Spesa</button>
-        <button class="category-btn" data-category="altro">⭐ Altro</button>
+    <div class="pinPad">
+      <button data-num="1">1</button>
+      <button data-num="2">2</button>
+      <button data-num="3">3</button>
+      <button data-num="4">4</button>
+      <button data-num="5">5</button>
+      <button data-num="6">6</button>
+      <button data-num="7">7</button>
+      <button data-num="8">8</button>
+      <button data-num="9">9</button>
+      <button id="pinBack">⌫</button>
+      <button data-num="0">0</button>
     </div>
 
-    <!-- LISTA NOTE -->
+    <label class="remember-pin">
+      <input type="checkbox" id="rememberPin" />
+      <span data-i18n="rememberPin">Memorizza PIN su questo dispositivo</span>
+    </label>
+  </div>
+
+  <!-- TOP BAR -->
+  <header class="top-bar glass">
+    <h1 class="app-title" data-i18n="notesTitle">Le tue note</h1>
+
+    <div class="top-icons">
+      <!-- Lingue -->
+      <div class="lang-group">
+        <button class="lang-btn" data-lang="it">IT</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="de">DE</button>
+        <button class="lang-btn" data-lang="es">ES</button>
+      </div>
+
+      <!-- Temi -->
+      <div class="theme-group">
+        <button id="theme-light" class="theme-btn" title="Chiaro">🌞</button>
+        <button id="theme-dark" class="theme-btn" title="Scuro">🌙</button>
+        <button id="theme-amoled" class="theme-btn" title="AMOLED">⬛</button>
+      </div>
+
+      <!-- Backup & Impostazioni -->
+      <button id="backup-btn" class="icon-btn" title="Backup">🛟</button>
+      <button id="settings-btn" class="icon-btn" title="Impostazioni">⚙️</button>
+    </div>
+  </header>
+
+  <!-- CATEGORIE -->
+  <div class="categories glass">
+    <button class="category-btn active" data-category="all" data-i18n="catAll">📁 Tutte</button>
+    <button class="category-btn cat-home" data-category="home" data-i18n="catHome">🏠 Casa</button>
+    <button class="category-btn cat-work" data-category="work" data-i18n="catWork">💼 Lavoro</button>
+    <button class="category-btn cat-ideas" data-category="ideas" data-i18n="catIdeas">💡 Idee</button>
+    <button class="category-btn cat-shopping" data-category="shopping" data-i18n="catShopping">🛒 Spesa</button>
+    <button class="category-btn cat-other" data-category="other" data-i18n="catOther">⭐ Altro</button>
+  </div>
+
+  <!-- LISTA NOTE -->
+  <main class="main-area">
     <div id="notes-container" class="notes-container"></div>
+  </main>
 
-    <!-- PULSANTE AGGIUNGI -->
-    <button id="add-note-btn" class="add-note-btn">+</button>
+  <!-- PULSANTE AGGIUNGI -->
+  <button id="add-note-btn" class="add-note-btn">+</button>
 
-    <!-- EDITOR NOTA -->
-    <div id="note-editor" class="editor hidden">
-        <div class="editor-content">
-            <input id="note-title" class="note-title-input" placeholder="Titolo...">
-            <textarea id="note-text" class="note-textarea" placeholder="Scrivi qui..."></textarea>
+  <!-- EDITOR NOTA -->
+  <div id="note-editor" class="editor hidden">
+    <div class="editor-backdrop"></div>
+    <div class="editor-content glass">
+      <div class="editor-header">
+        <h2 data-i18n="editNote">Nota</h2>
+        <button id="close-editor-btn" class="close-btn">✕</button>
+      </div>
 
-            <!-- Categoria -->
-            <select id="note-category" class="note-category-select">
-                <option value="casa">🏠 Casa</option>
-                <option value="lavoro">💼 Lavoro</option>
-                <option value="idee">💡 Idee</option>
-                <option value="spesa">🛒 Spesa</option>
-                <option value="altro">⭐ Altro</option>
-            </select>
+      <input
+        id="note-title"
+        class="note-title-input"
+        data-i18n-placeholder="titlePlaceholder"
+        placeholder="Titolo"
+      />
 
-            <!-- Colore -->
-            <input type="color" id="note-color" class="color-picker">
+      <textarea
+        id="note-text"
+        class="note-textarea"
+        data-i18n-placeholder="textPlaceholder"
+        placeholder="Scrivi la tua nota..."
+      ></textarea>
 
-            <div class="editor-buttons">
-                <button id="save-note-btn" class="save-btn">Salva</button>
-                <button id="delete-note-btn" class="delete-btn">Elimina</button>
-                <button id="close-editor-btn" class="close-btn">Chiudi</button>
+      <div class="editor-row">
+        <!-- Categoria -->
+        <div class="editor-field">
+          <label data-i18n="categoryLabel">Categoria</label>
+          <select id="note-category" class="note-category-select">
+            <option value="home" data-i18n="catHome">🏠 Casa</option>
+            <option value="work" data-i18n="catWork">💼 Lavoro</option>
+            <option value="ideas" data-i18n="catIdeas">💡 Idee</option>
+            <option value="shopping" data-i18n="catShopping">🛒 Spesa</option>
+            <option value="other" data-i18n="catOther">⭐ Altro</option>
+          </select>
+        </div>
+
+        <!-- Colore -->
+        <div class="editor-field">
+          <label data-i18n="colorLabel">Colore nota</label>
+          <div class="color-row">
+            <input type="color" id="note-color" class="color-picker" />
+            <div class="color-palette">
+              <button class="color-dot" data-color="#ffffff" style="background:#ffffff;"></button>
+              <button class="color-dot" data-color="#ffe9a3" style="background:#ffe9a3;"></button>
+              <button class="color-dot" data-color="#ffd1dc" style="background:#ffd1dc;"></button>
+              <button class="color-dot" data-color="#c9f7ff" style="background:#c9f7ff;"></button>
+              <button class="color-dot" data-color="#d6ffb7" style="background:#d6ffb7;"></button>
             </div>
+          </div>
         </div>
+      </div>
+
+      <div class="editor-buttons">
+        <button id="save-note-btn" class="save-btn" data-i18n="save">Salva</button>
+        <button id="delete-note-btn" class="delete-btn" data-i18n="delete">Elimina</button>
+      </div>
     </div>
+  </div>
 
-    <!-- OVERLAY BACKUP -->
-    <div id="backup-panel" class="panel hidden">
-        <div class="panel-box">
+  <!-- OVERLAY BACKUP -->
+  <div id="backup-panel" class="panel hidden">
+    <div class="panel-backdrop"></div>
+    <div class="panel-box glass">
+      <h2 class="panel-title">🛟 <span data-i18n="backupTitle">Backup & Ripristino</span></h2>
 
-            <h2 class="panel-title">🛟 Backup & Ripristino</h2>
+      <h3 class="panel-section" data-i18n="backupSection">Backup</h3>
+      <button class="panel-btn" id="quick-backup-btn" data-i18n="quickBackup">Backup veloce</button>
+      <button class="panel-btn" id="manual-backup-btn" data-i18n="manualBackup">Backup manuale</button>
 
-            <h3 class="panel-section">Backup</h3>
-            <button class="panel-btn" id="quick-backup-btn">Backup veloce</button>
-            <button class="panel-btn" id="manual-backup-btn">Backup manuale</button>
+      <h3 class="panel-section" data-i18n="restoreSection">Ripristino</h3>
+      <button class="panel-btn" id="manual-restore-btn" data-i18n="manualRestore">Ripristino manuale</button>
 
-            <h3 class="panel-section">Ripristino</h3>
-            <button class="panel-btn" id="manual-restore-btn">Ripristino manuale</button>
+      <h3 class="panel-section" data-i18n="exportSection">Esporta / Importa</h3>
+      <button class="panel-btn" id="export-text-btn" data-i18n="exportText">Esporta note (.txt)</button>
 
-            <h3 class="panel-section">Esporta / Importa</h3>
-            <button class="panel-btn" id="export-text-btn">Esporta note</button>
-            <button class="panel-btn" id="import-notes-btn">Importa note</button>
+      <h3 class="panel-section" data-i18n="backupManageSection">Gestione backup</h3>
+      <button class="panel-btn danger" id="delete-backups-btn" data-i18n="deleteBackups">Cancella backup</button>
 
-            <h3 class="panel-section">Gestione Backup</h3>
-            <button class="panel-btn danger" id="delete-backups-btn">Cancella backup</button>
-
-            <button class="close-panel-btn" id="close-backup-panel">Chiudi</button>
-        </div>
+      <button class="close-panel-btn" id="close-backup-panel" data-i18n="close">Chiudi</button>
     </div>
+  </div>
 
-    <!-- OVERLAY IMPOSTAZIONI -->
-    <div id="settings-panel" class="panel hidden">
-        <div class="panel-box">
+  <!-- OVERLAY IMPOSTAZIONI -->
+  <div id="settings-panel" class="panel hidden">
+    <div class="panel-backdrop"></div>
+    <div class="panel-box glass">
+      <h2 class="panel-title">⚙️ <span data-i18n="settingsTitle">Impostazioni</span></h2>
 
-            <h2 class="panel-title">⚙️ Impostazioni</h2>
+      <h3 class="panel-section" data-i18n="securitySection">🔐 Sicurezza</h3>
+      <input
+        id="new-pin-input"
+        class="panel-input"
+        placeholder="Nuovo PIN (4 cifre)"
+        data-i18n-placeholder="newPinPlaceholder"
+      />
+      <button class="panel-btn" id="save-new-pin-btn" data-i18n="savePin">Salva nuovo PIN</button>
 
-            <h3 class="panel-section">🔐 Sicurezza</h3>
-            <input id="new-pin-input" class="panel-input" placeholder="Nuovo PIN (4 cifre)">
-            <button class="panel-btn" id="save-new-pin-btn">Salva nuovo PIN</button>
+      <h3 class="panel-section" data-i18n="maintenanceSection">🧼 Manutenzione</h3>
+      <button class="panel-btn danger" id="delete-all-notes-btn" data-i18n="deleteAllNotes">Cancella tutte le note</button>
+      <button class="panel-btn danger" id="reset-app-btn" data-i18n="resetApp">Reset totale app</button>
 
-            <h3 class="panel-section">🧼 Manutenzione</h3>
-            <button class="panel-btn danger" id="delete-all-notes-btn">Cancella tutte le note</button>
-            <button class="panel-btn danger" id="reset-app-btn">Reset totale app</button>
-
-            <button class="close-panel-btn" id="close-settings-panel">Chiudi</button>
-        </div>
+      <button class="close-panel-btn" id="close-settings-panel" data-i18n="close">Chiudi</button>
     </div>
+  </div>
 
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
