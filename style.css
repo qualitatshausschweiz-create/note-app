@@ -1,545 +1,509 @@
-/* --------------------------------------------------
-   BLOCCO 1 — STRUTTURA BASE + TEMI + TIPOGRAFIA
-   Stile Ultra iOS (blur, ombre morbide, superfici pulite)
--------------------------------------------------- */
-
-/* RESET BASE */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+:root {
+  --bg: #05060a;
+  --bg-glass: rgba(15, 16, 25, 0.85);
+  --accent: #4f8cff;
+  --accent-soft: rgba(79, 140, 255, 0.2);
+  --text: #f7f7ff;
+  --text-soft: #a7a9c4;
+  --danger: #ff4b6a;
+  --note-radius: 18px;
+  --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.45);
 }
 
 body {
-    background: var(--bg);
-    color: var(--text);
-    transition: background 0.3s ease, color 0.3s ease;
-    overflow-x: hidden;
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  background: radial-gradient(circle at top, #1b1f3b 0, #05060a 55%, #000 100%);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-/* --------------------------------------------------
-   TEMI
--------------------------------------------------- */
-
-/* TEMA CHIARO */
-:root {
-    --bg: #f5f5f7;
-    --text: #1c1c1e;
-    --panel-bg: rgba(255, 255, 255, 0.75);
-    --panel-border: rgba(0, 0, 0, 0.1);
-    --note-bg: #ffffff;
-    --note-border: rgba(0, 0, 0, 0.08);
-    --shadow: rgba(0, 0, 0, 0.08);
-}
-
-/* TEMA SCURO */
+/* Temi */
 body.dark {
-    --bg: #1c1c1e;
-    --text: #f5f5f7;
-    --panel-bg: rgba(40, 40, 40, 0.75);
-    --panel-border: rgba(255, 255, 255, 0.1);
-    --note-bg: #2c2c2e;
-    --note-border: rgba(255, 255, 255, 0.08);
-    --shadow: rgba(0, 0, 0, 0.4);
+  --bg: #05060a;
 }
-
-/* TEMA AMOLED (nero assoluto) */
 body.amoled {
-    --bg: #000000;
-    --text: #ffffff;
-    --panel-bg: rgba(20, 20, 20, 0.75);
-    --panel-border: rgba(255, 255, 255, 0.1);
-    --note-bg: #0d0d0d;
-    --note-border: rgba(255, 255, 255, 0.08);
-    --shadow: rgba(0, 0, 0, 0.6);
+  --bg: #000000;
 }
 
-/* --------------------------------------------------
-   TOP BAR
--------------------------------------------------- */
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border-radius: 24px;
+  box-shadow: var(--shadow-soft);
+}
 
+/* Top bar */
 .top-bar {
-    width: 100%;
-    padding: 14px 18px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    backdrop-filter: blur(18px);
-    background: var(--panel-bg);
-    border-bottom: 1px solid var(--panel-border);
-    position: sticky;
-    top: 0;
-    z-index: 50;
+  margin: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .app-title {
-    font-size: 22px;
-    font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
 .top-icons {
-    display: flex;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.top-icons button {
-    background: var(--note-bg);
-    border: 1px solid var(--note-border);
-    padding: 6px 10px;
-    border-radius: 10px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: transform 0.15s ease, background 0.2s ease;
+.lang-group,
+.theme-group {
+  display: flex;
+  gap: 4px;
+  margin-right: 4px;
 }
 
-.top-icons button:active {
-    transform: scale(0.92);
+.lang-btn,
+.theme-btn,
+.icon-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
 }
 
-/* --------------------------------------------------
-   CATEGORIE
--------------------------------------------------- */
+.lang-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
 
+/* Categorie */
 .categories {
-    display: flex;
-    gap: 8px;
-    padding: 12px;
-    overflow-x: auto;
+  margin: 0 10px;
+  margin-top: 4px;
+  padding: 6px;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
 }
 
 .category-btn {
-    background: var(--note-bg);
-    border: 1px solid var(--note-border);
-    padding: 8px 14px;
-    border-radius: 12px;
-    font-size: 15px;
-    white-space: nowrap;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.15s ease;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-soft);
+  white-space: nowrap;
 }
 
-.category-btn:active {
-    transform: scale(0.94);
+.category-btn.active {
+  background: var(--accent);
+  color: #fff;
 }
 
-/* --------------------------------------------------
-   NOTE LIST
--------------------------------------------------- */
+/* Colori categorie */
+.cat-home {
+  background: linear-gradient(135deg, #ffcf71, #ff9f1c);
+}
+.cat-work {
+  background: linear-gradient(135deg, #6a85ff, #4f8cff);
+}
+.cat-ideas {
+  background: linear-gradient(135deg, #ff9de1, #f6416c);
+}
+.cat-shopping {
+  background: linear-gradient(135deg, #7cf6fd, #00c6ff);
+}
+.cat-other {
+  background: linear-gradient(135deg, #b5ff7d, #4caf50);
+}
+.cat-home,
+.cat-work,
+.cat-ideas,
+.cat-shopping,
+.cat-other {
+  color: #05060a;
+}
+
+/* Area principale */
+.main-area {
+  flex: 1;
+  padding: 6px 10px 80px;
+}
 
 .notes-container {
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-/* Singola nota */
+/* Note */
 .note {
-    background: var(--note-bg);
-    border: 1px solid var(--note-border);
-    padding: 14px;
-    border-radius: 14px;
-    box-shadow: 0 4px 12px var(--shadow);
-    transition: transform 0.2s ease, opacity 0.3s ease;
-    cursor: pointer;
-    opacity: 0;
-    animation: fadeIn 0.4s forwards;
+  position: relative;
+  border-radius: var(--note-radius);
+  padding: 10px 12px 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--bg);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+}
+
+.note-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 4px;
 }
 
 .note-title {
-    font-size: 17px;
-    font-weight: 600;
-    margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.note-category-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  color: #111827;
 }
 
 .note-text {
-    font-size: 15px;
-    opacity: 0.8;
+  font-size: 12px;
+  color: #111827;
+  opacity: 0.8;
 }
 
-/* Animazione apparizione note */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Icone azioni nota */
+.note-actions {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  display: flex;
+  gap: 6px;
 }
 
-/* --------------------------------------------------
-   PULSANTE +
--------------------------------------------------- */
+.note-action-btn {
+  border: none;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 999px;
+  padding: 2px 6px;
+  font-size: 11px;
+  cursor: pointer;
+}
 
+/* Pulsante aggiungi */
 .add-note-btn {
-    position: fixed;
-    bottom: 22px;
-    right: 22px;
-    width: 58px;
-    height: 58px;
-    border-radius: 50%;
-    background: #007aff;
-    color: white;
-    font-size: 32px;
-    border: none;
-    box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
-    cursor: pointer;
-    transition: transform 0.2s ease;
+  position: fixed;
+  right: 18px;
+  bottom: 24px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: radial-gradient(circle at 30% 0, #ffffff, #4f8cff);
+  color: #05060a;
+  font-size: 26px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
 }
 
-.add-note-btn:active {
-    transform: scale(0.88);
-}
-/* --------------------------------------------------
-   BLOCCO 2 — EDITOR, CATEGORIE, ANIMAZIONI PREMIUM
--------------------------------------------------- */
-
-/* --------------------------------------------------
-   EDITOR NOTA
--------------------------------------------------- */
-
+/* Editor */
 .editor {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(18px);
-    background: rgba(0, 0, 0, 0.35);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 200;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 20;
 }
 
-.editor.show {
-    opacity: 1;
-    pointer-events: auto;
+.editor.hidden {
+  display: none;
+}
+
+.editor-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
 }
 
 .editor-content {
-    width: 92%;
-    max-width: 520px;
-    background: var(--note-bg);
-    border: 1px solid var(--note-border);
-    border-radius: 18px;
-    padding: 18px;
-    box-shadow: 0 8px 28px var(--shadow);
-    animation: popIn 0.25s ease forwards;
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  margin-bottom: 8px;
+  padding: 12px 14px 14px;
+  border-radius: 24px;
 }
 
-@keyframes popIn {
-    from { transform: scale(0.92); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-.note-title-input {
-    width: 100%;
-    padding: 10px;
-    font-size: 18px;
-    font-weight: 600;
-    border: none;
-    background: transparent;
-    color: var(--text);
-    margin-bottom: 10px;
-}
-
-.note-textarea {
-    width: 100%;
-    height: 180px;
-    padding: 10px;
-    font-size: 16px;
-    border: none;
-    background: transparent;
-    color: var(--text);
-    resize: none;
-    margin-bottom: 12px;
-}
-
-.note-title-input:focus,
-.note-textarea:focus {
-    outline: none;
-}
-
-/* Categoria */
-.note-category-select {
-    width: 100%;
-    padding: 10px;
-    border-radius: 12px;
-    border: 1px solid var(--note-border);
-    background: var(--note-bg);
-    color: var(--text);
-    margin-bottom: 12px;
-    font-size: 15px;
-}
-
-/* Colore */
-.color-picker {
-    width: 100%;
-    height: 40px;
-    border-radius: 12px;
-    border: 1px solid var(--note-border);
-    margin-bottom: 14px;
-    cursor: pointer;
-}
-
-/* Bottoni editor */
-.editor-buttons {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.editor-buttons button {
-    flex: 1;
-    padding: 12px;
-    border-radius: 12px;
-    border: none;
-    font-size: 15px;
-    cursor: pointer;
-    transition: transform 0.15s ease, opacity 0.2s ease;
-}
-
-.save-btn {
-    background: #007aff;
-    color: white;
-}
-
-.delete-btn {
-    background: #ff3b30;
-    color: white;
+.editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
 }
 
 .close-btn {
-    background: var(--note-bg);
-    border: 1px solid var(--note-border);
-    color: var(--text);
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 4px 8px;
+  cursor: pointer;
+  color: var(--text);
 }
 
-.editor-buttons button:active {
-    transform: scale(0.92);
+.note-title-input {
+  width: 100%;
+  border-radius: 14px;
+  border: none;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  font-size: 14px;
 }
 
-/* --------------------------------------------------
-   NOTE — LAYOUT AVANZATO
--------------------------------------------------- */
-
-.note {
-    position: relative;
+.note-textarea {
+  width: 100%;
+  min-height: 110px;
+  border-radius: 14px;
+  border: none;
+  padding: 8px 10px;
+  font-size: 13px;
+  resize: vertical;
 }
 
-/* Icona categoria nella nota */
-.note::before {
-    content: attr(data-icon);
-    position: absolute;
-    top: 10px;
-    right: 12px;
-    font-size: 20px;
-    opacity: 0.25;
+.editor-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
-/* --------------------------------------------------
-   ANIMAZIONI PREMIUM
--------------------------------------------------- */
-
-/* Animazione apertura pannelli */
-.panel-box {
-    animation: panelPop 0.25s ease forwards;
+.editor-field {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text-soft);
 }
 
-@keyframes panelPop {
-    from { transform: scale(0.92); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+.note-category-select {
+  width: 100%;
+  border-radius: 999px;
+  border: none;
+  padding: 6px 10px;
+  font-size: 12px;
+  margin-top: 4px;
 }
 
-/* Hover morbido stile iOS */
-button:hover {
-    opacity: 0.85;
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
 }
 
-/* Transizione generale */
-button, .note, .category-btn {
-    transition: background 0.25s ease, transform 0.15s ease, opacity 0.25s ease;
+.color-picker {
+  width: 40px;
+  height: 28px;
+  border-radius: 999px;
+  border: none;
+  padding: 0;
 }
 
-/* --------------------------------------------------
-   SCROLL MORBIDO
--------------------------------------------------- */
-
-html {
-    scroll-behavior: smooth;
+.color-palette {
+  display: flex;
+  gap: 4px;
 }
 
-/* --------------------------------------------------
-   BARRA DI SCORRIMENTO (iOS style)
--------------------------------------------------- */
-
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+.color-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
 }
 
-::-webkit-scrollbar-thumb {
-    background: rgba(120, 120, 120, 0.25);
-    border-radius: 10px;
+.color-dot.selected {
+  border-color: #111827;
 }
 
-::-webkit-scrollbar-track {
-    background: transparent;
+.editor-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
 }
-/* --------------------------------------------------
-   BLOCCO 3 — PANNELLI BACKUP + IMPOSTAZIONI + RESPONSIVE
--------------------------------------------------- */
 
-/* --------------------------------------------------
-   OVERLAY PANNELLI (Backup + Impostazioni)
--------------------------------------------------- */
+.save-btn,
+.delete-btn {
+  flex: 1;
+  border-radius: 999px;
+  border: none;
+  padding: 8px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
 
+.save-btn {
+  margin-right: 6px;
+  background: var(--accent);
+  color: #fff;
+}
+
+.delete-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--danger);
+}
+
+/* Pannelli */
 .panel {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(18px);
-    background: rgba(0, 0, 0, 0.35);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 300;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 30;
 }
 
-.panel.show {
-    opacity: 1;
-    pointer-events: auto;
+.panel.hidden {
+  display: none;
+}
+
+.panel-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
 }
 
 .panel-box {
-    width: 92%;
-    max-width: 520px;
-    max-height: 88%;
-    overflow-y: auto;
-    background: var(--panel-bg);
-    border: 1px solid var(--panel-border);
-    border-radius: 18px;
-    padding: 20px;
-    box-shadow: 0 8px 28px var(--shadow);
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  margin-bottom: 8px;
+  padding: 12px 14px 14px;
+  border-radius: 24px;
 }
 
-/* Titolo pannello */
 .panel-title {
-    font-size: 22px;
-    font-weight: 700;
-    margin-bottom: 14px;
-    text-align: center;
+  margin: 0 0 8px;
+  font-size: 16px;
 }
 
-/* Sezioni */
 .panel-section {
-    font-size: 15px;
-    font-weight: 600;
-    opacity: 0.7;
-    margin-top: 18px;
-    margin-bottom: 6px;
+  margin: 10px 0 4px;
+  font-size: 12px;
+  color: var(--text-soft);
 }
 
-/* Bottoni pannello */
 .panel-btn {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 10px;
-    border-radius: 12px;
-    border: 1px solid var(--note-border);
-    background: var(--note-bg);
-    color: var(--text);
-    font-size: 15px;
-    cursor: pointer;
-    transition: transform 0.15s ease, background 0.2s ease;
-}
-
-.panel-btn:active {
-    transform: scale(0.94);
+  width: 100%;
+  border-radius: 999px;
+  border: none;
+  padding: 7px 10px;
+  margin-bottom: 4px;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
 }
 
 .panel-btn.danger {
-    background: #ff3b30;
-    color: white;
-    border: none;
+  background: rgba(255, 75, 106, 0.16);
+  color: #ffb3c2;
 }
 
-/* Pulsante chiudi */
+.panel-input {
+  width: 100%;
+  border-radius: 999px;
+  border: none;
+  padding: 7px 10px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
 .close-panel-btn {
-    width: 100%;
-    padding: 12px;
-    margin-top: 14px;
-    border-radius: 12px;
-    background: var(--note-bg);
-    border: 1px solid var(--note-border);
-    font-size: 15px;
-    cursor: pointer;
+  width: 100%;
+  border-radius: 999px;
+  border: none;
+  padding: 8px 10px;
+  margin-top: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
 }
 
-/* --------------------------------------------------
-   RESPONSIVE — iPhone
--------------------------------------------------- */
-
-@media (max-width: 480px) {
-    .editor-content,
-    .panel-box {
-        width: 94%;
-        border-radius: 16px;
-    }
-
-    .note-title-input {
-        font-size: 17px;
-    }
-
-    .note-textarea {
-        font-size: 15px;
-    }
-
-    .panel-title {
-        font-size: 20px;
-    }
+/* PIN overlay */
+.pin-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top, #1b1f3b 0, #05060a 55%, #000 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  color: var(--text);
 }
 
-/* --------------------------------------------------
-   RIFINITURE FINALI ULTRA iOS
--------------------------------------------------- */
-
-/* Effetto pressione morbida */
-button:active,
-.note:active {
-    transform: scale(0.97);
+.pin-overlay.hidden {
+  display: none;
 }
 
-/* Ombre morbide */
-.note,
-.panel-box,
-.editor-content {
-    box-shadow: 0 8px 28px var(--shadow);
+.pin-circles {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
 }
 
-/* Transizioni globali */
-* {
-    transition: background 0.25s ease, color 0.25s ease;
+.circle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--text-soft);
 }
 
-/* Arrotondamenti coerenti */
-button,
-input,
-textarea,
-select {
-    border-radius: 12px;
+.circle.filled {
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
-/* Blur più morbido */
-.top-bar,
-.editor,
-.panel {
-    backdrop-filter: blur(18px);
+.pinPad {
+  display: grid;
+  grid-template-columns: repeat(3, 52px);
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.pinPad button {
+  border-radius: 999px;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.pin-error {
+  min-height: 18px;
+  font-size: 12px;
+  color: #ff9da6;
+}
+
+.remember-pin {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-soft);
 }
