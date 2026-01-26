@@ -16,6 +16,7 @@ let categories = [
 
 let showTrash = false;
 let showArchive = false;
+let autoBackup = JSON.parse(localStorage.getItem("autoBackup") || "false");
 
 /* ===========================
    ELEMENTS
@@ -111,9 +112,11 @@ function saveNote() {
   noteContent.value = "";
 
   saveAll();
+
+  if (autoBackup) createBackup(true);
+
   renderNotes();
 }
-
 saveNoteBtn.onclick = saveNote;
 
 function deleteNote(id) {
@@ -353,8 +356,95 @@ openArchiveBtn.onclick = () => {
    BACKUP
 =========================== */
 
+function createBackup(silenzioso = false) {
+  const backups = JSON.parse(localStorage.getItem("backups") || "[]");
+  const settings = JSON.parse(localStorage.getItem("settings") || "{}");
+
+  backups.unshift({
+    notes,
+    deletedNotes,
+    archivedNotes,
+    categories,
+    settings,
+    date: new Date().toLocaleString()
+  });
+
+  localStorage.setItem("backups", JSON.stringify(backups));
+  renderBackupList();
+
+  if (!silenzioso) alert("Backup manuale creato.");
+}
+
+function restoreBackup(i) {
+  const backups = JSON.parse(localStorage.getItem("backups") || "[]");
+  const b = backups[i];
+  if (!b) return;
+
+  notes = b.notes || [];
+  deletedNotes = b.deletedNotes || [];
+  archivedNotes = b.archivedNotes || [];
+  categories = b.categories || categories;
+
+  if (b.settings) localStorage.setItem("settings", JSON.stringify(b.settings));
+
+  saveAll();
+  renderCategories();
+  renderNotes();
+  alert("Backup ripristinato.");
+}
+
+function setAutoBackup(value) {
+  autoBackup = value;
+  localStorage.setItem("autoBackup", JSON.stringify(autoBackup));
+  alert("Backup automatico " + (autoBackup ? "attivato" : "disattivato"));
+}
+
+function restoreLatestBackupAuto() {
+  const backups = JSON.parse(localStorage.getItem("backups") || "[]");
+  if (!backups.length) {
+    alert("Nessun backup disponibile.");
+    return;
+  }
+  restoreBackup(0);
+}
+
 function renderBackupList() {
   backupList.innerHTML = "";
+
+  const controls = document.createElement("div");
+  controls.className = "backup-controls";
+  controls.innerHTML = `
+    <button id="btnBackupManuale" class="primary-btn">Backup manuale</button>
+    <button id="btnRipristinoManuale" class="secondary-btn">Ripristino manuale</button>
+    <button id="btnBackupAutomatico" class="secondary-btn">
+      Backup automatico: ${autoBackup ? "ON" : "OFF"}
+    </button>
+    <button id="btnRipristinoAutomatico" class="secondary-btn">Ripristino automatico</button>
+    <hr/>
+  `;
+  backupList.appendChild(controls);
+
+  document.getElementById("btnBackupManuale").onclick = () => createBackup(false);
+
+  document.getElementById("btnRipristinoManuale").onclick = () => {
+    const backups = JSON.parse(localStorage.getItem("backups") || "[]");
+    if (!backups.length) {
+      alert("Nessun backup disponibile.");
+      return;
+    }
+    const index = prompt("Quale backup vuoi ripristinare? (1 = più recente)", "1");
+    const i = parseInt(index, 10) - 1;
+    if (isNaN(i) || i < 0 || i >= backups.length) return;
+    restoreBackup(i);
+  };
+
+  document.getElementById("btnBackupAutomatico").onclick = () => {
+    setAutoBackup(!autoBackup);
+    renderBackupList();
+  };
+
+  document.getElementById("btnRipristinoAutomatico").onclick = restoreLatestBackupAuto;
+
   const backups = JSON.parse(localStorage.getItem("backups") || "[]");
   backups.forEach((b, i) => {
     const div = document.createElement("div");
@@ -368,42 +458,14 @@ function renderBackupList() {
   });
 }
 
-function createBackup() {
-  const backups = JSON.parse(localStorage.getItem("backups") || "[]");
-  backups.unshift({
-    notes,
-    deletedNotes,
-    archivedNotes,
-    categories,
-    date: new Date().toLocaleString()
-  });
-  localStorage.setItem("backups", JSON.stringify(backups));
-  renderBackupList();
-}
-
-createBackupBtn.onclick = createBackup;
-
-function restoreBackup(i) {
-  const backups = JSON.parse(localStorage.getItem("backups") || "[]");
-  const b = backups[i];
-  if (!b) return;
-  notes = b.notes;
-  deletedNotes = b.deletedNotes;
-  archivedNotes = b.archivedNotes;
-  categories = b.categories;
-  saveAll();
-  renderCategories();
-  renderNotes();
-  alert("Backup ripristinato.");
-}
-
 exportDataBtn.onclick = () => {
-  const data = { notes, deletedNotes, archivedNotes, categories };
+  const settings = JSON.parse(localStorage.getItem("settings") || "{}");
+  const data = { notes, deletedNotes, archivedNotes, categories, settings };
   const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "backup.json";
+  a.download = "backup_note_app.json";
   a.click();
   URL.revokeObjectURL(url);
 };
