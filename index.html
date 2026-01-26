@@ -46,6 +46,7 @@
     <h1 class="app-title" data-i18n="notesTitle">Le tue note</h1>
 
     <div class="top-icons">
+
       <!-- Lingue -->
       <div class="lang-group">
         <button class="lang-btn" data-lang="it">IT</button>
@@ -56,25 +57,31 @@
 
       <!-- Temi -->
       <div class="theme-group">
-        <button id="theme-light" class="theme-btn" title="Chiaro">🌞</button>
-        <button id="theme-dark" class="theme-btn" title="Scuro">🌙</button>
-        <button id="theme-amoled" class="theme-btn" title="AMOLED">⬛</button>
+        <button id="theme-light" class="theme-btn">🌞</button>
+        <button id="theme-dark" class="theme-btn">🌙</button>
+        <button id="theme-amoled" class="theme-btn">⬛</button>
       </div>
 
-      <!-- Backup & Impostazioni -->
-      <button id="backup-btn" class="icon-btn" title="Backup">🛟</button>
-      <button id="settings-btn" class="icon-btn" title="Impostazioni">⚙️</button>
+      <!-- Backup -->
+      <button id="backup-btn" class="icon-btn">🛟</button>
+
+      <!-- Impostazioni -->
+      <button id="settings-btn" class="icon-btn">⚙️</button>
+
+      <!-- Info App -->
+      <button id="info-btn" class="icon-btn">ℹ️</button>
+
     </div>
   </header>
 
   <!-- CATEGORIE -->
   <div class="categories glass">
-    <button class="category-btn active" data-category="all" data-i18n="catAll">📁 Tutte</button>
-    <button class="category-btn cat-home" data-category="home" data-i18n="catHome">🏠 Casa</button>
-    <button class="category-btn cat-work" data-category="work" data-i18n="catWork">💼 Lavoro</button>
-    <button class="category-btn cat-ideas" data-category="ideas" data-i18n="catIdeas">💡 Idee</button>
-    <button class="category-btn cat-shopping" data-category="shopping" data-i18n="catShopping">🛒 Spesa</button>
-    <button class="category-btn cat-other" data-category="other" data-i18n="catOther">⭐ Altro</button>
+    <button class="category-btn active" data-category="all">📁 <span data-i18n="catAll">Tutte</span></button>
+    <button class="category-btn cat-home" data-category="home">🏠 <span data-i18n="catHome">Casa</span></button>
+    <button class="category-btn cat-work" data-category="work">💼 <span data-i18n="catWork">Lavoro</span></button>
+    <button class="category-btn cat-ideas" data-category="ideas">💡 <span data-i18n="catIdeas">Idee</span></button>
+    <button class="category-btn cat-shopping" data-category="shopping">🛒 <span data-i18n="catShopping">Spesa</span></button>
+    <button class="category-btn cat-other" data-category="other">⭐ <span data-i18n="catOther">Altro</span></button>
   </div>
 
   <!-- LISTA NOTE -->
@@ -89,26 +96,18 @@
   <div id="note-editor" class="editor hidden">
     <div class="editor-backdrop"></div>
     <div class="editor-content glass">
+
       <div class="editor-header">
         <h2 data-i18n="editNote">Nota</h2>
         <button id="close-editor-btn" class="close-btn">✕</button>
       </div>
 
-      <input
-        id="note-title"
-        class="note-title-input"
-        data-i18n-placeholder="titlePlaceholder"
-        placeholder="Titolo"
-      />
+      <input id="note-title" class="note-title-input" data-i18n-placeholder="titlePlaceholder" placeholder="Titolo" />
 
-      <textarea
-        id="note-text"
-        class="note-textarea"
-        data-i18n-placeholder="textPlaceholder"
-        placeholder="Scrivi la tua nota..."
-      ></textarea>
+      <textarea id="note-text" class="note-textarea" data-i18n-placeholder="textPlaceholder" placeholder="Scrivi la tua nota..."></textarea>
 
       <div class="editor-row">
+
         <!-- Categoria -->
         <div class="editor-field">
           <label data-i18n="categoryLabel">Categoria</label>
@@ -135,24 +134,31 @@
             </div>
           </div>
         </div>
+
       </div>
 
       <div class="editor-buttons">
         <button id="save-note-btn" class="save-btn" data-i18n="save">Salva</button>
         <button id="delete-note-btn" class="delete-btn" data-i18n="delete">Elimina</button>
       </div>
+
     </div>
   </div>
 
-  <!-- OVERLAY BACKUP -->
+  <!-- BACKUP PANEL -->
   <div id="backup-panel" class="panel hidden">
     <div class="panel-backdrop"></div>
     <div class="panel-box glass">
+
       <h2 class="panel-title">🛟 <span data-i18n="backupTitle">Backup & Ripristino</span></h2>
 
       <h3 class="panel-section" data-i18n="backupSection">Backup</h3>
       <button class="panel-btn" id="quick-backup-btn" data-i18n="quickBackup">Backup veloce</button>
       <button class="panel-btn" id="manual-backup-btn" data-i18n="manualBackup">Backup manuale</button>
+
+      <h3 class="panel-section">Automatico</h3>
+      <button class="panel-btn" id="toggle-auto-backup">Backup automatico</button>
+      <button class="panel-btn" id="toggle-auto-restore">Ripristino automatico</button>
 
       <h3 class="panel-section" data-i18n="restoreSection">Ripristino</h3>
       <button class="panel-btn" id="manual-restore-btn" data-i18n="manualRestore">Ripristino manuale</button>
@@ -164,29 +170,86 @@
       <button class="panel-btn danger" id="delete-backups-btn" data-i18n="deleteBackups">Cancella backup</button>
 
       <button class="close-panel-btn" id="close-backup-panel" data-i18n="close">Chiudi</button>
+
     </div>
   </div>
 
-  <!-- OVERLAY IMPOSTAZIONI -->
+  <!-- SETTINGS PANEL -->
   <div id="settings-panel" class="panel hidden">
     <div class="panel-backdrop"></div>
     <div class="panel-box glass">
+
       <h2 class="panel-title">⚙️ <span data-i18n="settingsTitle">Impostazioni</span></h2>
 
       <h3 class="panel-section" data-i18n="securitySection">🔐 Sicurezza</h3>
-      <input
-        id="new-pin-input"
-        class="panel-input"
-        placeholder="Nuovo PIN (4 cifre)"
-        data-i18n-placeholder="newPinPlaceholder"
-      />
+      <input id="new-pin-input" class="panel-input" data-i18n-placeholder="newPinPlaceholder" placeholder="Nuovo PIN (4 cifre)" />
       <button class="panel-btn" id="save-new-pin-btn" data-i18n="savePin">Salva nuovo PIN</button>
 
+      <h3 class="panel-section">🕶️ Privacy</h3>
+      <button class="panel-btn" id="toggle-privacy">Modalità privacy</button>
+
+      <h3 class="panel-section">🎨 Aspetto</h3>
+      <button class="panel-btn" id="change-font">Font app</button>
+      <button class="panel-btn" id="change-text-size">Dimensione testo</button>
+      <button class="panel-btn" id="toggle-animations">Animazioni ON/OFF</button>
+      <button class="panel-btn" id="change-animation-speed">Velocità animazioni</button>
+      <button class="panel-btn" id="toggle-transparency">Trasparenze iOS</button>
+
+      <h3 class="panel-section">🗂️ Gestione note</h3>
+      <button class="panel-btn" id="sort-notes">Ordinamento note</button>
+      <button class="panel-btn" id="toggle-pinned">Note fissate</button>
+      <button class="panel-btn" id="open-archive">Archivio note</button>
+      <button class="panel-btn" id="open-trash">Cestino</button>
+      <button class="panel-btn" id="duplicate-note">Duplica nota</button>
+      <button class="panel-btn" id="merge-notes">Unisci note</button>
+
       <h3 class="panel-section" data-i18n="maintenanceSection">🧼 Manutenzione</h3>
+      <button class="panel-btn" id="optimize-storage">Ottimizza spazio</button>
+      <button class="panel-btn" id="reset-layout">Ripristina layout</button>
       <button class="panel-btn danger" id="delete-all-notes-btn" data-i18n="deleteAllNotes">Cancella tutte le note</button>
       <button class="panel-btn danger" id="reset-app-btn" data-i18n="resetApp">Reset totale app</button>
 
       <button class="close-panel-btn" id="close-settings-panel" data-i18n="close">Chiudi</button>
+
+    </div>
+  </div>
+
+  <!-- INFO APP PANEL -->
+  <div id="info-panel" class="panel hidden">
+    <div class="panel-backdrop"></div>
+    <div class="panel-box glass">
+
+      <h2 class="panel-title">ℹ️ Info App</h2>
+
+      <h3 class="panel-section">Versione</h3>
+      <p class="info-text">Versione: 1.0.0 PRO<br>Build: 2026<br>Release: Stable</p>
+
+      <h3 class="panel-section">Crediti</h3>
+      <p class="info-text">Progettata da Sandro<br>Sviluppo assistito da Copilot</p>
+
+      <h3 class="panel-section">Note di rilascio</h3>
+      <p class="info-text">• Nuovo multilingua<br>• Nuovi temi<br>• Backup automatico<br>• Ripristino automatico<br>• Impostazioni avanzate<br>• Editor premium<br>• Categorie colorate</p>
+
+      <h3 class="panel-section">Informazioni tecniche</h3>
+      <p class="info-text">Salvataggio locale (localStorage)<br>Compatibile con iPhone, iPad, Safari, GitHub Pages</p>
+
+      <h3 class="panel-section">Licenza</h3>
+      <p class="info-text">Uso personale — non commerciale.</p>
+
+      <h3 class="panel-section">Screenshot app</h3>
+      <p class="info-text">Top bar → Lingue, Temi, Backup, Impostazioni, Info<br>Categorie colorate<br>Note con colori personalizzati<br>Editor premium</p>
+
+      <h3 class="panel-section">Roadmap futura</h3>
+      <p class="info-text">• Tag<br>• Preferiti<br>• Ricerca note<br>• Archivio avanzato<br>• Sincronizzazione locale<br>• Widget iOS</p>
+
+      <h3 class="panel-section">Debug</h3>
+      <p id="debug-info" class="info-text">Caricamento...</p>
+
+      <h3 class="panel-section">Stato memoria</h3>
+      <p id="storage-info" class="info-text">Caricamento...</p>
+
+      <button class="close-panel-btn" id="close-info-panel">Chiudi</button>
+
     </div>
   </div>
 
