@@ -3,41 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Note</title>
+  <title>Le mie note</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="app">
-    <aside id="sidebar">
-      <div class="sidebar-header">
-        <h2>Categorie</h2>
-        <button id="openSettingsBtn" class="icon-btn">⚙️</button>
+    <!-- Header con icone -->
+    <header id="topBar">
+      <h1>Le mie note</h1>
+      <div class="top-icons">
+        <button id="openSettingsBtn">⚙️</button>
+        <button id="openTrashBtn">🗑️</button>
+        <button id="openLifebuoyBtn">🛟</button>
       </div>
-      <ul id="categoryList" class="category-list"></ul>
-      <div class="sidebar-footer">
-        <button id="openLifebuoyBtn" class="footer-btn">🛟 Salvagente</button>
-      </div>
-    </aside>
+    </header>
 
-    <main id="mainArea">
-      <div id="notesHeader">
-        <h2 id="currentCategoryName">Tutte le note</h2>
-        <div class="notes-header-buttons">
-          <button id="addNoteBtn">+ Nota</button>
-          <button id="categoryMenuBtn">⋯</button>
-        </div>
+    <!-- Editor nota -->
+    <section id="noteEditor">
+      <input type="text" id="noteTitle" placeholder="Titolo della nota..." />
+      <select id="categorySelector">
+        <option value="personale">Personale</option>
+        <option value="lavoro">Lavoro</option>
+        <option value="idee">Idee</option>
+        <option value="spesa">Spesa</option>
+      </select>
+      <textarea id="noteContent" placeholder="Scrivi la tua nota qui..."></textarea>
+      <div class="editor-buttons">
+        <button id="saveNoteBtn" class="primary-btn">Salva nota</button>
+        <button id="cancelEditBtn" class="secondary-btn">Elimina nota</button>
       </div>
+    </section>
+
+    <!-- Lista note -->
+    <section id="noteListSection">
+      <h2>Le tue note</h2>
       <div id="noteList" class="note-list"></div>
+    </section>
 
-      <div id="noteEditor" class="hidden">
-        <input type="text" id="noteTitle" placeholder="Titolo" />
-        <textarea id="noteContent" placeholder="Contenuto..."></textarea>
-        <div id="editorButtons">
-          <button id="saveNoteBtn" class="primary-btn">Salva</button>
-          <button id="cancelEditBtn" class="secondary-btn">Annulla</button>
-        </div>
-      </div>
-    </main>
+    <!-- Categorie -->
+    <section id="categorySection">
+      <h2>Categorie</h2>
+      <ul id="categoryList" class="category-list"></ul>
+      <button id="addCategoryBtn" class="primary-btn">+ Aggiungi</button>
+    </section>
   </div>
 
   <!-- Popup Salvagente -->
@@ -69,26 +77,20 @@
 
       <div class="settings-section">
         <h3>Tema</h3>
-        <div class="settings-row">
-          <label for="themeSelect">Tema:</label>
-          <select id="themeSelect">
-            <option value="auto">Automatico</option>
-            <option value="light">Chiaro</option>
-            <option value="dark">Scuro</option>
-          </select>
-        </div>
+        <select id="themeSelect">
+          <option value="auto">Automatico</option>
+          <option value="light">Chiaro</option>
+          <option value="dark">Scuro</option>
+        </select>
       </div>
 
       <div class="settings-section">
         <h3>Font</h3>
-        <div class="settings-row">
-          <label for="fontSelect">Font:</label>
-          <select id="fontSelect">
-            <option value="system-ui">Sistema</option>
-            <option value="serif">Serif</option>
-            <option value="monospace">Monospace</option>
-          </select>
-        </div>
+        <select id="fontSelect">
+          <option value="system-ui">Sistema</option>
+          <option value="serif">Serif</option>
+          <option value="monospace">Monospace</option>
+        </select>
       </div>
 
       <div class="settings-section">
