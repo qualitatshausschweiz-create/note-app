@@ -199,3 +199,22 @@ header#topBar h1 {
 .hidden {
   display: none !important;
 }
+.note-footer {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.note-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e5e5ea;
+}
+
+.note-restore {
+  color: #34c759;
+  cursor: pointer;
+  font-weight: 600;
+}
