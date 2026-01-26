@@ -6,13 +6,14 @@
   <title>Le tue note</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body data-theme="light">
 
   <!-- TOP BAR -->
   <header class="top-bar">
     <h1 class="app-title">Le tue note</h1>
 
     <div class="top-actions">
+      <button id="theme-toggle-btn" class="icon-btn" title="Tema chiaro/scuro">🌞</button>
       <button id="backup-btn" class="icon-btn" title="Backup">🛟</button>
       <button id="settings-btn" class="icon-btn" title="Impostazioni">⚙️</button>
     </div>
@@ -75,23 +76,92 @@
     </div>
   </div>
 
-  <!-- PANNELLO BACKUP SEMPLICE -->
+  <!-- BACKUP PANEL -->
   <div id="backup-panel" class="panel hidden">
     <div class="panel-backdrop"></div>
     <div class="panel-box">
       <h2>🛟 Backup & Ripristino</h2>
       <button id="quick-backup-btn" class="panel-btn">Backup veloce</button>
-      <button id="manual-restore-btn" class="panel-btn">Ripristina ultimo backup</button>
+      <button id="manual-backup-btn" class="panel-btn">Backup manuale</button>
+      <button id="manual-restore-btn" class="panel-btn">Ripristina backup</button>
+      <button id="toggle-auto-backup-btn" class="panel-btn">Backup automatico: OFF</button>
+      <button id="toggle-auto-restore-btn" class="panel-btn">Ripristino automatico: OFF</button>
+      <button id="export-notes-btn" class="panel-btn">Esporta note (.txt)</button>
+      <button id="clear-backups-btn" class="panel-btn danger">Cancella backup</button>
       <button id="close-backup-panel" class="close-panel-btn">Chiudi</button>
     </div>
   </div>
 
-  <!-- PANNELLO IMPOSTAZIONI SEMPLICE -->
+  <!-- SETTINGS PANEL -->
   <div id="settings-panel" class="panel hidden">
     <div class="panel-backdrop"></div>
     <div class="panel-box">
       <h2>⚙️ Impostazioni</h2>
-      <button id="delete-all-notes-btn" class="panel-btn danger">Cancella tutte le note</button>
+
+      <div class="settings-group">
+        <h3>Privacy</h3>
+        <label class="settings-row">
+          <span>Modalità privacy (sfoca contenuto)</span>
+          <input type="checkbox" id="privacy-toggle" />
+        </label>
+      </div>
+
+      <div class="settings-group">
+        <h3>Testo</h3>
+        <label class="settings-row">
+          <span>Font</span>
+          <select id="font-select">
+            <option value="system">Predefinito</option>
+            <option value="serif">Serif</option>
+            <option value="mono">Monospace</option>
+          </select>
+        </label>
+        <label class="settings-row">
+          <span>Dimensione testo</span>
+          <input type="range" id="text-size-range" min="14" max="22" value="16" />
+        </label>
+      </div>
+
+      <div class="settings-group">
+        <h3>Animazioni & Trasparenze</h3>
+        <label class="settings-row">
+          <span>Animazioni</span>
+          <input type="checkbox" id="animations-toggle" checked />
+        </label>
+        <label class="settings-row">
+          <span>Velocità animazioni</span>
+          <select id="animation-speed-select">
+            <option value="fast">Veloce</option>
+            <option value="normal" selected>Normale</option>
+            <option value="slow">Lenta</option>
+          </select>
+        </label>
+        <label class="settings-row">
+          <span>Trasparenze stile iOS</span>
+          <input type="checkbox" id="transparency-toggle" />
+        </label>
+      </div>
+
+      <div class="settings-group">
+        <h3>Note</h3>
+        <label class="settings-row">
+          <span>Ordina note</span>
+          <select id="sort-notes-select">
+            <option value="updated_desc">Più recenti prima</option>
+            <option value="updated_asc">Più vecchie prima</option>
+            <option value="title_asc">Titolo A-Z</option>
+          </select>
+        </label>
+        <button id="open-trash-view-btn" class="panel-btn">Apri cestino</button>
+      </div>
+
+      <div class="settings-group">
+        <h3>Layout & Dati</h3>
+        <button id="reset-layout-btn" class="panel-btn">Ripristina layout</button>
+        <button id="delete-all-notes-btn" class="panel-btn danger">Cancella tutte le note</button>
+        <button id="full-reset-btn" class="panel-btn danger">Reset totale app</button>
+      </div>
+
       <button id="close-settings-panel" class="close-panel-btn">Chiudi</button>
     </div>
   </div>
