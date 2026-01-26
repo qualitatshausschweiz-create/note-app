@@ -1,829 +1,201 @@
-/* ============================================================
-   RESET BASE — Stile pulito, iOS-like
-============================================================ */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html, body {
-    width: 100%;
-    height: 100%;
-    font-family: var(--app-font);
-    background: var(--bg);
-    color: var(--text);
-    -webkit-font-smoothing: antialiased;
-}
-
-/* Rimuove highlight blu su mobile */
-button, input, textarea {
-    -webkit-tap-highlight-color: transparent;
-}
-
-/* ============================================================
-   VARIABILI GLOBALI — Tema, colori, font
-============================================================ */
 :root {
-    /* Tema chiaro */
-    --bg-light: #f5f5f7;
-    --bg-secondary-light: #ffffff;
-    --text-light: #1c1c1e;
-    --border-light: #d2d2d7;
-
-    /* Tema scuro */
-    --bg-dark: #1c1c1e;
-    --bg-secondary-dark: #2c2c2e;
-    --text-dark: #f5f5f7;
-    --border-dark: #3a3a3c;
-
-    /* Colore principale (cambia da impostazioni) */
-    --accent: #007aff;
-
-    /* Font app (cambia da impostazioni) */
-    --app-font: system-ui;
-
-    /* Raggi e ombre */
-    --radius: 12px;
-    --shadow: 0 4px 20px rgba(0,0,0,0.12);
+  --accent: #007aff;
+  --bg: #f9f9f9;
+  --bg-secondary: #ffffff;
+  --text: #1c1c1e;
+  --radius: 12px;
+  --shadow: 0 4px 12px rgba(0,0,0,0.08);
+  --border: #d1d1d6;
+  --app-font: system-ui;
 }
 
-/* ============================================================
-   TEMA AUTOMATICO — segue preferenze sistema
-============================================================ */
-:root[data-theme="light"] {
-    --bg: var(--bg-light);
-    --bg-secondary: var(--bg-secondary-light);
-    --text: var(--text-light);
-    --border: var(--border-light);
+body {
+  margin: 0;
+  font-family: var(--app-font);
+  background: var(--bg);
+  color: var(--text);
 }
 
-:root[data-theme="dark"] {
-    --bg: var(--bg-dark);
-    --bg-secondary: var(--bg-secondary-dark);
-    --text: var(--text-dark);
-    --border: var(--border-dark);
-}
-
-/* Modalità automatica */
-@media (prefers-color-scheme: dark) {
-    :root[data-theme="auto"] {
-        --bg: var(--bg-dark);
-        --bg-secondary: var(--bg-secondary-dark);
-        --text: var(--text-dark);
-        --border: var(--border-dark);
-    }
-}
-
-@media (prefers-color-scheme: light) {
-    :root[data-theme="auto"] {
-        --bg: var(--bg-light);
-        --bg-secondary: var(--bg-secondary-light);
-        --text: var(--text-light);
-        --border: var(--border-light);
-    }
-}
-
-/* ============================================================
-   STRUTTURA BASE APP
-============================================================ */
 #app {
-    display: flex;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-    background: var(--bg);
-}
-/* ============================================================
-   SIDEBAR — Layout, colori, pulsanti
-============================================================ */
-#sidebar {
-    width: 260px;
-    background: var(--bg-secondary);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    gap: 20px;
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
 }
 
-/* ============================
-   HEADER SIDEBAR
-============================ */
-.sidebar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+header#topBar {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-.sidebar-header h2 {
-    font-size: 1.2rem;
-    font-weight: 600;
+header#topBar h1 {
+  margin: 0;
+  font-size: 24px;
 }
 
-.icon-btn {
-    background: var(--accent);
-    color: white;
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: var(--radius);
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: 0.2s;
+.subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 4px 0 12px;
 }
 
-.icon-btn:hover {
-    opacity: 0.85;
+.top-icons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
 }
 
-/* ============================
-   LISTA CATEGORIE
-============================ */
-.category-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.top-icons button {
+  font-size: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
-.category-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: 0.2s;
+#noteEditor input,
+#noteEditor textarea,
+#noteEditor select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 16px;
+  background: var(--bg-secondary);
 }
 
-.category-item:hover {
-    background: rgba(0,0,0,0.05);
-}
-
-.color-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    margin-right: 10px;
-}
-
-.category-name {
-    flex: 1;
-    font-size: 0.95rem;
-}
-
-/* Pulsante menu ⋯ */
-.category-menu-btn {
-    background: transparent;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: var(--text);
-    padding: 4px;
-}
-
-/* ============================
-   FOOTER SIDEBAR
-============================ */
-.sidebar-footer {
-    margin-top: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.footer-btn {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    padding: 10px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    text-align: left;
-    transition: 0.2s;
-}
-
-.footer-btn:hover {
-    background: rgba(0,0,0,0.05);
-}
-/* ============================================================
-   AREA NOTE — Layout generale
-============================================================ */
-#mainArea {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: var(--bg);
-    padding: 20px;
-    overflow: hidden;
-}
-
-/* ============================
-   HEADER AREA NOTE
-============================ */
-#notesHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-#notesHeader h2 {
-    font-size: 1.4rem;
-    font-weight: 600;
-}
-
-.notes-header-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-/* Pulsanti header */
-#addNoteBtn,
-#categoryMenuBtn {
-    background: var(--accent);
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: 0.2s;
-}
-
-#addNoteBtn:hover,
-#categoryMenuBtn:hover {
-    opacity: 0.85;
-}
-
-/* ============================
-   LISTA NOTE
-============================ */
-.note-list {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding-right: 6px;
-}
-
-.note-item {
-    display: flex;
-    align-items: center;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    padding: 12px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.note-item:hover {
-    background: rgba(0,0,0,0.05);
-}
-
-.note-color {
-    width: 10px;
-    height: 100%;
-    border-radius: 6px;
-    margin-right: 12px;
-}
-
-.note-text {
-    flex: 1;
-}
-
-.note-text h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 4px;
-}
-
-.note-text p {
-    font-size: 0.85rem;
-    opacity: 0.7;
-}
-
-/* Pulsante menu ⋯ per note */
-.note-menu-btn {
-    background: transparent;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 4px;
-    color: var(--text);
-}
-
-/* ============================
-   EDITOR NOTA
-============================ */
-#noteEditor {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-#noteEditor.hidden {
-    display: none;
-}
-
-#noteTitle {
-    padding: 12px;
-    font-size: 1.1rem;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    background: var(--bg-secondary);
-    color: var(--text);
-}
-
-#noteContent {
-    padding: 12px;
-    height: 200px;
-    resize: none;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    background: var(--bg-secondary);
-    color: var(--text);
-    font-size: 1rem;
-}
-
-/* Pulsanti editor */
-#editorButtons {
-    display: flex;
-    gap: 10px;
+.editor-buttons {
+  display: flex;
+  gap: 10px;
 }
 
 .primary-btn {
-    background: var(--accent);
-    color: white;
-    border: none;
-    padding: 10px 18px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    font-size: 0.95rem;
-    transition: 0.2s;
-}
-
-.primary-btn:hover {
-    opacity: 0.85;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  cursor: pointer;
 }
 
 .secondary-btn {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    padding: 10px 18px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    font-size: 0.95rem;
-    transition: 0.2s;
+  background: #ccc;
+  color: #333;
+  border: none;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  cursor: pointer;
 }
 
-.secondary-btn:hover {
-    background: rgba(0,0,0,0.05);
+#noteListSection h2,
+#categorySection h2 {
+  margin-top: 30px;
+  font-size: 20px;
 }
-/* ============================================================
-   POPUP SALVAGENTE — Overlay + contenitore
-============================================================ */
+
+.note-item {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.note-item h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.note-item p {
+  margin: 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.category-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+
+.color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
 .popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.popup.hidden {
-    display: none;
-}
-
-/* Overlay vetro-opaco */
 .popup-overlay {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(12px);
-    background: rgba(0,0,0,0.35);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.3);
 }
 
-/* Contenitore centrale */
-.popup-content {
-    position: relative;
-    background: var(--bg-secondary);
-    padding: 24px;
-    border-radius: var(--radius);
-    width: 90%;
-    max-width: 420px;
-    box-shadow: var(--shadow);
-    animation: popupFade 0.25s ease;
+.popup-content,
+.settings-content {
+  position: relative;
+  background: var(--bg-secondary);
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  max-width: 500px;
+  width: 90%;
+  z-index: 10;
 }
 
-/* Animazione apertura */
-@keyframes popupFade {
-    from {
-        opacity: 0;
-        transform: scale(0.92);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-/* Header popup */
 .popup-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
-}
-
-.popup-header h2 {
-    font-size: 1.3rem;
-    font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .close-btn {
-    background: transparent;
-    border: none;
-    font-size: 1.3rem;
-    cursor: pointer;
-    color: var(--text);
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
 }
 
-/* Descrizione */
-.popup-description {
-    font-size: 0.95rem;
-    opacity: 0.8;
-    margin-bottom: 16px;
-}
-
-/* Lista backup */
-.backup-list {
-    max-height: 220px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.backup-item {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    padding: 12px;
-    border-radius: var(--radius);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.backup-date {
-    font-size: 0.9rem;
-}
-
-.restoreBackupBtn {
-    background: var(--accent);
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: 0.2s;
-}
-
-.restoreBackupBtn:hover {
-    opacity: 0.85;
-}
-
-/* Pulsanti principali */
-.popup-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-#createBackupBtn,
-#importBackupBtn {
-    width: 100%;
-}
-/* ============================================================
-   POPUP IMPOSTAZIONI — Layout generale
-============================================================ */
-.settings-content {
-    position: relative;
-    background: var(--bg-secondary);
-    padding: 24px;
-    border-radius: var(--radius);
-    width: 90%;
-    max-width: 420px;
-    box-shadow: var(--shadow);
-    animation: popupFade 0.25s ease;
-}
-
-/* Sezioni impostazioni */
-.settings-section {
-    margin-bottom: 22px;
-}
-
-.settings-section h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 10px;
-}
-
-/* Riga impostazioni */
-.settings-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    padding: 12px;
-    border-radius: var(--radius);
-    margin-bottom: 10px;
-}
-
-/* Select moderni */
-.settings-row select {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    padding: 8px;
-    border-radius: var(--radius);
-    color: var(--text);
-    font-size: 0.95rem;
-}
-
-/* ============================================================
-   PALETTE COLORI
-============================================================ */
 .color-palette {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .color-swatch {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: 0.2s;
-}
-
-.color-swatch:hover {
-    transform: scale(1.1);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
 }
 
 .color-swatch.selected {
-    border-color: var(--accent);
+  border-color: var(--accent);
 }
 
-/* ============================================================
-   PULSANTI AVANZATI
-============================================================ */
-.danger-btn {
-    background: #ff3b30;
-    color: white;
-    border: none;
-    padding: 10px 18px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    font-size: 0.95rem;
-    transition: 0.2s;
-}
-
-.danger-btn:hover {
-    opacity: 0.85;
-}
-
-/* Info app */
-.info-text {
-    font-size: 0.9rem;
-    opacity: 0.7;
-    line-height: 1.4;
-}
-/* ============================================================
-   MENU CONTESTUALE “⋯”
-============================================================ */
-.context-menu {
-    position: absolute;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 6px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    z-index: 3000;
-    min-width: 160px;
-    animation: menuFade 0.18s ease;
-}
-
-/* Animazione apertura */
-@keyframes menuFade {
-    from {
-        opacity: 0;
-        transform: translateY(-6px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Voci del menu */
-.context-item {
-    background: transparent;
-    border: none;
-    text-align: left;
-    padding: 10px 14px;
-    font-size: 0.95rem;
-    cursor: pointer;
-    color: var(--text);
-    transition: 0.15s;
-    width: 100%;
-}
-
-.context-item:hover {
-    background: rgba(0,0,0,0.06);
-}
-
-/* Azioni pericolose */
-.context-item.danger {
-    color: #ff3b30;
-}
-
-.context-item.danger:hover {
-    background: rgba(255,59,48,0.12);
-}
-/* ============================================================
-   POPUP — Regole generali condivise
-============================================================ */
-
-/* Overlay già definito, qui aggiungiamo comportamento touch */
-.popup-overlay {
-    touch-action: none;
-}
-
-/* Contenitori popup: stile comune */
-.popup-content {
-    border-radius: var(--radius);
-    background: var(--bg-secondary);
-    color: var(--text);
-    box-shadow: var(--shadow);
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-/* Scroll morbido */
-.popup-content::-webkit-scrollbar {
-    width: 6px;
-}
-
-.popup-content::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.2);
-    border-radius: 10px;
-}
-
-/* ============================================================
-   ANIMAZIONI POPUP — Fade + Zoom
-============================================================ */
-
-@keyframes popupZoom {
-    from {
-        opacity: 0;
-        transform: scale(0.92);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-.popup-content {
-    animation: popupZoom 0.22s ease;
-}
-
-/* ============================================================
-   RESPONSIVE — iPhone, iPad, piccoli schermi
-============================================================ */
-
-@media (max-width: 600px) {
-    #sidebar {
-        width: 220px;
-        padding: 16px;
-    }
-
-    .popup-content {
-        width: 92%;
-        padding: 20px;
-    }
-
-    #mainArea {
-        padding: 16px;
-    }
-
-    .note-item {
-        padding: 10px;
-    }
-
-    #noteContent {
-        height: 160px;
-    }
-}
-/* ============================================================
-   TRANSIZIONI GLOBALI — Fluidità Apple-style
-============================================================ */
-button,
-input,
-textarea,
-.category-item,
-.note-item,
-.context-item {
-    transition: background 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
-}
-
-/* ============================================================
-   UTILITY CLASSES
-============================================================ */
-
-/* Nascondi */
 .hidden {
-    display: none !important;
+  display: none !important;
 }
-
-/* Testo disabilitato */
-.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-/* Divider sottile */
-.divider {
-    width: 100%;
-    height: 1px;
-    background: var(--border);
-    margin: 10px 0;
-}
-
-/* Spaziatura */
-.mt-10 { margin-top: 10px; }
-.mt-20 { margin-top: 20px; }
-.mb-10 { margin-bottom: 10px; }
-.mb-20 { margin-bottom: 20px; }
-
-/* ============================================================
-   FIX SPECIFICI PER SAFARI iOS
-============================================================ */
-
-/* Rimuove zoom automatico su input */
-input, textarea, select {
-    font-size: 16px;
-}
-
-/* Evita glitch su border-radius durante animazioni */
-@supports (-webkit-touch-callout: none) {
-    .popup-content,
-    .note-item,
-    .category-item {
-        -webkit-backface-visibility: hidden;
-    }
-}
-
-/* Scroll fluido */
-html, body {
-    -webkit-overflow-scrolling: touch;
-}
-
-/* ============================================================
-   MICRO-ANIMAZIONI — Tocchi finali
-============================================================ */
-
-/* Press effect */
-button:active,
-.category-item:active,
-.note-item:active,
-.context-item:active {
-    transform: scale(0.97);
-}
-
-/* Hover leggero su desktop */
-@media (hover: hover) {
-    .note-item:hover,
-    .category-item:hover {
-        background: rgba(0,0,0,0.06);
-    }
-}
-
-/* ============================================================
-   FINE CSS
-============================================================ */
