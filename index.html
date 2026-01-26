@@ -6,6 +6,7 @@
   <title>Le mie note</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
   <div id="app">
 
@@ -38,26 +39,27 @@
       </div>
     </section>
 
-    <!-- NOTE -->
+    <!-- NOTE LIST -->
     <section id="noteListSection">
       <h2>Le tue note</h2>
       <div id="noteList" class="note-list"></div>
     </section>
 
-    <!-- CATEGORIE -->
+    <!-- CATEGORIES -->
     <section id="categorySection">
       <h2>Categorie</h2>
       <ul id="categoryList" class="category-list"></ul>
       <button id="addCategoryBtn" class="primary-btn">+ Aggiungi</button>
     </section>
+
   </div>
 
-  <!-- POPUP BACKUP -->
+  <!-- POPUP BACKUP / SALVAGENTE -->
   <div id="lifebuoyPopup" class="popup hidden">
     <div class="popup-overlay"></div>
     <div class="popup-content">
       <div class="popup-header">
-        <h2>Backup</h2>
+        <h2>Backup & Ripristino</h2>
         <button id="closeLifebuoyBtn" class="close-btn">✕</button>
       </div>
 
@@ -82,11 +84,7 @@
 
       <div class="settings-section">
         <h3>Tema</h3>
-        <select id="themeSelect">
-          <option value="auto">Automatico</option>
-          <option value="light">Chiaro</option>
-          <option value="dark">Scuro</option>
-        </select>
+        <button id="themeToggleBtn2" class="secondary-btn">Cambia tema</button>
       </div>
 
       <div class="settings-section">
