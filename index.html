@@ -1,131 +1,111 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Note App</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Note App</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body data-theme="light">
-
-    <header id="top-bar">
-        <div id="left-icons">
-            <button id="theme-toggle-btn">🌞</button>
-        </div>
-
-        <div id="right-icons">
-            <button id="ai-chat-btn">🤖</button>
-            <button id="lifebuoy-btn">🛟</button>
-            <button id="settings-btn">⚙️</button>
-        </div>
-    </header>
-
-    <main id="main-content">
-        <div id="notes-container"></div>
-    </main>
-
-    <button id="add-note-btn">+</button>
-
-    <div id="editor-panel">
-        <div id="editor-header">
-            <button id="close-editor-btn">✖</button>
-            <button id="ai-editor-btn">✨</button>
-        </div>
-
-        <input id="note-title-input" placeholder="Titolo">
-        <textarea id="note-content-input" placeholder="Scrivi qui..."></textarea>
-
-        <div id="editor-footer">
-            <button id="save-note-btn">Salva</button>
-        </div>
+  <header id="top-bar">
+    <div id="left-icons">
+      <button id="theme-toggle-btn">🌞</button>
     </div>
-
-    <div id="trash-panel">
-        <div id="trash-header">
-            <h2>Cestino</h2>
-            <button id="close-trash-btn">✖</button>
-        </div>
-        <div id="trash-container"></div>
+    <div id="right-icons">
+      <button id="ai-chat-btn">🤖</button>
+      <button id="lifebuoy-btn">🛟</button>
+      <button id="settings-btn">⚙️</button>
     </div>
+  </header>
 
-    <div id="lifebuoy-panel">
-        <h2>Backup & Ripristino</h2>
+  <main id="main-content">
+    <div id="notes-container"></div>
+  </main>
 
-        <button id="manual-backup-btn">Backup manuale</button>
-        <button id="manual-restore-btn">Ripristina backup</button>
+  <button id="add-note-btn">+</button>
 
-        <button id="toggle-auto-backup-btn">Backup automatico</button>
-        <button id="toggle-auto-restore-btn">Ripristino automatico</button>
-
-        <button id="export-notes-btn">Esporta note</button>
-        <button id="delete-backup-btn">Cancella backup</button>
-
-        <button id="close-lifebuoy-btn">Chiudi</button>
+  <div id="editor-panel">
+    <div id="editor-header">
+      <button id="close-editor-btn">✖</button>
+      <button id="ai-editor-btn">✨</button>
     </div>
-
-    <div id="settings-panel">
-        <h2>Impostazioni</h2>
-
-        <label>Lingua:
-            <select id="language-select">
-                <option value="it">Italiano</option>
-                <option value="en">English</option>
-                <option value="es">Español</option>
-                <option value="de">Deutsch</option>
-            </select>
-        </label>
-
-        <label>Font:
-            <select id="font-select">
-                <option value="default">Default</option>
-                <option value="serif">Serif</option>
-                <option value="mono">Monospace</option>
-            </select>
-        </label>
-
-        <label>Dimensione testo:
-            <input type="range" id="text-size-slider" min="12" max="26" value="16">
-        </label>
-
-        <label>
-            <input type="checkbox" id="privacy-toggle">
-            Privacy Mode
-        </label>
-
-        <label>
-            <input type="checkbox" id="transparency-toggle">
-            Trasparenze
-        </label>
-
-        <label>Velocità animazioni:
-            <select id="animation-speed-select">
-                <option value="normal">Normale</option>
-                <option value="fast">Veloce</option>
-                <option value="slow">Lenta</option>
-            </select>
-        </label>
-
-        <button id="reset-layout-btn">Reset layout</button>
-        <button id="reset-app-btn">Reset totale</button>
-
-        <button id="close-settings-btn">Chiudi</button>
+    <input id="note-title-input" placeholder="Titolo">
+    <textarea id="note-content-input" placeholder="Scrivi qui..."></textarea>
+    <div id="editor-footer">
+      <button id="save-note-btn">Salva</button>
     </div>
+  </div>
 
-    <div id="ai-chat-panel">
-        <div id="ai-chat-header">
-            <h2>Assistente AI</h2>
-            <button id="close-ai-chat-btn">✖</button>
-        </div>
-
-        <div id="ai-chat-messages"></div>
-
-        <div id="ai-chat-input-area">
-            <input id="ai-chat-input" placeholder="Scrivi un messaggio...">
-            <button id="ai-chat-send-btn">Invia</button>
-        </div>
+  <div id="trash-panel">
+    <div id="trash-header">
+      <h2>Cestino</h2>
+      <button id="close-trash-btn">✖</button>
     </div>
+    <div id="trash-container"></div>
+  </div>
 
-    <script src="script.js"></script>
+  <div id="lifebuoy-panel">
+    <h2>Backup & Ripristino</h2>
+    <button id="manual-backup-btn">Backup manuale</button>
+    <button id="manual-restore-btn">Ripristina backup</button>
+    <button id="toggle-auto-backup-btn">Backup automatico</button>
+    <button id="toggle-auto-restore-btn">Ripristino automatico</button>
+    <button id="export-notes-btn">Esporta note</button>
+    <button id="delete-backup-btn">Cancella backup</button>
+    <button id="close-lifebuoy-btn">Chiudi</button>
+  </div>
+
+  <div id="settings-panel">
+    <h2>Impostazioni</h2>
+    <label>Lingua:
+      <select id="language-select">
+        <option value="it">Italiano</option>
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="de">Deutsch</option>
+      </select>
+    </label>
+    <label>Font:
+      <select id="font-select">
+        <option value="default">Default</option>
+        <option value="serif">Serif</option>
+        <option value="mono">Monospace</option>
+      </select>
+    </label>
+    <label>Dimensione testo:
+      <input type="range" id="text-size-slider" min="12" max="26" value="16">
+    </label>
+    <label>
+      <input type="checkbox" id="privacy-toggle"> Privacy Mode
+    </label>
+    <label>
+      <input type="checkbox" id="transparency-toggle"> Trasparenze
+    </label>
+    <label>Velocità animazioni:
+      <select id="animation-speed-select">
+        <option value="normal">Normale</option>
+        <option value="fast">Veloce</option>
+        <option value="slow">Lenta</option>
+      </select>
+    </label>
+    <button id="reset-layout-btn">Reset layout</button>
+    <button id="reset-app-btn">Reset totale</button>
+    <button id="open-trash-btn">Apri cestino</button>
+    <button id="close-settings-btn">Chiudi</button>
+  </div>
+
+  <div id="ai-chat-panel">
+    <div id="ai-chat-header">
+      <h2>Assistente AI</h2>
+      <button id="close-ai-chat-btn">✖</button>
+    </div>
+    <div id="ai-chat-messages"></div>
+    <div id="ai-chat-input-area">
+      <input id="ai-chat-input" placeholder="Scrivi un messaggio...">
+      <button id="ai-chat-send-btn">Invia</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
