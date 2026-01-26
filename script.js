@@ -66,14 +66,150 @@ const translations = {
     noBackupFound: "Nessun backup trovato.",
     pinFormat: "Il PIN deve avere 4 cifre.",
     pinChanged: "PIN cambiato."
+  },
+  en: {
+    notesTitle: "Your notes",
+    enterPin: "Enter PIN",
+    rememberPin: "Remember PIN on this device",
+    pinError: "Wrong PIN",
+    noTitle: "No title",
+    catAll: "All",
+    catHome: "Home",
+    catWork: "Work",
+    catIdeas: "Ideas",
+    catShopping: "Shopping",
+    catOther: "Other",
+    titlePlaceholder: "Title",
+    textPlaceholder: "Write your note...",
+    categoryLabel: "Category",
+    colorLabel: "Note color",
+    save: "Save",
+    delete: "Delete",
+    editNote: "Note",
+    backupTitle: "Backup & Restore",
+    backupSection: "Backup",
+    restoreSection: "Restore",
+    exportSection: "Export / Import",
+    backupManageSection: "Backup management",
+    quickBackup: "Quick backup",
+    manualBackup: "Manual backup",
+    manualRestore: "Manual restore",
+    exportText: "Export notes (.txt)",
+    deleteBackups: "Delete backups",
+    close: "Close",
+    settingsTitle: "Settings",
+    securitySection: "Security",
+    maintenanceSection: "Maintenance",
+    newPinPlaceholder: "New PIN (4 digits)",
+    savePin: "Save new PIN",
+    deleteAllNotes: "Delete all notes",
+    resetApp: "Reset app",
+    quickBackupDone: "Quick backup done.",
+    manualBackupDone: "Manual backup done.",
+    restoreDone: "Restore completed.",
+    noBackupFound: "No backup found.",
+    pinFormat: "PIN must be 4 digits.",
+    pinChanged: "PIN changed."
+  },
+  de: {
+    notesTitle: "Deine Notizen",
+    enterPin: "PIN eingeben",
+    rememberPin: "PIN auf diesem Gerät merken",
+    pinError: "Falscher PIN",
+    noTitle: "Ohne Titel",
+    catAll: "Alle",
+    catHome: "Zuhause",
+    catWork: "Arbeit",
+    catIdeas: "Ideen",
+    catShopping: "Einkauf",
+    catOther: "Sonstiges",
+    titlePlaceholder: "Titel",
+    textPlaceholder: "Schreibe deine Notiz...",
+    categoryLabel: "Kategorie",
+    colorLabel: "Notizfarbe",
+    save: "Speichern",
+    delete: "Löschen",
+    editNote: "Notiz",
+    backupTitle: "Backup & Wiederherstellung",
+    backupSection: "Backup",
+    restoreSection: "Wiederherstellung",
+    exportSection: "Export / Import",
+    backupManageSection: "Backup-Verwaltung",
+    quickBackup: "Schnelles Backup",
+    manualBackup: "Manuelles Backup",
+    manualRestore: "Manuelle Wiederherstellung",
+    exportText: "Notizen exportieren (.txt)",
+    deleteBackups: "Backups löschen",
+    close: "Schließen",
+    settingsTitle: "Einstellungen",
+    securitySection: "Sicherheit",
+    maintenanceSection: "Wartung",
+    newPinPlaceholder: "Neuer PIN (4 Ziffern)",
+    savePin: "Neuen PIN speichern",
+    deleteAllNotes: "Alle Notizen löschen",
+    resetApp: "App zurücksetzen",
+    quickBackupDone: "Schnelles Backup fertig.",
+    manualBackupDone: "Manuelles Backup fertig.",
+    restoreDone: "Wiederherstellung abgeschlossen.",
+    noBackupFound: "Kein Backup gefunden.",
+    pinFormat: "PIN muss 4 Ziffern haben.",
+    pinChanged: "PIN geändert."
+  },
+  es: {
+    notesTitle: "Tus notas",
+    enterPin: "Introduce el PIN",
+    rememberPin: "Recordar PIN en este dispositivo",
+    pinError: "PIN incorrecto",
+    noTitle: "Sin título",
+    catAll: "Todas",
+    catHome: "Casa",
+    catWork: "Trabajo",
+    catIdeas: "Ideas",
+    catShopping: "Compras",
+    catOther: "Otros",
+    titlePlaceholder: "Título",
+    textPlaceholder: "Escribe tu nota...",
+    categoryLabel: "Categoría",
+    colorLabel: "Color de la nota",
+    save: "Guardar",
+    delete: "Eliminar",
+    editNote: "Nota",
+    backupTitle: "Copia y restauración",
+    backupSection: "Copia",
+    restoreSection: "Restaurar",
+    exportSection: "Exportar / Importar",
+    backupManageSection: "Gestión de copias",
+    quickBackup: "Copia rápida",
+    manualBackup: "Copia manual",
+    manualRestore: "Restauración manual",
+    exportText: "Exportar notas (.txt)",
+    deleteBackups: "Eliminar copias",
+    close: "Cerrar",
+    settingsTitle: "Ajustes",
+    securitySection: "Seguridad",
+    maintenanceSection: "Mantenimiento",
+    newPinPlaceholder: "Nuevo PIN (4 dígitos)",
+    savePin: "Guardar nuevo PIN",
+    deleteAllNotes: "Eliminar todas las notas",
+    resetApp: "Restablecer app",
+    quickBackupDone: "Copia rápida realizada.",
+    manualBackupDone: "Copia manual realizada.",
+    restoreDone: "Restauración completada.",
+    noBackupFound: "No se encontró copia.",
+    pinFormat: "El PIN debe tener 4 dígitos.",
+    pinChanged: "PIN cambiado."
   }
 };
 
 /* ============================================================
    MULTILINGUA
 ============================================================ */
+function getT() {
+  return translations[currentLang] || translations.it;
+}
+
 function applyTranslations() {
-  const t = translations[currentLang];
+  const t = getT();
 
   document.querySelectorAll("[data-i18n]").forEach(el => {
     const key = el.getAttribute("data-i18n");
@@ -90,7 +226,7 @@ function applyTranslations() {
 }
 
 function updateCategoryButtons() {
-  const t = translations[currentLang];
+  const t = getT();
   document.querySelector('[data-category="all"]').innerHTML = `📁 ${t.catAll}`;
   document.querySelector('[data-category="home"]').innerHTML = `🏠 ${t.catHome}`;
   document.querySelector('[data-category="work"]').innerHTML = `💼 ${t.catWork}`;
@@ -137,7 +273,7 @@ function updateCircles() {
 }
 
 function checkPIN() {
-  const t = translations[currentLang];
+  const t = getT();
   if (enteredPIN === savedPIN) {
     pinOverlay.classList.add("hidden");
     if (document.getElementById("rememberPin").checked)
@@ -176,7 +312,7 @@ if (localStorage.getItem("rememberPIN") === "1") {
    NOTE
 ============================================================ */
 function getCategoryLabel(cat) {
-  const t = translations[currentLang];
+  const t = getT();
   return {
     home: t.catHome,
     work: t.catWork,
@@ -190,12 +326,19 @@ function renderNotes() {
   const container = document.getElementById("notes-container");
   container.innerHTML = "";
 
-  notes
+  const sortMode = localStorage.getItem("sortMode") || "date";
+  let list = [...notes];
+
+  if (sortMode === "title") list.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+  if (sortMode === "category") list.sort((a, b) => a.category.localeCompare(b.category));
+  if (sortMode === "date") list.sort((a, b) => b.id - a.id);
+
+  list
     .filter(n => currentCategoryFilter === "all" || n.category === currentCategoryFilter)
     .forEach(n => {
       const div = document.createElement("div");
       div.className = "note";
-      div.style.background = n.color;
+      div.style.background = n.color || "#ffffff";
 
       if (privacyMode) {
         div.style.filter = "blur(6px)";
@@ -203,7 +346,7 @@ function renderNotes() {
 
       div.innerHTML = `
         <div class="note-header">
-          <div class="note-title">${n.title || translations[currentLang].noTitle}</div>
+          <div class="note-title">${n.title || getT().noTitle}</div>
           <div class="note-category-tag">${getCategoryLabel(n.category)}</div>
         </div>
         <div class="note-text">${(n.text || "").slice(0, 160)}</div>
@@ -258,10 +401,11 @@ function openEditor(id = null) {
 
   if (id) {
     const n = notes.find(x => x.id === id);
-    title.value = n.title;
-    text.value = n.text;
-    cat.value = n.category;
-    selectedColor = n.color;
+    if (!n) return;
+    title.value = n.title || "";
+    text.value = n.text || "";
+    cat.value = n.category || "other";
+    selectedColor = n.color || "#ffffff";
   } else {
     title.value = "";
     text.value = "";
@@ -289,10 +433,10 @@ document.getElementById("save-note-btn").onclick = () => {
   const text = document.getElementById("note-text").value.trim();
   const category = document.getElementById("note-category").value;
 
-  if (!text) return;
-
+  // 👉 Ora salva SEMPRE, anche se il testo è vuoto
   if (editingId) {
     const n = notes.find(x => x.id === editingId);
+    if (!n) return;
     n.title = title;
     n.text = text;
     n.category = category;
@@ -320,6 +464,9 @@ document.getElementById("delete-note-btn").onclick = () => {
 
 function deleteNoteById(id) {
   const note = notes.find(n => n.id === id);
+  if (!note) return;
+
+  // 👉 Cestino = backup nota
   trash.push(note);
   localStorage.setItem("trash", JSON.stringify(trash));
 
@@ -344,7 +491,7 @@ document.getElementById("note-color").oninput = e => {
 };
 
 /* ============================================================
-   BACKUP — PARTE 1
+   BACKUP
 ============================================================ */
 function saveNotes() {
   localStorage.setItem("notes", JSON.stringify(notes));
@@ -365,12 +512,10 @@ function autoRestoreIfEmpty() {
     }
   }
 }
-/* ============================================================
-   BACKUP — PARTE 2
-============================================================ */
+
 document.getElementById("quick-backup-btn").onclick = () => {
   localStorage.setItem("notesBackup", JSON.stringify(notes));
-  alert(translations[currentLang].quickBackupDone);
+  alert(getT().quickBackupDone);
 };
 
 document.getElementById("manual-backup-btn").onclick = () => {
@@ -382,7 +527,7 @@ document.getElementById("manual-backup-btn").onclick = () => {
   a.download = "note-backup.json";
   a.click();
   URL.revokeObjectURL(url);
-  alert(translations[currentLang].manualBackupDone);
+  alert(getT().manualBackupDone);
 };
 
 document.getElementById("manual-restore-btn").onclick = () => {
@@ -398,7 +543,7 @@ document.getElementById("manual-restore-btn").onclick = () => {
         notes = JSON.parse(event.target.result);
         saveNotes();
         renderNotes();
-        alert(translations[currentLang].restoreDone);
+        alert(getT().restoreDone);
       } catch {
         alert("File non valido.");
       }
@@ -425,7 +570,7 @@ document.getElementById("export-text-btn").onclick = () => {
 
 document.getElementById("delete-backups-btn").onclick = () => {
   localStorage.removeItem("notesBackup");
-  alert(translations[currentLang].noBackupFound);
+  alert(getT().noBackupFound);
 };
 
 /* Backup automatico ON/OFF */
@@ -479,12 +624,12 @@ document.getElementById("close-info-panel").onclick = () => {
 document.getElementById("save-new-pin-btn").onclick = () => {
   const newPin = document.getElementById("new-pin-input").value.trim();
   if (!/^\d{4}$/.test(newPin)) {
-    alert(translations[currentLang].pinFormat);
+    alert(getT().pinFormat);
     return;
   }
   savedPIN = newPin;
   localStorage.setItem("appPIN", newPin);
-  alert(translations[currentLang].pinChanged);
+  alert(getT().pinChanged);
 };
 
 /* Modalità privacy */
@@ -564,11 +709,6 @@ document.getElementById("sort-notes").onclick = () => {
   const current = localStorage.getItem("sortMode") || "date";
   const next = modes[(modes.indexOf(current) + 1) % modes.length];
   localStorage.setItem("sortMode", next);
-
-  if (next === "title") notes.sort((a, b) => a.title.localeCompare(b.title));
-  if (next === "category") notes.sort((a, b) => a.category.localeCompare(b.category));
-  if (next === "date") notes.sort((a, b) => b.id - a.id);
-
   renderNotes();
 };
 
@@ -579,8 +719,18 @@ document.getElementById("open-archive").onclick = () => {
   alert("Archivio note in sviluppo.");
 };
 
+/* 👉 Cestino = ripristino nota eliminata */
 document.getElementById("open-trash").onclick = () => {
-  alert("Cestino note in sviluppo.");
+  if (trash.length === 0) {
+    alert("Cestino vuoto.");
+    return;
+  }
+  const last = trash.pop(); // ripristina l’ultima nota eliminata
+  notes.push(last);
+  localStorage.setItem("trash", JSON.stringify(trash));
+  saveNotes();
+  renderNotes();
+  alert("Nota ripristinata dal cestino.");
 };
 
 document.getElementById("duplicate-note").onclick = () => {
