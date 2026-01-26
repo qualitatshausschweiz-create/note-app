@@ -44,15 +44,9 @@ header#topBar {
   margin-bottom: 20px;
 }
 
-header#topBar h1 {
-  margin: 0;
-  font-size: 26px;
-}
-
 .subtitle {
   font-size: 14px;
   color: #666;
-  margin: 4px 0 12px;
 }
 
 .top-icons {
@@ -69,6 +63,17 @@ header#topBar h1 {
   cursor: pointer;
 }
 
+/* SEARCH */
+.search {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 15px;
+  background: var(--bg-secondary);
+  color: var(--text);
+}
+
 /* EDITOR */
 #noteEditor input,
 #noteEditor textarea,
@@ -78,7 +83,6 @@ header#topBar h1 {
   margin-bottom: 10px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  font-size: 16px;
   background: var(--bg-secondary);
   color: var(--text);
 }
@@ -86,11 +90,6 @@ header#topBar h1 {
 textarea {
   height: 120px;
   resize: none;
-}
-
-.editor-buttons {
-  display: flex;
-  gap: 10px;
 }
 
 .primary-btn {
@@ -120,42 +119,23 @@ textarea {
   margin-bottom: 10px;
 }
 
-.note-item h3 {
-  margin: 0 0 4px;
-  font-size: 16px;
-}
-
-.note-item p {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text);
-}
-
-.note-footer {
-  margin-top: 8px;
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-}
-
 .note-badge {
-  padding: 2px 8px;
+  padding: 4px 10px;
   border-radius: 999px;
-  background: #e5e5ea;
+  font-size: 12px;
 }
 
-.note-restore {
-  cursor: pointer;
-  font-weight: 600;
+/* TAGS */
+.tag {
+  background: var(--accent);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 8px;
+  margin-right: 4px;
+  font-size: 12px;
 }
 
 /* CATEGORIE */
-.category-list {
-  list-style: none;
-  padding: 0;
-  margin: 10px 0;
-}
-
 .category-item {
   display: flex;
   align-items: center;
@@ -205,24 +185,15 @@ textarea {
   z-index: 10;
 }
 
-.popup-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.hidden {
+  display: none !important;
 }
 
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-/* PALETTE COLORI */
+/* PALETTE */
 .color-palette {
   display: flex;
   gap: 10px;
-  margin-top: 10px;
+  flex-wrap: wrap;
 }
 
 .color-swatch {
@@ -235,8 +206,4 @@ textarea {
 
 .color-swatch.selected {
   border-color: var(--accent);
-}
-
-.hidden {
-  display: none !important;
 }
