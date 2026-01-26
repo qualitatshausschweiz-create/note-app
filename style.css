@@ -218,3 +218,15 @@ header#topBar h1 {
   cursor: pointer;
   font-weight: 600;
 }
+.color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border 0.2s ease;
+}
+
+.color-swatch.selected {
+  border-color: var(--accent);
+}
