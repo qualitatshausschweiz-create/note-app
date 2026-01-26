@@ -9,6 +9,39 @@
 
 <body>
 
+    <!-- PIN OVERLAY -->
+    <div id="pinOverlay" class="pin-overlay">
+        <h2 data-i18n="enterPin">Inserisci PIN</h2>
+
+        <div class="pin-circles">
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>
+
+        <div id="pinError" class="pin-error"></div>
+
+        <div class="pinPad">
+            <button data-num="1">1</button>
+            <button data-num="2">2</button>
+            <button data-num="3">3</button>
+            <button data-num="4">4</button>
+            <button data-num="5">5</button>
+            <button data-num="6">6</button>
+            <button data-num="7">7</button>
+            <button data-num="8">8</button>
+            <button data-num="9">9</button>
+            <button id="pinBack">⌫</button>
+            <button data-num="0">0</button>
+        </div>
+
+        <label class="remember-pin">
+            <input type="checkbox" id="rememberPin">
+            <span data-i18n="rememberPin">Memorizza PIN su questo dispositivo</span>
+        </label>
+    </div>
+
     <!-- TOP BAR -->
     <header class="top-bar">
         <h1 class="app-title">Le Tue Note</h1>
@@ -35,6 +68,7 @@
 
     <!-- CATEGORIE -->
     <div class="categories">
+        <button class="category-btn active" data-category="all">📁 Tutte</button>
         <button class="category-btn" data-category="casa">🏠 Casa</button>
         <button class="category-btn" data-category="lavoro">💼 Lavoro</button>
         <button class="category-btn" data-category="idee">💡 Idee</button>
@@ -74,101 +108,43 @@
         </div>
     </div>
 
-    <!-- OVERLAY BACKUP 🛟 -->
+    <!-- OVERLAY BACKUP -->
     <div id="backup-panel" class="panel hidden">
         <div class="panel-box">
 
             <h2 class="panel-title">🛟 Backup & Ripristino</h2>
 
-            <!-- Sezione Backup -->
             <h3 class="panel-section">Backup</h3>
-            <button class="panel-btn" id="backup-quick">Backup veloce</button>
-            <button class="panel-btn" id="backup-manual">Backup manuale</button>
+            <button class="panel-btn" id="quick-backup-btn">Backup veloce</button>
+            <button class="panel-btn" id="manual-backup-btn">Backup manuale</button>
 
-            <!-- Sezione Ripristino -->
             <h3 class="panel-section">Ripristino</h3>
-            <button class="panel-btn" id="restore-manual">Ripristino manuale</button>
-            <button class="panel-btn" id="restore-auto">Ripristino automatico</button>
+            <button class="panel-btn" id="manual-restore-btn">Ripristino manuale</button>
 
-            <!-- Sezione Esporta/Importa -->
             <h3 class="panel-section">Esporta / Importa</h3>
-            <button class="panel-btn" id="export-notes">Esporta note</button>
-            <button class="panel-btn" id="import-notes">Importa note</button>
+            <button class="panel-btn" id="export-text-btn">Esporta note</button>
+            <button class="panel-btn" id="import-notes-btn">Importa note</button>
 
-            <!-- Sezione Gestione -->
             <h3 class="panel-section">Gestione Backup</h3>
-            <button class="panel-btn danger" id="delete-backups">Cancella backup</button>
-            <button class="panel-btn" id="backup-info">Info backup</button>
+            <button class="panel-btn danger" id="delete-backups-btn">Cancella backup</button>
 
             <button class="close-panel-btn" id="close-backup-panel">Chiudi</button>
         </div>
     </div>
 
-    <!-- OVERLAY IMPOSTAZIONI ⚙️ -->
+    <!-- OVERLAY IMPOSTAZIONI -->
     <div id="settings-panel" class="panel hidden">
         <div class="panel-box">
 
             <h2 class="panel-title">⚙️ Impostazioni</h2>
 
-            <!-- SICUREZZA -->
             <h3 class="panel-section">🔐 Sicurezza</h3>
-            <button class="panel-btn">Cambia PIN</button>
-            <button class="panel-btn">Memorizza PIN</button>
-            <button class="panel-btn">Timeout automatico</button>
-            <button class="panel-btn">PIN 6 cifre</button>
-            <button class="panel-btn">PIN alfanumerico</button>
-            <button class="panel-btn">Modalità privacy</button>
+            <input id="new-pin-input" class="panel-input" placeholder="Nuovo PIN (4 cifre)">
+            <button class="panel-btn" id="save-new-pin-btn">Salva nuovo PIN</button>
 
-            <!-- ASPETTO -->
-            <h3 class="panel-section">🎨 Aspetto</h3>
-            <button class="panel-btn">Tema personalizzato</button>
-            <button class="panel-btn">Font app</button>
-            <button class="panel-btn">Dimensione testo</button>
-            <button class="panel-btn">Spaziatura note</button>
-            <button class="panel-btn">Layout note</button>
-            <button class="panel-btn">Angoli arrotondati</button>
-            <button class="panel-btn">Ombre personalizzate</button>
-            <button class="panel-btn">Trasparenze iOS</button>
-            <button class="panel-btn">Blur regolabile</button>
-            <button class="panel-btn">Animazioni ON/OFF</button>
-            <button class="panel-btn">Velocità animazioni</button>
-
-            <!-- FUNZIONI INTELLIGENTI -->
-            <h3 class="panel-section">🧠 Funzioni intelligenti</h3>
-            <button class="panel-btn">Riconoscimento categorie</button>
-            <button class="panel-btn">Riconoscimento date</button>
-            <button class="panel-btn">Riconoscimento liste</button>
-            <button class="panel-btn">Evidenzia parole chiave</button>
-
-            <!-- GESTIONE NOTE -->
-            <h3 class="panel-section">🗂️ Gestione note</h3>
-            <button class="panel-btn">Ordinamento note</button>
-            <button class="panel-btn">Note fissate</button>
-            <button class="panel-btn">Archivio note</button>
-            <button class="panel-btn">Cestino</button>
-            <button class="panel-btn">Duplica nota</button>
-            <button class="panel-btn">Unisci note</button>
-            <button class="panel-btn">Pulisci note vuote</button>
-            <button class="panel-btn">Pulisci note vecchie</button>
-
-            <!-- LINGUA -->
-            <h3 class="panel-section">🌍 Lingua</h3>
-            <button class="panel-btn">Italiano</button>
-            <button class="panel-btn">Inglese</button>
-            <button class="panel-btn">Tedesco</button>
-            <button class="panel-btn">Spagnolo</button>
-
-            <!-- MANUTENZIONE -->
             <h3 class="panel-section">🧼 Manutenzione</h3>
-            <button class="panel-btn">Ottimizza spazio</button>
-            <button class="panel-btn">Ripristina layout</button>
-            <button class="panel-btn danger">Reset totale app</button>
-
-            <!-- INFO -->
-            <h3 class="panel-section">ℹ️ Info app</h3>
-            <button class="panel-btn">Versione</button>
-            <button class="panel-btn">Crediti</button>
-            <button class="panel-btn">Note di rilascio</button>
+            <button class="panel-btn danger" id="delete-all-notes-btn">Cancella tutte le note</button>
+            <button class="panel-btn danger" id="reset-app-btn">Reset totale app</button>
 
             <button class="close-panel-btn" id="close-settings-panel">Chiudi</button>
         </div>
