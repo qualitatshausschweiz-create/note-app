@@ -243,3 +243,34 @@ body, #app, .note-item, .popup-content, .settings-content {
               border-color 0.35s ease,
               box-shadow 0.35s ease;
 }
+/* Tema chiaro (default) */
+:root {
+  --bg: #f9f9f9;
+  --bg-secondary: #ffffff;
+  --text: #1c1c1e;
+  --border: #d1d1d6;
+}
+
+/* Tema scuro */
+[data-theme="dark"] {
+  --bg: #1c1c1e;
+  --bg-secondary: #2c2c2e;
+  --text: #f2f2f7;
+  --border: #3a3a3c;
+}
+
+/* Applica i colori */
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+#app,
+.note-item,
+.popup-content,
+.settings-content,
+.category-item {
+  background: var(--bg-secondary);
+  color: var(--text);
+  border-color: var(--border);
+}
