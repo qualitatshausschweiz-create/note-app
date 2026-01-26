@@ -8,12 +8,10 @@
 </head>
 <body>
   <div id="app">
-
     <!-- HEADER -->
     <header id="topBar">
       <h1>Le mie note</h1>
       <p class="subtitle">Categorie, cestino, backup, tutto sotto controllo</p>
-
       <div class="top-icons">
         <button id="themeToggleBtn">🌞</button>
         <button id="openSettingsBtn">⚙️</button>
@@ -27,7 +25,6 @@
       <input type="text" id="noteTitle" placeholder="Titolo della nota..." />
       <select id="categorySelector"></select>
       <textarea id="noteContent" placeholder="Scrivi la tua nota qui..."></textarea>
-
       <div class="editor-buttons">
         <button id="saveNoteBtn" class="primary-btn">Salva nota</button>
         <button id="cancelEditBtn" class="secondary-btn">Elimina nota</button>
@@ -56,11 +53,8 @@
         <h2>Backup</h2>
         <button id="closeLifebuoyBtn" class="close-btn">✕</button>
       </div>
-
       <p class="popup-description">Backup locale e iCloud</p>
-
       <div id="backupList"></div>
-
       <div class="popup-buttons">
         <button id="createBackupBtn" class="primary-btn">Backup manuale</button>
         <button id="importBackupBtn" class="secondary-btn">Ripristina da file</button>
@@ -98,8 +92,6 @@
 
       <div class="settings-section">
         <h3>Colore principale</h3>
-
-        <!-- PALETTE COLORI -->
         <div class="color-palette">
           <div class="color-swatch" data-color="#007aff" style="background:#007aff;"></div>
           <div class="color-swatch" data-color="#ff6b6b" style="background:#ff6b6b;"></div>
@@ -108,8 +100,6 @@
           <div class="color-swatch" data-color="#af52de" style="background:#af52de;"></div>
           <div class="color-swatch" data-color="#5ac8fa" style="background:#5ac8fa;"></div>
         </div>
-
-        <!-- COLORE PERSONALIZZATO -->
         <input type="color" id="customColorPicker" value="#007aff" />
       </div>
 
