@@ -1,141 +1,188 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // CATEGORIE DI BASE
-    let categories = [];
-    try {
-        categories = JSON.parse(localStorage.getItem("categories")) || [
-            { name: "Lavoro", color: "#1e90ff" },
-            { name: "Spesa", color: "#ffa502" },
-            { name: "Idee", color: "#a55eea" },
-            { name: "Tutte", color: "#2ed573" }
-        ];
-    } catch (e) {
-        categories = [
-            { name: "Lavoro", color: "#1e90ff" },
-            { name: "Spesa", color: "#ffa502" },
-            { name: "Idee", color: "#a55eea" },
-            { name: "Tutte", color: "#2ed573" }
-        ];
-    }
 
-    let selectedColor = null;
+    // STORAGE
+    let categories = JSON.parse(localStorage.getItem("categories")) || [
+        { name: "Lavoro", color: "#1e90ff" },
+        { name: "Spesa", color: "#ffa502" },
+        { name: "Idee", color: "#a55eea" },
+        { name: "Tutte", color: "#2ed573" }
+    ];
 
-    // ELEMENTI (con controlli di sicurezza)
-    const popup = document.getElementById("categoryPopup");
-    const categoryList = document.getElementById("categoryList");
-    const saveBtn = document.getElementById("saveCategoryBtn");
-    const closeBtn = document.getElementById("closePopupBtn");
-    const newCategoryName = document.getElementById("newCategoryName");
-    const categoriesBtn = document.getElementById("categoriesBtn");
-    const sunBtn = document.getElementById("sunBtn");
-    const moonBtn = document.getElementById("moonBtn");
+    let notes = JSON.parse(localStorage.getItem("notes")) || [];
+    let trash = JSON.parse(localStorage.getItem("trash")) || [];
 
-    // Se manca il popup, esco senza rompere tutto
-    if (!popup || !categoryList || !saveBtn || !closeBtn || !newCategoryName) {
-        console.warn("Elementi popup categorie mancanti");
-        return;
-    }
+    // ELEMENTI
+    const addNoteBtn = document.getElementById("addNoteBtn");
+    const notePanel = document.getElementById("notePanel");
+    const closeNotePanel = document.getElementById("closeNotePanel");
+    const saveNoteBtn = document.getElementById("saveNoteBtn");
+    const noteTitle = document.getElementById("noteTitle");
+    const noteText = document.getElementById("noteText");
+    const categoryButtons = document.getElementById("categoryButtons");
+    const notePalette = document.getElementById("notePalette");
+    const notesContainer = document.getElementById("notesContainer");
 
-    // APRI POPUP
-    if (categoriesBtn) {
-        categoriesBtn.addEventListener("click", () => {
-            popup.classList.remove("hidden");
-            renderCategories();
+    const trashBtn = document.getElementById("trashBtn");
+    const trashPanel = document.getElementById("trashPanel");
+    const closeTrashPanel = document.getElementById("closeTrashPanel");
+    const trashList = document.getElementById("trashList");
+
+    let selectedCategory = null;
+    let selectedColor = "#1e90ff";
+
+    // APRI PANELLO NUOVA NOTA
+    addNoteBtn.onclick = () => {
+        notePanel.classList.remove("hidden");
+        renderCategoryButtons();
+        renderPalette();
+    };
+
+    // CHIUDI PANELLO
+    closeNotePanel.onclick = () => {
+        notePanel.classList.add("hidden");
+        resetNoteForm();
+    };
+
+    // BOTTONI CATEGORIA
+    function renderCategoryButtons() {
+        categoryButtons.innerHTML = "";
+        categories.forEach(cat => {
+            const btn = document.createElement("button");
+            btn.className = "category-btn";
+            btn.style.background = cat.color;
+            btn.textContent = cat.name;
+
+            btn.onclick = () => {
+                selectedCategory = cat.name;
+                document.querySelectorAll(".category-btn").forEach(b => b.style.opacity = "0.5");
+                btn.style.opacity = "1";
+            };
+
+            categoryButtons.appendChild(btn);
         });
     }
 
-    // CHIUDI POPUP (bottone)
-    closeBtn.addEventListener("click", () => {
-        popup.classList.add("hidden");
-    });
+    // PALETTE COLORI
+    function renderPalette() {
+        const colors = ["#ff6b6b", "#ffa502", "#2ed573", "#1e90ff", "#a55eea", "#000000", "#ffffff"];
+        notePalette.innerHTML = "";
 
-    // CHIUDI POPUP cliccando fuori dal contenuto
-    popup.addEventListener("click", (e) => {
-        if (e.target === popup) {
-            popup.classList.add("hidden");
-        }
-    });
-
-    // RENDER CATEGORIE
-    function renderCategories() {
-        categoryList.innerHTML = "";
-        categories.forEach((cat, index) => {
+        colors.forEach(c => {
             const div = document.createElement("div");
-            div.className = "category-item";
+            div.className = "color";
+            div.style.background = c;
+
+            div.onclick = () => {
+                selectedColor = c;
+                document.querySelectorAll(".color").forEach(x => x.classList.remove("selected"));
+                div.classList.add("selected");
+            };
+
+            notePalette.appendChild(div);
+        });
+    }
+
+    // SALVA NOTA
+    saveNoteBtn.onclick = () => {
+        if (!noteTitle.value.trim() || !selectedCategory) return;
+
+        const newNote = {
+            id: Date.now(),
+            titolo: noteTitle.value,
+            testo: noteText.value,
+            colore: selectedColor,
+            categoria: selectedCategory,
+            data: new Date().toISOString()
+        };
+
+        notes.push(newNote);
+        localStorage.setItem("notes", JSON.stringify(notes));
+
+        renderNotes();
+        resetNoteForm();
+        notePanel.classList.add("hidden");
+    };
+
+    function resetNoteForm() {
+        noteTitle.value = "";
+        noteText.value = "";
+        selectedCategory = null;
+        selectedColor = "#1e90ff";
+    }
+
+    // MOSTRA NOTE
+    function renderNotes() {
+        notesContainer.innerHTML = "";
+
+        notes.forEach(n => {
+            const div = document.createElement("div");
+            div.className = "note";
+            div.style.borderLeftColor = n.colore;
+
             div.innerHTML = `
-                <span>${cat.name}</span>
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <div class="category-color" style="background:${cat.color}"></div>
-                    <button data-index="${index}" class="deleteCat">❌</button>
-                </div>
+                <h3>${n.titolo}</h3>
+                <p>${n.testo}</p>
+                <small>${n.categoria}</small><br>
+                <button class="deleteNote">Elimina</button>
             `;
-            categoryList.appendChild(div);
-        });
 
-        // ELIMINA CATEGORIA
-        categoryList.querySelectorAll(".deleteCat").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const i = parseInt(btn.getAttribute("data-index"), 10);
-                if (!isNaN(i)) {
-                    categories.splice(i, 1);
-                    saveCategories();
-                    renderCategories();
-                }
-            });
+            div.querySelector(".deleteNote").onclick = () => {
+                trash.push(n);
+                notes = notes.filter(x => x.id !== n.id);
+                localStorage.setItem("notes", JSON.stringify(notes));
+                localStorage.setItem("trash", JSON.stringify(trash));
+                renderNotes();
+            };
+
+            notesContainer.appendChild(div);
         });
     }
 
-    // SELEZIONE COLORE PALETTE
-    const colorNodes = document.querySelectorAll(".palette .color");
-    colorNodes.forEach(c => {
-        c.addEventListener("click", () => {
-            colorNodes.forEach(x => x.classList.remove("selected"));
-            c.classList.add("selected");
-            selectedColor = c.dataset.color || null;
-        });
-    });
+    renderNotes();
 
-    // SALVA NUOVA CATEGORIA
-    saveBtn.addEventListener("click", () => {
-        const name = newCategoryName.value.trim();
-        if (!name) {
-            // niente nome, non salvo
-            return;
-        }
-        if (!selectedColor) {
-            // nessun colore selezionato, non salvo
-            return;
-        }
+    // CESTINO
+    trashBtn.onclick = () => {
+        trashPanel.classList.remove("hidden");
+        renderTrash();
+    };
 
-        categories.push({ name, color: selectedColor });
-        saveCategories();
+    closeTrashPanel.onclick = () => {
+        trashPanel.classList.add("hidden");
+    };
 
-        // reset campi
-        newCategoryName.value = "";
-        selectedColor = null;
-        colorNodes.forEach(x => x.classList.remove("selected"));
+    function renderTrash() {
+        trashList.innerHTML = "";
 
-        renderCategories();
-    });
+        trash.forEach(n => {
+            const div = document.createElement("div");
+            div.className = "note";
+            div.style.borderLeftColor = n.colore;
 
-    // SALVA SU LOCALSTORAGE
-    function saveCategories() {
-        try {
-            localStorage.setItem("categories", JSON.stringify(categories));
-        } catch (e) {
-            console.warn("Errore salvataggio categorie", e);
-        }
-    }
+            div.innerHTML = `
+                <h3>${n.titolo}</h3>
+                <p>${n.testo}</p>
+                <small>${n.categoria}</small><br>
+                <button class="restoreNote">Ripristina</button>
+                <button class="deleteForever">Elimina definitivamente</button>
+            `;
 
-    // TEMA CHIARO/SCURO
-    if (sunBtn) {
-        sunBtn.addEventListener("click", () => {
-            document.body.classList.remove("dark");
+            div.querySelector(".restoreNote").onclick = () => {
+                notes.push(n);
+                trash = trash.filter(x => x.id !== n.id);
+                localStorage.setItem("notes", JSON.stringify(notes));
+                localStorage.setItem("trash", JSON.stringify(trash));
+                renderTrash();
+                renderNotes();
+            };
+
+            div.querySelector(".deleteForever").onclick = () => {
+                trash = trash.filter(x => x.id !== n.id);
+                localStorage.setItem("trash", JSON.stringify(trash));
+                renderTrash();
+            };
+
+            trashList.appendChild(div);
         });
     }
 
-    if (moonBtn) {
-        moonBtn.addEventListener("click", () => {
-            document.body.classList.add("dark");
-        });
-    }
 });
