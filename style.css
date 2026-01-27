@@ -168,6 +168,8 @@ input {
   cursor: pointer;
   font-size: 16px;
 }
+
+/* ANIMAZIONE SOLE/LUNA */
 #themeToggle {
   transition: transform 0.25s ease, opacity 0.25s ease;
 }
