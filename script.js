@@ -4,6 +4,7 @@
 
 let notes = JSON.parse(localStorage.getItem("notes") || "[]");
 let categories = JSON.parse(localStorage.getItem("categories") || "[]");
+let trash = JSON.parse(localStorage.getItem("trash") || "[]");
 
 /* Categorie di default */
 if (categories.length === 0) {
@@ -45,7 +46,7 @@ document.getElementById("saveNoteBtn").onclick = () => {
 };
 
 /* ============================================================
-   ELIMINA NOTE
+   ELIMINA NOTE (solo pulizia campi)
 ============================================================ */
 
 document.getElementById("deleteNoteBtn").onclick = () => {
@@ -54,7 +55,24 @@ document.getElementById("deleteNoteBtn").onclick = () => {
 };
 
 /* ============================================================
-   RENDER NOTE
+   MANDARE UNA NOTA NEL CESTINO
+============================================================ */
+
+function moveToTrash(id) {
+  const note = notes.find(n => n.id == id);
+  if (!note) return;
+
+  trash.unshift(note);
+  notes = notes.filter(n => n.id != id);
+
+  localStorage.setItem("notes", JSON.stringify(notes));
+  localStorage.setItem("trash", JSON.stringify(trash));
+
+  renderNotes();
+}
+
+/* ============================================================
+   RENDER NOTE (VERSIONE AGGIORNATA CON ICONA 🗑️)
 ============================================================ */
 
 function renderNotes(filter = "tutte") {
@@ -79,9 +97,17 @@ function renderNotes(filter = "tutte") {
       <span class="note-category" style="background:${cat.color}">
         ${cat.name}
       </span>
+
+      <div class="note-actions">
+        <span class="delete-note-btn" data-id="${note.id}">🗑️</span>
+      </div>
     `;
 
     list.appendChild(div);
+  });
+
+  document.querySelectorAll(".delete-note-btn").forEach(btn => {
+    btn.onclick = () => moveToTrash(btn.dataset.id);
   });
 }
 
@@ -132,17 +158,3 @@ document.getElementById("addCategoryBtn").onclick = () => {
 
 renderCategories();
 renderNotes();
-let trash = JSON.parse(localStorage.getItem("trash") || "[]");
-
-function moveToTrash(id) {
-  const note = notes.find(n => n.id == id);
-  if (!note) return;
-
-  trash.unshift(note);
-  notes = notes.filter(n => n.id != id);
-
-  localStorage.setItem("notes", JSON.stringify(notes));
-  localStorage.setItem("trash", JSON.stringify(trash));
-
-  renderNotes();
-}
