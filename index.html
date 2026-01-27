@@ -10,7 +10,7 @@
 
     <!-- Barra superiore -->
     <div class="top-bar">
-        <span class="icon" onclick="showSection('homeSection')">🌞</span>
+        <span id="themeToggle" class="icon">🌞</span>
         <span class="icon" onclick="showSection('settingsSection')">⚙️</span>
         <span class="icon" onclick="showSection('trashSection')">🗑️</span>
         <span class="icon" onclick="showSection('archiveSection')">📦</span>
@@ -39,49 +39,41 @@
     <!-- IMPOSTAZIONI -->
     <section id="settingsSection" class="page-section hidden">
         <h2>Impostazioni</h2>
-        <p>Qui in futuro aggiungeremo altre opzioni.</p>
+        <p>Qui aggiungeremo altre opzioni in futuro.</p>
     </section>
 
-    <!-- SALVAGENTE (BACKUP) -->
+    <!-- SALVAGENTE -->
     <section id="lifebuoySection" class="page-section hidden">
         <h2>🛟 Centro Backup</h2>
-
-        <!-- BACKUP MANUALE -->
-        <div class="backup-block">
-            <h3>Backup manuale</h3>
-            <button onclick="manualBackup()">Salva backup manuale</button>
-            <button onclick="manualRestore()">Ripristina backup manuale</button>
-        </div>
-
-        <!-- BACKUP AUTOMATICO -->
-        <div class="backup-block">
-            <h3>Backup automatico</h3>
-            <button onclick="toggleAutoBackup()">Attiva/Disattiva backup automatico</button>
-            <button onclick="autoRestore()">Ripristino automatico</button>
-        </div>
-
-        <!-- BACKUP COMPLETO -->
-        <div class="backup-block">
-            <h3>Backup completo</h3>
-            <button onclick="fullBackup()">Salva backup completo</button>
-            <button onclick="fullRestore()">Ripristina backup completo</button>
-        </div>
-
-        <!-- BACKUP LOCALE -->
-        <div class="backup-block">
-            <h3>Backup locale</h3>
-            <button onclick="localBackup()">Salva backup locale</button>
-            <button onclick="localRestore()">Ripristina backup locale</button>
-        </div>
-
-        <!-- BACKUP ICLOUD -->
-        <div class="backup-block">
-            <h3>Backup iCloud Drive</h3>
-            <button onclick="icloudBackup()">Salva su iCloud Drive</button>
-            <button onclick="icloudRestore()">Ripristina da iCloud Drive</button>
-        </div>
-
+        <p>Backup già configurati come prima.</p>
     </section>
+
+    <!-- POPUP NUOVA NOTA -->
+    <div id="notePopup" class="popup hidden">
+        <div class="popup-content">
+            <h3>Nuova nota</h3>
+            <textarea id="noteText" placeholder="Scrivi la nota..."></textarea>
+
+            <label>Categoria:</label>
+            <div id="categoryList"></div>
+
+            <button id="addCategoryBtn">+ Nuova categoria</button>
+
+            <button onclick="saveNote()">Salva</button>
+            <button onclick="closePopup()">Chiudi</button>
+        </div>
+    </div>
+
+    <!-- POPUP NUOVA CATEGORIA -->
+    <div id="categoryPopup" class="popup hidden">
+        <div class="popup-content">
+            <h3>Nuova categoria</h3>
+            <input id="newCategoryName" placeholder="Nome categoria">
+            <input id="newCategoryColor" type="color" value="#007aff">
+            <button onclick="createCategory()">Crea</button>
+            <button onclick="closeCategoryPopup()">Chiudi</button>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
