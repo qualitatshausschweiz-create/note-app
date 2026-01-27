@@ -129,15 +129,23 @@ document.addEventListener("DOMContentLoaded", () => {
     if (first) first.classList.add("selected");
   }
 
+  // ⭐ VERSIONE CORRETTA CHE SALVA SEMPRE LA NOTA ⭐
   saveNoteBtn.onclick = () => {
-    if (!noteTitle.value.trim() || !selectedCategory) return;
+    const titolo = noteTitle.value.trim();
+    const testo = noteText.value.trim();
+
+    if (!titolo && !testo) return;
+
+    const categoriaScelta =
+      selectedCategory ||
+      (categories.length > 0 ? categories[0].name : "Senza categoria");
 
     const newNote = {
       id: Date.now(),
-      titolo: noteTitle.value.trim(),
-      testo: noteText.value.trim(),
+      titolo,
+      testo,
       colore: selectedNoteColor,
-      categoria: selectedCategory,
+      categoria: categoriaScelta,
       data: new Date().toISOString()
     };
 
@@ -279,7 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
     saveCategories();
     newCategoryName.value = "";
     renderCategoryList();
-    renderCategoryButtons(); // aggiorna pannello nota
+    renderCategoryButtons();
   };
 
   function renderCategoryList() {
