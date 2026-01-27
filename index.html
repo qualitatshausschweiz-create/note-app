@@ -1,83 +1,52 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Note App</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Note App</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Barra superiore -->
-    <div class="top-bar">
-        <span id="themeToggle" class="icon">🌞</span>
-        <span class="icon" onclick="showSection('settingsSection')">⚙️</span>
-        <span class="icon" onclick="showSection('trashSection')">🗑️</span>
-        <span class="icon" onclick="showSection('archiveSection')">📦</span>
-        <span class="icon" onclick="showSection('lifebuoySection')">🛟</span>
+<header>
+    <div class="icon-bar">
+        <button id="sunBtn">☀️</button>
+        <button id="moonBtn">🌙</button>
+        <button id="addNoteBtn">＋</button>
+        <button id="categoriesBtn">📂</button>
+        <button id="trashBtn">🗑️</button>
     </div>
+</header>
 
-    <!-- HOME -->
-    <section id="homeSection" class="page-section">
-        <h2>Le tue note</h2>
-        <button id="addNoteBtn">+ Nota</button>
-        <div id="notesContainer"></div>
-    </section>
+<main id="notesContainer"></main>
 
-    <!-- ARCHIVIO -->
-    <section id="archiveSection" class="page-section hidden">
-        <h2>Archivio</h2>
-        <div id="archiveContainer"></div>
-    </section>
+<!-- POPUP CATEGORIE -->
+<div id="categoryPopup" class="popup hidden">
+    <div class="popup-content">
 
-    <!-- CESTINO -->
-    <section id="trashSection" class="page-section hidden">
-        <h2>Cestino</h2>
-        <div id="trashContainer"></div>
-    </section>
+        <h2>Categorie</h2>
 
-    <!-- IMPOSTAZIONI -->
-    <section id="settingsSection" class="page-section hidden">
-        <h2>Impostazioni</h2>
-        <p>Qui potrai aggiungere altre opzioni in futuro.</p>
-    </section>
+        <div id="categoryList"></div>
 
-    <!-- SALVAGENTE -->
-    <section id="lifebuoySection" class="page-section hidden">
-        <h2>🛟 Centro Backup</h2>
-        <p>Backup già configurati.</p>
-    </section>
+        <hr>
 
-    <!-- POPUP NUOVA NOTA -->
-    <div id="notePopup" class="popup hidden">
-        <div class="popup-content">
-            <h3>Nuova nota</h3>
+        <h3>Crea nuova categoria</h3>
+        <input type="text" id="newCategoryName" placeholder="Nome categoria">
 
-            <textarea id="noteText" placeholder="Scrivi la nota..."></textarea>
-
-            <label>Categoria:</label>
-            <div id="categoryList"></div>
-
-            <button id="addCategoryBtn">+ Nuova categoria</button>
-
-            <button onclick="saveNote()">Salva</button>
-            <button onclick="closeNotePopup()">Chiudi</button>
+        <div class="palette">
+            <div class="color" data-color="#ff6b6b" style="background:#ff6b6b"></div>
+            <div class="color" data-color="#ffa502" style="background:#ffa502"></div>
+            <div class="color" data-color="#2ed573" style="background:#2ed573"></div>
+            <div class="color" data-color="#1e90ff" style="background:#1e90ff"></div>
+            <div class="color" data-color="#a55eea" style="background:#a55eea"></div>
         </div>
+
+        <button id="saveCategoryBtn">Salva categoria</button>
+        <button id="closePopupBtn" class="close">Chiudi</button>
+
     </div>
+</div>
 
-    <!-- POPUP NUOVA CATEGORIA -->
-    <div id="categoryPopup" class="popup hidden">
-        <div class="popup-content">
-            <h3>Nuova categoria</h3>
-
-            <input id="newCategoryName" placeholder="Nome categoria">
-            <input id="newCategoryColor" type="color" value="#007aff">
-
-            <button onclick="createCategory()">Crea</button>
-            <button onclick="closeCategoryPopup()">Chiudi</button>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
