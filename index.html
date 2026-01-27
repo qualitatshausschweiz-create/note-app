@@ -39,13 +39,42 @@
     <!-- IMPOSTAZIONI -->
     <section id="settingsSection" class="page-section hidden">
         <h2>Impostazioni</h2>
-        <p>Qui aggiungeremo altre opzioni in futuro.</p>
+        <p>Qui potrai aggiungere altre opzioni in futuro.</p>
     </section>
 
-    <!-- SALVAGENTE -->
+    <!-- SALVAGENTE / CENTRO BACKUP -->
     <section id="lifebuoySection" class="page-section hidden">
         <h2>🛟 Centro Backup</h2>
-        <p>Backup già configurati come prima.</p>
+
+        <div class="backup-block">
+            <h3>Backup manuale</h3>
+            <button onclick="manualBackup()">Salva backup manuale</button>
+            <button onclick="manualRestore()">Ripristina backup manuale</button>
+        </div>
+
+        <div class="backup-block">
+            <h3>Backup automatico</h3>
+            <button onclick="toggleAutoBackup()">Attiva/Disattiva backup automatico</button>
+            <button onclick="autoRestore()">Ripristino automatico</button>
+        </div>
+
+        <div class="backup-block">
+            <h3>Backup completo</h3>
+            <button onclick="fullBackup()">Salva backup completo</button>
+            <button onclick="fullRestore()">Ripristina backup completo</button>
+        </div>
+
+        <div class="backup-block">
+            <h3>Backup locale</h3>
+            <button onclick="localBackup()">Salva backup locale</button>
+            <button onclick="localRestore()">Ripristina backup locale</button>
+        </div>
+
+        <div class="backup-block">
+            <h3>Backup iCloud Drive</h3>
+            <button onclick="icloudBackup()">Salva su iCloud Drive</button>
+            <button onclick="icloudRestore()">Ripristina da iCloud Drive</button>
+        </div>
     </section>
 
     <!-- POPUP NUOVA NOTA -->
