@@ -116,6 +116,7 @@ function closeCategoryPopup() {
     categoryPopup.classList.add("hidden");
 }
 
+// ⭐ VERSIONE CORRETTA: NON BLOCCA PIÙ IL POPUP ⭐
 function createCategory() {
     const name = document.getElementById("newCategoryName").value.trim();
     const color = document.getElementById("newCategoryColor").value;
@@ -127,8 +128,11 @@ function createCategory() {
 
     categories.push({ name, color });
     saveCategories();
-    closeCategoryPopup();
     renderCategoryList();
+
+    // 🔥 FIX: chiude il popup e torna alla nota
+    closeCategoryPopup();
+    notePopup.classList.remove("hidden");
 }
 
 // --- ELIMINA CATEGORIA ---
@@ -318,7 +322,7 @@ function localRestore() {
     alert("Ripristino locale completato.");
 }
 
-// --- BACKUP ICLOUD (USO STESSA LOGICA DEL MANUALE) ---
+// --- BACKUP ICLOUD (STESSA LOGICA DEL MANUALE) ---
 function icloudBackup() {
     manualBackup();
 }
