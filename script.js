@@ -1,20 +1,38 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  // THEME
+  // THEME (nuova versione con una sola icona + animazione)
+  const themeToggle = document.getElementById("themeToggle");
+
+  // carica tema salvato
   const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "dark") document.body.classList.add("dark");
 
-  const sunBtn = document.getElementById("sunBtn");
-  const moonBtn = document.getElementById("moonBtn");
-
-  sunBtn.onclick = () => {
-    document.body.classList.remove("dark");
-    localStorage.setItem("theme", "light");
-  };
-
-  moonBtn.onclick = () => {
+  if (savedTheme === "dark") {
     document.body.classList.add("dark");
-    localStorage.setItem("theme", "dark");
+    themeToggle.textContent = "🌙"; // mostra luna
+  } else {
+    document.body.classList.remove("dark");
+    themeToggle.textContent = "☀️"; // mostra sole
+  }
+
+  // toggle tema con animazione
+  themeToggle.onclick = () => {
+    themeToggle.classList.add("animate");
+
+    setTimeout(() => {
+      themeToggle.classList.remove("animate");
+    }, 250);
+
+    if (document.body.classList.contains("dark")) {
+      // passa a chiaro
+      document.body.classList.remove("dark");
+      themeToggle.textContent = "☀️";
+      localStorage.setItem("theme", "light");
+    } else {
+      // passa a scuro
+      document.body.classList.add("dark");
+      themeToggle.textContent = "🌙";
+      localStorage.setItem("theme", "dark");
+    }
   };
 
   // STORAGE
