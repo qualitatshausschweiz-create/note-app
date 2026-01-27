@@ -1,10 +1,10 @@
-// --- NAVIGAZIONE ---
+// --- NAVIGAZIONE TRA LE SEZIONI ---
 function showSection(id) {
     document.querySelectorAll(".page-section").forEach(sec => sec.classList.add("hidden"));
     document.getElementById(id).classList.remove("hidden");
 }
 
-// --- TEMA CHIARO/SCURO ---
+// --- TEMA CHIARO/SCURO (SOLE/LUNA) ---
 const themeToggle = document.getElementById("themeToggle");
 let darkMode = JSON.parse(localStorage.getItem("darkMode")) || false;
 
@@ -26,7 +26,12 @@ themeToggle.onclick = () => {
 
 applyTheme();
 
-// --- CATEGORIE UFFICIALI ---
+// --- DATI BASE ---
+let notes = JSON.parse(localStorage.getItem("notes")) || [];
+let archive = JSON.parse(localStorage.getItem("archive")) || [];
+let trash = JSON.parse(localStorage.getItem("trash")) || [];
+
+// --- CATEGORIE UFFICIALI + SALVATAGGIO ---
 let categories = JSON.parse(localStorage.getItem("categories")) || [
     { name: "Personale", color: "#4da3ff" },
     { name: "Lavoro", color: "#555555" },
@@ -43,20 +48,25 @@ function saveCategories() {
     localStorage.setItem("categories", JSON.stringify(categories));
 }
 
-// --- POPUP NOTA ---
+function saveAll() {
+    localStorage.setItem("notes", JSON.stringify(notes));
+    localStorage.setItem("archive", JSON.stringify(archive));
+    localStorage.setItem("trash", JSON.stringify(trash));
+}
+
+// --- POPUP NUOVA NOTA ---
 const notePopup = document.getElementById("notePopup");
 const categoryPopup = document.getElementById("categoryPopup");
+const addNoteBtn = document.getElementById("addNoteBtn");
 
 let selectedCategory = null;
 
-document.getElementById("addNoteBtn").onclick = () => {
-    openNotePopup();
-};
-
-function openNotePopup() {
+addNoteBtn.onclick = () => {
+    document.getElementById("noteText").value = "";
+    selectedCategory = null;
     renderCategoryList();
     notePopup.classList.remove("hidden");
-}
+};
 
 function closePopup() {
     notePopup.classList.add("hidden");
@@ -69,17 +79,36 @@ function renderCategoryList() {
 
     categories.forEach((cat, index) => {
         const row = document.createElement("div");
-        row.innerHTML = `
-            <input type="radio" name="cat" onclick="selectedCategory='${cat.name}'">
-            <span class="category-tag" style="background:${cat.color}">${cat.name}</span>
-            <span onclick="deleteCategory(${index})">❌</span>
-        `;
+
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "cat";
+        radio.onclick = () => {
+            selectedCategory = cat.name;
+        };
+
+        const tag = document.createElement("span");
+        tag.className = "category-tag";
+        tag.style.background = cat.color;
+        tag.textContent = cat.name;
+
+        const del = document.createElement("span");
+        del.className = "delete-cat";
+        del.textContent = "❌";
+        del.onclick = () => deleteCategory(index);
+
+        row.appendChild(radio);
+        row.appendChild(tag);
+        row.appendChild(del);
+
         list.appendChild(row);
     });
 }
 
 // --- NUOVA CATEGORIA ---
 document.getElementById("addCategoryBtn").onclick = () => {
+    document.getElementById("newCategoryName").value = "";
+    document.getElementById("newCategoryColor").value = "#007aff";
     categoryPopup.classList.remove("hidden");
 };
 
@@ -91,7 +120,10 @@ function createCategory() {
     const name = document.getElementById("newCategoryName").value.trim();
     const color = document.getElementById("newCategoryColor").value;
 
-    if (!name) return alert("Inserisci un nome");
+    if (!name) {
+        alert("Inserisci un nome per la categoria");
+        return;
+    }
 
     categories.push({ name, color });
     saveCategories();
@@ -101,24 +133,36 @@ function createCategory() {
 
 // --- ELIMINA CATEGORIA ---
 function deleteCategory(i) {
+    const removed = categories[i].name;
     categories.splice(i, 1);
     saveCategories();
+
+    // Le note che avevano questa categoria diventano "Senza categoria"
+    notes = notes.map(n => {
+        if (n.category === removed) {
+            return { ...n, category: null };
+        }
+        return n;
+    });
+    saveAll();
     renderCategoryList();
+    renderNotes();
 }
 
 // --- NOTE ---
-let notes = JSON.parse(localStorage.getItem("notes")) || [];
-
 function saveNote() {
     const text = document.getElementById("noteText").value.trim();
-    if (!text) return;
+    if (!text) {
+        alert("Scrivi qualcosa nella nota");
+        return;
+    }
 
     notes.push({
         text,
         category: selectedCategory
     });
 
-    localStorage.setItem("notes", JSON.stringify(notes));
+    saveAll();
     closePopup();
     renderNotes();
 }
@@ -127,20 +171,22 @@ function renderNotes() {
     const container = document.getElementById("notesContainer");
     container.innerHTML = "";
 
-    notes.forEach(n => {
+    notes.forEach((n, index) => {
         const div = document.createElement("div");
         div.className = "note";
 
-        let tag = "";
+        let tagHTML = "";
         if (n.category) {
             const cat = categories.find(c => c.name === n.category);
             if (cat) {
-                tag = `<div class="category-tag" style="background:${cat.color}">${cat.name}</div>`;
+                tagHTML = `<div class="category-tag" style="background:${cat.color}">${cat.name}</div>`;
+            } else {
+                tagHTML = `<div class="category-tag" style="background:#777">Senza categoria</div>`;
             }
         }
 
         div.innerHTML = `
-            ${tag}
+            ${tagHTML}
             <p>${n.text}</p>
         `;
 
@@ -149,3 +195,134 @@ function renderNotes() {
 }
 
 renderNotes();
+
+// --- BACKUP MANUALE ---
+function manualBackup() {
+    const data = JSON.stringify({ notes, archive, trash, categories });
+    const blob = new Blob([data], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "backup_manuale.json";
+    a.click();
+}
+
+function manualRestore() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+    input.onchange = e => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+            const data = JSON.parse(reader.result);
+            notes = data.notes || [];
+            archive = data.archive || [];
+            trash = data.trash || [];
+            categories = data.categories || categories;
+            saveAll();
+            saveCategories();
+            renderNotes();
+            alert("Ripristino manuale completato.");
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
+
+// --- BACKUP AUTOMATICO ---
+let autoBackupEnabled = JSON.parse(localStorage.getItem("autoBackup")) || false;
+
+function toggleAutoBackup() {
+    autoBackupEnabled = !autoBackupEnabled;
+    localStorage.setItem("autoBackup", JSON.stringify(autoBackupEnabled));
+    alert("Backup automatico: " + (autoBackupEnabled ? "ATTIVO" : "DISATTIVO"));
+}
+
+function autoBackup() {
+    if (autoBackupEnabled) {
+        localStorage.setItem("autoBackupData", JSON.stringify({ notes, archive, trash, categories }));
+    }
+}
+
+setInterval(autoBackup, 5000);
+
+function autoRestore() {
+    const data = JSON.parse(localStorage.getItem("autoBackupData"));
+    if (!data) return alert("Nessun backup automatico trovato.");
+    notes = data.notes || [];
+    archive = data.archive || [];
+    trash = data.trash || [];
+    categories = data.categories || categories;
+    saveAll();
+    saveCategories();
+    renderNotes();
+    alert("Ripristino automatico completato.");
+}
+
+// --- BACKUP COMPLETO ---
+function fullBackup() {
+    const data = JSON.stringify({
+        notes,
+        archive,
+        trash,
+        categories,
+        autoBackupEnabled
+    });
+    const blob = new Blob([data], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "backup_completo.json";
+    a.click();
+}
+
+function fullRestore() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+    input.onchange = e => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+            const data = JSON.parse(reader.result);
+            notes = data.notes || [];
+            archive = data.archive || [];
+            trash = data.trash || [];
+            categories = data.categories || categories;
+            autoBackupEnabled = data.autoBackupEnabled || false;
+            saveAll();
+            saveCategories();
+            renderNotes();
+            alert("Ripristino completo effettuato.");
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
+
+// --- BACKUP LOCALE ---
+function localBackup() {
+    localStorage.setItem("localBackup", JSON.stringify({ notes, archive, trash, categories }));
+    alert("Backup locale salvato.");
+}
+
+function localRestore() {
+    const data = JSON.parse(localStorage.getItem("localBackup"));
+    if (!data) return alert("Nessun backup locale trovato.");
+    notes = data.notes || [];
+    archive = data.archive || [];
+    trash = data.trash || [];
+    categories = data.categories || categories;
+    saveAll();
+    saveCategories();
+    renderNotes();
+    alert("Ripristino locale completato.");
+}
+
+// --- BACKUP ICLOUD (USO STESSA LOGICA DEL MANUALE) ---
+function icloudBackup() {
+    manualBackup();
+}
+
+function icloudRestore() {
+    manualRestore();
+}
