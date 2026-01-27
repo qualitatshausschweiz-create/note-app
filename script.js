@@ -26,11 +26,17 @@ themeToggle.onclick = () => {
 
 applyTheme();
 
-// --- CATEGORIE ---
+// --- CATEGORIE UFFICIALI ---
 let categories = JSON.parse(localStorage.getItem("categories")) || [
     { name: "Personale", color: "#4da3ff" },
     { name: "Lavoro", color: "#555555" },
-    { name: "Spesa", color: "#3cb371" }
+    { name: "Spesa", color: "#3cb371" },
+    { name: "Appuntamenti", color: "#ff8c00" },
+    { name: "Viaggi", color: "#1e90ff" },
+    { name: "Idee", color: "#ffd700" },
+    { name: "Emozioni", color: "#ff69b4" },
+    { name: "Tecnico", color: "#ff0000" },
+    { name: "Studio", color: "#9370db" }
 ];
 
 function saveCategories() {
