@@ -1,51 +1,88 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Le mie note</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note App</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <header>
-    <h1>Le mie note</h1>
-    <p>Categorie, cestino, backup, tutto sotto controllo</p>
-    <div class="icon-bar">
-      <span>🌞</span>
-      <span>⚙️</span>
-      <span>🗑️</span>
-      <span>🛟</span>
+    <!-- Barra superiore -->
+    <div class="top-bar">
+        <span class="icon" onclick="showSection('homeSection')">🌞</span>
+        <span class="icon" onclick="showSection('settingsSection')">⚙️</span>
+        <span class="icon" onclick="showSection('trashSection')">🗑️</span>
+        <span class="icon" onclick="showSection('archiveSection')">📦</span>
+        <span class="icon" onclick="showSection('lifebuoySection')">🛟</span>
     </div>
-  </header>
 
-  <section class="note-editor">
-    <input type="text" id="noteTitle" placeholder="Titolo della nota..." />
-    <select id="categorySelector">
-      <option value="personale">Personale</option>
-      <option value="lavoro">Lavoro</option>
-      <option value="idee">Idee</option>
-      <option value="spesa">Spesa</option>
-      <option value="altro">Altro</option>
-    </select>
-    <textarea id="noteContent" placeholder="Scrivi la tua nota qui..."></textarea>
-    <div class="button-row">
-      <button id="saveNoteBtn" class="primary-btn">Salva nota</button>
-      <button id="deleteNoteBtn" class="secondary-btn">Elimina nota</button>
-    </div>
-  </section>
+    <!-- HOME -->
+    <section id="homeSection" class="page-section">
+        <h2>Le tue note</h2>
+        <button id="addNoteBtn">+ Nota</button>
+        <div id="notesContainer"></div>
+    </section>
 
-  <section class="note-list">
-    <h2>Le tue note</h2>
-    <div id="noteList"></div>
-  </section>
+    <!-- ARCHIVIO -->
+    <section id="archiveSection" class="page-section hidden">
+        <h2>Archivio</h2>
+        <div id="archiveContainer"></div>
+    </section>
 
-  <section class="category-list">
-    <h2>Categorie</h2>
-    <ul id="categoryList"></ul>
-    <button id="addCategoryBtn" class="primary-btn">+ Aggiungi</button>
-  </section>
+    <!-- CESTINO -->
+    <section id="trashSection" class="page-section hidden">
+        <h2>Cestino</h2>
+        <div id="trashContainer"></div>
+    </section>
 
-  <script src="script.js"></script>
+    <!-- IMPOSTAZIONI -->
+    <section id="settingsSection" class="page-section hidden">
+        <h2>Impostazioni</h2>
+        <p>Qui in futuro aggiungeremo altre opzioni.</p>
+    </section>
+
+    <!-- SALVAGENTE (BACKUP) -->
+    <section id="lifebuoySection" class="page-section hidden">
+        <h2>🛟 Centro Backup</h2>
+
+        <!-- BACKUP MANUALE -->
+        <div class="backup-block">
+            <h3>Backup manuale</h3>
+            <button onclick="manualBackup()">Salva backup manuale</button>
+            <button onclick="manualRestore()">Ripristina backup manuale</button>
+        </div>
+
+        <!-- BACKUP AUTOMATICO -->
+        <div class="backup-block">
+            <h3>Backup automatico</h3>
+            <button onclick="toggleAutoBackup()">Attiva/Disattiva backup automatico</button>
+            <button onclick="autoRestore()">Ripristino automatico</button>
+        </div>
+
+        <!-- BACKUP COMPLETO -->
+        <div class="backup-block">
+            <h3>Backup completo</h3>
+            <button onclick="fullBackup()">Salva backup completo</button>
+            <button onclick="fullRestore()">Ripristina backup completo</button>
+        </div>
+
+        <!-- BACKUP LOCALE -->
+        <div class="backup-block">
+            <h3>Backup locale</h3>
+            <button onclick="localBackup()">Salva backup locale</button>
+            <button onclick="localRestore()">Ripristina backup locale</button>
+        </div>
+
+        <!-- BACKUP ICLOUD -->
+        <div class="backup-block">
+            <h3>Backup iCloud Drive</h3>
+            <button onclick="icloudBackup()">Salva su iCloud Drive</button>
+            <button onclick="icloudRestore()">Ripristina da iCloud Drive</button>
+        </div>
+
+    </section>
+
+    <script src="script.js"></script>
 </body>
 </html>
