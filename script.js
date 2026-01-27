@@ -1,175 +1,145 @@
-// --- NAVIGAZIONE TRA LE SEZIONI ---
+// --- NAVIGAZIONE ---
 function showSection(id) {
     document.querySelectorAll(".page-section").forEach(sec => sec.classList.add("hidden"));
     document.getElementById(id).classList.remove("hidden");
 }
 
-// --- NOTE BASE ---
-let notes = JSON.parse(localStorage.getItem("notes")) || [];
-let archive = JSON.parse(localStorage.getItem("archive")) || [];
-let trash = JSON.parse(localStorage.getItem("trash")) || [];
+// --- TEMA CHIARO/SCURO ---
+const themeToggle = document.getElementById("themeToggle");
+let darkMode = JSON.parse(localStorage.getItem("darkMode")) || false;
 
-function saveAll() {
+function applyTheme() {
+    if (darkMode) {
+        document.body.classList.add("dark");
+        themeToggle.textContent = "🌚";
+    } else {
+        document.body.classList.remove("dark");
+        themeToggle.textContent = "🌞";
+    }
+}
+
+themeToggle.onclick = () => {
+    darkMode = !darkMode;
+    localStorage.setItem("darkMode", JSON.stringify(darkMode));
+    applyTheme();
+};
+
+applyTheme();
+
+// --- CATEGORIE ---
+let categories = JSON.parse(localStorage.getItem("categories")) || [
+    { name: "Personale", color: "#4da3ff" },
+    { name: "Lavoro", color: "#555555" },
+    { name: "Spesa", color: "#3cb371" }
+];
+
+function saveCategories() {
+    localStorage.setItem("categories", JSON.stringify(categories));
+}
+
+// --- POPUP NOTA ---
+const notePopup = document.getElementById("notePopup");
+const categoryPopup = document.getElementById("categoryPopup");
+
+let selectedCategory = null;
+
+document.getElementById("addNoteBtn").onclick = () => {
+    openNotePopup();
+};
+
+function openNotePopup() {
+    renderCategoryList();
+    notePopup.classList.remove("hidden");
+}
+
+function closePopup() {
+    notePopup.classList.add("hidden");
+}
+
+// --- LISTA CATEGORIE NEL POPUP ---
+function renderCategoryList() {
+    const list = document.getElementById("categoryList");
+    list.innerHTML = "";
+
+    categories.forEach((cat, index) => {
+        const row = document.createElement("div");
+        row.innerHTML = `
+            <input type="radio" name="cat" onclick="selectedCategory='${cat.name}'">
+            <span class="category-tag" style="background:${cat.color}">${cat.name}</span>
+            <span onclick="deleteCategory(${index})">❌</span>
+        `;
+        list.appendChild(row);
+    });
+}
+
+// --- NUOVA CATEGORIA ---
+document.getElementById("addCategoryBtn").onclick = () => {
+    categoryPopup.classList.remove("hidden");
+};
+
+function closeCategoryPopup() {
+    categoryPopup.classList.add("hidden");
+}
+
+function createCategory() {
+    const name = document.getElementById("newCategoryName").value.trim();
+    const color = document.getElementById("newCategoryColor").value;
+
+    if (!name) return alert("Inserisci un nome");
+
+    categories.push({ name, color });
+    saveCategories();
+    closeCategoryPopup();
+    renderCategoryList();
+}
+
+// --- ELIMINA CATEGORIA ---
+function deleteCategory(i) {
+    categories.splice(i, 1);
+    saveCategories();
+    renderCategoryList();
+}
+
+// --- NOTE ---
+let notes = JSON.parse(localStorage.getItem("notes")) || [];
+
+function saveNote() {
+    const text = document.getElementById("noteText").value.trim();
+    if (!text) return;
+
+    notes.push({
+        text,
+        category: selectedCategory
+    });
+
     localStorage.setItem("notes", JSON.stringify(notes));
-    localStorage.setItem("archive", JSON.stringify(archive));
-    localStorage.setItem("trash", JSON.stringify(trash));
+    closePopup();
+    renderNotes();
 }
 
 function renderNotes() {
     const container = document.getElementById("notesContainer");
     container.innerHTML = "";
-    notes.forEach((n, i) => {
+
+    notes.forEach(n => {
         const div = document.createElement("div");
         div.className = "note";
+
+        let tag = "";
+        if (n.category) {
+            const cat = categories.find(c => c.name === n.category);
+            if (cat) {
+                tag = `<div class="category-tag" style="background:${cat.color}">${cat.name}</div>`;
+            }
+        }
+
         div.innerHTML = `
-            <p>${n}</p>
-            <button onclick="archiveNote(${i})">Archivia</button>
-            <button onclick="deleteNote(${i})">Elimina</button>
+            ${tag}
+            <p>${n.text}</p>
         `;
+
         container.appendChild(div);
     });
 }
 
-document.getElementById("addNoteBtn").onclick = () => {
-    const text = prompt("Scrivi la nota:");
-    if (text) {
-        notes.push(text);
-        saveAll();
-        renderNotes();
-    }
-};
-
-function archiveNote(i) {
-    archive.push(notes[i]);
-    notes.splice(i, 1);
-    saveAll();
-    renderNotes();
-}
-
-function deleteNote(i) {
-    trash.push(notes[i]);
-    notes.splice(i, 1);
-    saveAll();
-    renderNotes();
-}
-
 renderNotes();
-
-// --- BACKUP MANUALE ---
-function manualBackup() {
-    const data = JSON.stringify({ notes, archive, trash });
-    const blob = new Blob([data], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "backup_manuale.json";
-    a.click();
-}
-
-function manualRestore() {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json";
-    input.onchange = e => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = () => {
-            const data = JSON.parse(reader.result);
-            notes = data.notes;
-            archive = data.archive;
-            trash = data.trash;
-            saveAll();
-            renderNotes();
-            alert("Ripristino manuale completato.");
-        };
-        reader.readAsText(file);
-    };
-    input.click();
-}
-
-// --- BACKUP AUTOMATICO ---
-let autoBackupEnabled = JSON.parse(localStorage.getItem("autoBackup")) || false;
-
-function toggleAutoBackup() {
-    autoBackupEnabled = !autoBackupEnabled;
-    localStorage.setItem("autoBackup", JSON.stringify(autoBackupEnabled));
-    alert("Backup automatico: " + (autoBackupEnabled ? "ATTIVO" : "DISATTIVO"));
-}
-
-function autoBackup() {
-    if (autoBackupEnabled) {
-        localStorage.setItem("autoBackupData", JSON.stringify({ notes, archive, trash }));
-    }
-}
-
-setInterval(autoBackup, 5000);
-
-function autoRestore() {
-    const data = JSON.parse(localStorage.getItem("autoBackupData"));
-    if (!data) return alert("Nessun backup automatico trovato.");
-    notes = data.notes;
-    archive = data.archive;
-    trash = data.trash;
-    saveAll();
-    renderNotes();
-    alert("Ripristino automatico completato.");
-}
-
-// --- BACKUP COMPLETO ---
-function fullBackup() {
-    const data = JSON.stringify({
-        notes, archive, trash, autoBackupEnabled
-    });
-    const blob = new Blob([data], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "backup_completo.json";
-    a.click();
-}
-
-function fullRestore() {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json";
-    input.onchange = e => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = () => {
-            const data = JSON.parse(reader.result);
-            notes = data.notes;
-            archive = data.archive;
-            trash = data.trash;
-            autoBackupEnabled = data.autoBackupEnabled;
-            saveAll();
-            renderNotes();
-            alert("Ripristino completo effettuato.");
-        };
-        reader.readAsText(file);
-    };
-    input.click();
-}
-
-// --- BACKUP LOCALE ---
-function localBackup() {
-    localStorage.setItem("localBackup", JSON.stringify({ notes, archive, trash }));
-    alert("Backup locale salvato.");
-}
-
-function localRestore() {
-    const data = JSON.parse(localStorage.getItem("localBackup"));
-    if (!data) return alert("Nessun backup locale trovato.");
-    notes = data.notes;
-    archive = data.archive;
-    trash = data.trash;
-    saveAll();
-    renderNotes();
-    alert("Ripristino locale completato.");
-}
-
-// --- BACKUP ICLOUD DRIVE ---
-function icloudBackup() {
-    manualBackup();
-}
-
-function icloudRestore() {
-    manualRestore();
-}
