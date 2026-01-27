@@ -1,112 +1,115 @@
-<!-- POPUP IMPOSTAZIONI -->
-<div id="settingsPopup" class="popup hidden">
-  <div class="popup-overlay"></div>
-  <div class="settings-content">
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Le mie note</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
 
-    <div class="popup-header">
-      <h2>Impostazioni</h2>
-      <button id="closeSettingsBtn" class="close-btn">✕</button>
+<body>
+  <div id="app">
+
+    <!-- HEADER -->
+    <header id="topBar">
+      <h1>Le mie note</h1>
+      <p class="subtitle">Categorie, cestino, backup, tutto sotto controllo</p>
+
+      <div class="top-icons">
+        <button id="themeToggleBtn">🌞</button>
+        <button id="openSettingsBtn">⚙️</button>
+        <button id="openTrashBtn">🗑️</button>
+        <button id="openArchiveBtn">📦</button>
+        <button id="openLifebuoyBtn">🛟</button>
+      </div>
+    </header>
+
+    <!-- SEARCH -->
+    <input id="searchInput" class="search" placeholder="Cerca note..." />
+
+    <!-- EDITOR -->
+    <section id="noteEditor">
+      <input type="text" id="noteTitle" placeholder="Titolo della nota..." />
+      <select id="categorySelector"></select>
+      <textarea id="noteContent" placeholder="Scrivi la tua nota qui..."></textarea>
+
+      <div class="editor-buttons">
+        <button id="saveNoteBtn" class="primary-btn">Salva nota</button>
+        <button id="cancelEditBtn" class="secondary-btn">Elimina nota</button>
+      </div>
+    </section>
+
+    <!-- LANGUAGE SELECTOR (iOS STYLE) -->
+    <section id="languageSection">
+      <div id="languageSelector">
+        <button data-lang="it" class="lang-btn active">IT</button>
+        <button data-lang="de" class="lang-btn">DE</button>
+        <button data-lang="en" class="lang-btn">EN</button>
+        <button data-lang="es" class="lang-btn">ES</button>
+      </div>
+    </section>
+
+    <!-- NOTE LIST -->
+    <section id="noteListSection">
+      <h2>Le tue note</h2>
+      <div id="noteList" class="note-list"></div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <section id="categorySection">
+      <h2>Categorie</h2>
+      <ul id="categoryList" class="category-list"></ul>
+      <button id="addCategoryBtn" class="primary-btn">+ Aggiungi</button>
+    </section>
+
+  </div>
+
+  <!-- POPUP BACKUP / SALVAGENTE -->
+  <div id="lifebuoyPopup" class="popup hidden">
+    <div class="popup-overlay"></div>
+    <div class="popup-content">
+      <div class="popup-header">
+        <h2>Backup & Ripristino</h2>
+        <button id="closeLifebuoyBtn" class="close-btn">✕</button>
+      </div>
+
+      <div id="backupList"></div>
+
+      <div class="popup-buttons">
+        <button id="createBackupBtn" class="primary-btn">Backup manuale</button>
+        <button id="importBackupBtn" class="secondary-btn">Ripristina da file</button>
+        <button id="exportDataBtn" class="secondary-btn">Esporta backup</button>
+      </div>
     </div>
+  </div>
 
-    <!-- 📱 ASPETTO -->
-    <div class="settings-section">
-      <h3>Aspetto</h3>
+  <!-- POPUP IMPOSTAZIONI -->
+  <div id="settingsPopup" class="popup hidden">
+    <div class="popup-overlay"></div>
+    <div class="settings-content">
+      <div class="popup-header">
+        <h2>Impostazioni</h2>
+        <button id="closeSettingsBtn" class="close-btn">✕</button>
+      </div>
 
-      <!-- Tema -->
-      <div class="settings-row">
-        <span>Tema</span>
+      <div class="settings-section">
+        <h3>Tema</h3>
         <button id="themeToggleBtn2" class="secondary-btn">Cambia tema</button>
       </div>
 
-      <!-- Dimensione testo -->
-      <div class="settings-row">
-        <span>Dimensione testo</span>
-        <div class="text-size-options">
-          <button class="text-size-btn" data-size="s">S</button>
-          <button class="text-size-btn active" data-size="m">M</button>
-          <button class="text-size-btn" data-size="l">L</button>
-        </div>
+      <div class="settings-section">
+        <h3>Colore principale</h3>
+        <div class="color-palette"></div>
+        <input type="color" id="customColorPicker" value="#007aff" />
       </div>
 
-      <!-- Animazioni -->
-      <div class="settings-row">
-        <span>Animazioni iOS</span>
-        <label class="switch">
-          <input type="checkbox" id="toggleAnimations">
-          <span class="slider"></span>
-        </label>
-      </div>
-
-      <!-- Font -->
-      <div class="settings-row">
-        <span>Font app</span>
-        <select id="fontSelector">
-          <option value="Inter">Inter (iOS)</option>
-          <option value="Poppins">Poppins</option>
-          <option value="Manrope">Manrope</option>
-          <option value="Nunito">Nunito</option>
-          <option value="Montserrat">Montserrat</option>
-          <option value="Roboto">Roboto</option>
-          <option value="Urbanist">Urbanist</option>
-        </select>
+      <div class="settings-section">
+        <h3>Avanzate</h3>
+        <button id="resetAppBtn" class="danger-btn">Ripristina app</button>
       </div>
     </div>
-
-    <!-- 🧩 FUNZIONALITÀ -->
-    <div class="settings-section">
-      <h3>Funzionalità</h3>
-
-      <div class="settings-row">
-        <span>Contatore note</span>
-        <label class="switch">
-          <input type="checkbox" id="toggleNoteCounter">
-          <span class="slider"></span>
-        </label>
-      </div>
-
-      <div class="settings-row">
-        <span>Contatore categorie</span>
-        <label class="switch">
-          <input type="checkbox" id="toggleCategoryCounter">
-          <span class="slider"></span>
-        </label>
-      </div>
-    </div>
-
-    <!-- 🎨 PALETTE COLORI NOTE -->
-    <div class="settings-section">
-      <h3>Colori note</h3>
-
-      <div id="noteColorPalette" class="color-palette"></div>
-
-      <div class="settings-row">
-        <span>Colore personalizzato</span>
-        <input type="color" id="customNoteColorPicker" value="#ff9500">
-      </div>
-    </div>
-
-    <!-- 💾 BACKUP -->
-    <div class="settings-section">
-      <h3>Backup</h3>
-
-      <div class="settings-row">
-        <span>Backup automatico</span>
-        <label class="switch">
-          <input type="checkbox" id="toggleAutoBackup">
-          <span class="slider"></span>
-        </label>
-      </div>
-    </div>
-
-    <!-- 🛠️ SISTEMA -->
-    <div class="settings-section">
-      <h3>Sistema</h3>
-
-      <button id="resetCategoriesBtn" class="danger-btn">Reset categorie</button>
-      <button id="resetNotesBtn" class="danger-btn">Reset note</button>
-
-      <p class="app-version">Versione app: <strong>1.0 Multilingua</strong></p>
-    </div>
-
   </div>
-</div>
+
+  <script src="script.js"></script>
+</body>
+</html>
