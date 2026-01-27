@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Note App</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Note App</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -18,32 +18,36 @@
     </div>
 </header>
 
-<main id="notesContainer">
-    <!-- qui andranno le note, per ora vuoto -->
-</main>
+<main id="notesContainer"></main>
 
-<!-- POPUP CATEGORIE -->
-<div id="categoryPopup" class="popup hidden">
-    <div class="popup-content">
-        <h2>Categorie</h2>
+<!-- PANNELLO NUOVA NOTA (slide-up iOS) -->
+<div id="notePanel" class="panel hidden">
+    <div class="panel-content">
 
-        <div id="categoryList"></div>
+        <h2>Nuova Nota</h2>
 
-        <hr>
+        <input type="text" id="noteTitle" placeholder="Titolo">
 
-        <h3>Crea nuova categoria</h3>
-        <input type="text" id="newCategoryName" placeholder="Nome categoria">
+        <textarea id="noteText" placeholder="Scrivi la tua nota..."></textarea>
 
-        <div class="palette">
-            <div class="color" data-color="#ff6b6b" style="background:#ff6b6b"></div>
-            <div class="color" data-color="#ffa502" style="background:#ffa502"></div>
-            <div class="color" data-color="#2ed573" style="background:#2ed573"></div>
-            <div class="color" data-color="#1e90ff" style="background:#1e90ff"></div>
-            <div class="color" data-color="#a55eea" style="background:#a55eea"></div>
-        </div>
+        <h3>Categoria</h3>
+        <div id="categoryButtons" class="category-buttons"></div>
 
-        <button id="saveCategoryBtn">Salva categoria</button>
-        <button id="closePopupBtn" class="close">Chiudi</button>
+        <h3>Colore nota</h3>
+        <div class="palette" id="notePalette"></div>
+
+        <button id="saveNoteBtn" class="save">Salva nota</button>
+        <button id="closeNotePanel" class="close">Chiudi</button>
+
+    </div>
+</div>
+
+<!-- CESTINO -->
+<div id="trashPanel" class="panel hidden">
+    <div class="panel-content">
+        <h2>Cestino</h2>
+        <div id="trashList"></div>
+        <button id="closeTrashPanel" class="close">Chiudi</button>
     </div>
 </div>
 
