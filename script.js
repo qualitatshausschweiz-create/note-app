@@ -116,7 +116,7 @@ function closeCategoryPopup() {
     categoryPopup.classList.add("hidden");
 }
 
-// ⭐ VERSIONE CORRETTA: NON BLOCCA PIÙ IL POPUP ⭐
+// ⭐ VERSIONE DEFINITIVA: SALVA, CHIUDE E TORNA ALLA NOTA ⭐
 function createCategory() {
     const name = document.getElementById("newCategoryName").value.trim();
     const color = document.getElementById("newCategoryColor").value;
@@ -126,12 +126,17 @@ function createCategory() {
         return;
     }
 
+    // Salva la categoria
     categories.push({ name, color });
     saveCategories();
+
+    // Aggiorna la lista nel popup nota
     renderCategoryList();
 
-    // 🔥 FIX: chiude il popup e torna alla nota
+    // Chiudi popup categoria
     closeCategoryPopup();
+
+    // Torna al popup nota
     notePopup.classList.remove("hidden");
 }
 
