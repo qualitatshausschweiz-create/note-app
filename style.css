@@ -1,267 +1,171 @@
-:root {
-  --accent: #007aff;
-  --bg: #f9f9f9;
-  --bg-secondary: #ffffff;
-  --text: #1c1c1e;
-  --border: #d1d1d6;
-  --radius: 12px;
-  --shadow: 0 4px 12px rgba(0,0,0,0.08);
-  --app-font: system-ui;
-}
-
-/* Tema scuro */
-[data-theme="dark"] {
-  --bg: #1c1c1e;
-  --bg-secondary: #2c2c2e;
-  --text: #f2f2f7;
-  --border: #3a3a3c;
-}
-
-/* Transizioni premium */
-html, body, #app, .note-item, .popup-content, .settings-content {
-  transition: background-color 0.35s ease,
-              color 0.35s ease,
-              border-color 0.35s ease,
-              box-shadow 0.35s ease;
-}
+/* ===========================
+   BASE
+=========================== */
 
 body {
   margin: 0;
-  font-family: var(--app-font);
-  background: var(--bg);
-  color: var(--text);
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f2f2f7;
+  color: #1c1c1e;
 }
 
-#app {
-  max-width: 600px;
-  margin: auto;
-  padding: 20px;
-}
-
-/* HEADER */
-header#topBar {
+h1 {
+  margin: 20px 0 0 0;
   text-align: center;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+header p {
+  text-align: center;
+  margin: 4px 0 12px 0;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.icon-bar {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  font-size: 22px;
   margin-bottom: 20px;
 }
 
-.subtitle {
-  font-size: 14px;
-  color: #666;
+/* ===========================
+   NOTE EDITOR
+=========================== */
+
+.note-editor {
+  background: white;
+  padding: 16px;
+  margin: 0 12px;
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-.top-icons {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.top-icons button {
-  font-size: 22px;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-/* SEARCH */
-.search {
+.note-editor input,
+.note-editor select,
+.note-editor textarea {
   width: 100%;
-  padding: 12px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  margin-bottom: 15px;
-  background: var(--bg-secondary);
-  color: var(--text);
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d1d6;
+  font-size: 15px;
+  background: #fafafa;
 }
 
-/* EDITOR */
-#noteEditor input,
-#noteEditor textarea,
-#noteEditor select {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 10px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg-secondary);
-  color: var(--text);
-}
-
-textarea {
+.note-editor textarea {
   height: 120px;
   resize: none;
 }
 
+.button-row {
+  display: flex;
+  gap: 10px;
+}
+
 .primary-btn {
-  background: var(--accent);
+  flex: 1;
+  background: #007aff;
   color: white;
   border: none;
-  padding: 10px 16px;
-  border-radius: var(--radius);
-  cursor: pointer;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .secondary-btn {
-  background: #ccc;
-  color: #333;
+  flex: 1;
+  background: #e5e5ea;
+  color: #1c1c1e;
   border: none;
-  padding: 10px 16px;
-  border-radius: var(--radius);
-  cursor: pointer;
-}
-
-.danger-btn {
-  background: #ff3b30;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: var(--radius);
-  cursor: pointer;
-}
-
-/* NOTE */
-.note-item {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
   padding: 12px;
-  margin-bottom: 10px;
-}
-
-.note-footer {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-}
-
-.note-badge {
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  background: var(--accent);
-  color: white;
-}
-
-/* CATEGORIE */
-.category-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-  border-radius: var(--radius);
-  background: var(--bg-secondary);
-  margin-bottom: 6px;
-  cursor: pointer;
-  border: 1px solid var(--border);
-}
-
-.color-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-/* POPUP */
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.popup-overlay {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.3);
-}
-
-.popup-content,
-.settings-content {
-  position: relative;
-  background: var(--bg-secondary);
-  padding: 20px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  max-width: 500px;
-  width: 90%;
-  z-index: 10;
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* PALETTE */
-.color-palette {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.color-swatch {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid transparent;
-}
-
-.color-swatch.selected {
-  border-color: var(--accent);
-}
-
-/* BACKUP LIST */
-.backup-item {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  padding: 12px;
-  border-radius: var(--radius);
-  margin-bottom: 10px;
-}
-
-.backup-controls {
-  margin-bottom: 15px;
-}
-
-.backup-controls button {
-  width: 100%;
-  margin-bottom: 8px;
+  border-radius: 10px;
+  font-size: 15px;
 }
 
 /* ===========================
-   MULTILINGUA — iOS STYLE
+   NOTE LIST
 =========================== */
 
-#languageSelector {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 15px 0 25px 0;
+.note-list {
+  margin: 20px 12px;
 }
 
-.lang-btn {
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  background: var(--bg-secondary);
-  color: var(--text);
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.25s ease;
+.note-list h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
 }
 
-.lang-btn.active {
-  background: var(--accent);
+#noteList .note-item {
+  background: white;
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.note-item h3 {
+  margin: 0 0 6px 0;
+  font-size: 17px;
+}
+
+.note-item p {
+  margin: 0 0 10px 0;
+  opacity: 0.8;
+}
+
+.note-category {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
   color: white;
-  border-color: var(--accent);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-.lang-btn:hover {
-  transform: translateY(-1px);
+/* ===========================
+   CATEGORIES
+=========================== */
+
+.category-list {
+  margin: 20px 12px 40px 12px;
+}
+
+.category-list h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+#categoryList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#categoryList li {
+  background: white;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  cursor: pointer;
+}
+
+.color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+.primary-btn {
+  width: 100%;
+  margin-top: 10px;
 }
