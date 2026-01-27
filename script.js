@@ -1,20 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  // THEME (nuova versione con una sola icona + animazione)
+  // THEME (una sola icona + animazione)
   const themeToggle = document.getElementById("themeToggle");
 
-  // carica tema salvato
   const savedTheme = localStorage.getItem("theme");
 
   if (savedTheme === "dark") {
     document.body.classList.add("dark");
-    themeToggle.textContent = "🌙"; // mostra luna
+    themeToggle.textContent = "🌙";
   } else {
     document.body.classList.remove("dark");
-    themeToggle.textContent = "☀️"; // mostra sole
+    themeToggle.textContent = "☀️";
   }
 
-  // toggle tema con animazione
   themeToggle.onclick = () => {
     themeToggle.classList.add("animate");
 
@@ -23,12 +21,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 250);
 
     if (document.body.classList.contains("dark")) {
-      // passa a chiaro
       document.body.classList.remove("dark");
       themeToggle.textContent = "☀️";
       localStorage.setItem("theme", "light");
     } else {
-      // passa a scuro
       document.body.classList.add("dark");
       themeToggle.textContent = "🌙";
       localStorage.setItem("theme", "dark");
@@ -147,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (first) first.classList.add("selected");
   }
 
-  // ⭐ VERSIONE CORRETTA CHE SALVA SEMPRE LA NOTA ⭐
+  // SALVATAGGIO NOTA CORRETTO
   saveNoteBtn.onclick = () => {
     const titolo = noteTitle.value.trim();
     const testo = noteText.value.trim();
