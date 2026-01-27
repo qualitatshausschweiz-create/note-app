@@ -1,267 +1,267 @@
+/* ===========================
+   FONT GLOBALI
+=========================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@300;400;500;600&family=Manrope:wght@300;400;500;600&family=Nunito:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&family=Roboto:wght@300;400;500;600&family=Urbanist:wght@300;400;500;600&display=swap');
+
 :root {
-  --accent: #007aff;
-  --bg: #f9f9f9;
-  --bg-secondary: #ffffff;
-  --text: #1c1c1e;
-  --border: #d1d1d6;
-  --radius: 12px;
-  --shadow: 0 4px 12px rgba(0,0,0,0.08);
-  --app-font: system-ui;
+  --font-main: 'Inter', sans-serif;
+
+  --text-s: 14px;
+  --text-m: 16px;
+  --text-l: 19px;
+
+  --note-border-radius: 12px;
+
+  --switch-off: #e5e5ea;
+  --switch-on: #34c759;
+
+  --popup-bg: #ffffff;
+  --popup-dark-bg: #1c1c1e;
 }
 
-/* Tema scuro */
 [data-theme="dark"] {
-  --bg: #1c1c1e;
-  --bg-secondary: #2c2c2e;
-  --text: #f2f2f7;
-  --border: #3a3a3c;
+  --popup-bg: #1c1c1e;
 }
 
-/* Transizioni premium */
-html, body, #app, .note-item, .popup-content, .settings-content {
-  transition: background-color 0.35s ease,
-              color 0.35s ease,
-              border-color 0.35s ease,
-              box-shadow 0.35s ease;
-}
+/* ===========================
+   BASE
+=========================== */
 
 body {
+  font-family: var(--font-main);
+  font-size: var(--text-m);
   margin: 0;
-  font-family: var(--app-font);
+  padding: 0;
   background: var(--bg);
-  color: var(--text);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-#app {
-  max-width: 600px;
-  margin: auto;
-  padding: 20px;
-}
+/* ===========================
+   NOTE — BORDO COLORATO
+=========================== */
 
-/* HEADER */
-header#topBar {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.subtitle {
-  font-size: 14px;
-  color: #666;
-}
-
-.top-icons {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.top-icons button {
-  font-size: 22px;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-/* SEARCH */
-.search {
-  width: 100%;
-  padding: 12px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  margin-bottom: 15px;
-  background: var(--bg-secondary);
-  color: var(--text);
-}
-
-/* EDITOR */
-#noteEditor input,
-#noteEditor textarea,
-#noteEditor select {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 10px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg-secondary);
-  color: var(--text);
-}
-
-textarea {
-  height: 120px;
-  resize: none;
-}
-
-.primary-btn {
-  background: var(--accent);
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: var(--radius);
-  cursor: pointer;
-}
-
-.secondary-btn {
-  background: #ccc;
-  color: #333;
-  border: none;
-  padding: 10px 16px;
-  border-radius: var(--radius);
-  cursor: pointer;
-}
-
-.danger-btn {
-  background: #ff3b30;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: var(--radius);
-  cursor: pointer;
-}
-
-/* NOTE */
 .note-item {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 12px;
-  margin-bottom: 10px;
+  background: var(--popup-bg);
+  border-radius: var(--note-border-radius);
+  padding: 14px;
+  margin-bottom: 12px;
+  border-left: 8px solid #ff9500; /* colore dinamico */
+  transition: border-color 0.2s ease;
 }
 
-.note-footer {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-}
+/* ===========================
+   POPUP IMPOSTAZIONI
+=========================== */
 
-.note-badge {
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  background: var(--accent);
-  color: white;
-}
-
-/* CATEGORIE */
-.category-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-  border-radius: var(--radius);
-  background: var(--bg-secondary);
-  margin-bottom: 6px;
-  cursor: pointer;
-  border: 1px solid var(--border);
-}
-
-.color-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-/* POPUP */
 .popup {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.popup.hidden {
+  display: none;
 }
 
 .popup-overlay {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.3);
+  inset: 0;
+  background: rgba(0,0,0,0.4);
 }
 
-.popup-content,
 .settings-content {
   position: relative;
-  background: var(--bg-secondary);
-  padding: 20px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  max-width: 500px;
+  background: var(--popup-bg);
   width: 90%;
+  max-width: 420px;
+  padding: 20px;
+  border-radius: 20px;
   z-index: 10;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
-.hidden {
-  display: none !important;
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* PALETTE */
+.settings-section {
+  margin-top: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #d2d2d7;
+}
+
+.settings-section h3 {
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 12px 0;
+}
+
+/* ===========================
+   SWITCH iOS CLASSICO
+=========================== */
+
+.switch {
+  position: relative;
+  width: 50px;
+  height: 28px;
+  display: inline-block;
+}
+
+.switch input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background: var(--switch-off);
+  border-radius: 34px;
+  transition: 0.3s;
+}
+
+.slider:before {
+  content: "";
+  position: absolute;
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+input:checked + .slider {
+  background: var(--switch-on);
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+/* ===========================
+   TEXT SIZE SELECTOR
+=========================== */
+
+.text-size-options {
+  display: flex;
+  gap: 6px;
+}
+
+.text-size-btn {
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid #d2d2d7;
+  background: #f2f2f7;
+  cursor: pointer;
+}
+
+.text-size-btn.active {
+  background: #34c759;
+  color: white;
+  border-color: #34c759;
+}
+
+/* ===========================
+   FONT SELECTOR
+=========================== */
+
+#fontSelector {
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid #d2d2d7;
+  background: #f2f2f7;
+  font-size: 14px;
+}
+
+/* ===========================
+   PALETTE COLORI NOTE
+=========================== */
+
 .color-palette {
   display: flex;
-  gap: 10px;
   flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
-.color-swatch {
+.color-palette div {
   width: 28px;
   height: 28px;
   border-radius: 50%;
   cursor: pointer;
   border: 2px solid transparent;
+  transition: transform 0.2s ease;
 }
 
-.color-swatch.selected {
-  border-color: var(--accent);
+.color-palette div:hover {
+  transform: scale(1.15);
 }
 
-/* BACKUP LIST */
-.backup-item {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  padding: 12px;
-  border-radius: var(--radius);
-  margin-bottom: 10px;
-}
-
-.backup-controls {
-  margin-bottom: 15px;
-}
-
-.backup-controls button {
-  width: 100%;
-  margin-bottom: 8px;
+.color-palette .selected {
+  border-color: black;
 }
 
 /* ===========================
-   MULTILINGUA — iOS STYLE
+   COLOR PICKER
 =========================== */
 
-#languageSelector {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 15px 0 25px 0;
+#customNoteColorPicker {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
-.lang-btn {
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  background: var(--bg-secondary);
-  color: var(--text);
+/* ===========================
+   BUTTONS
+=========================== */
+
+.primary-btn,
+.secondary-btn,
+.danger-btn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.25s ease;
 }
 
-.lang-btn.active {
-  background: var(--accent);
+.primary-btn {
+  background: #007aff;
   color: white;
-  border-color: var(--accent);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-.lang-btn:hover {
-  transform: translateY(-1px);
+.secondary-btn {
+  background: #e5e5ea;
+  color: black;
+}
+
+.danger-btn {
+  background: #ff3b30;
+  color: white;
+}
+
+/* ===========================
+   VERSIONE APP
+=========================== */
+
+.app-version {
+  margin-top: 12px;
+  font-size: 14px;
+  opacity: 0.7;
 }
