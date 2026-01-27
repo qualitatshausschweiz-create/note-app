@@ -132,3 +132,17 @@ document.getElementById("addCategoryBtn").onclick = () => {
 
 renderCategories();
 renderNotes();
+let trash = JSON.parse(localStorage.getItem("trash") || "[]");
+
+function moveToTrash(id) {
+  const note = notes.find(n => n.id == id);
+  if (!note) return;
+
+  trash.unshift(note);
+  notes = notes.filter(n => n.id != id);
+
+  localStorage.setItem("notes", JSON.stringify(notes));
+  localStorage.setItem("trash", JSON.stringify(trash));
+
+  renderNotes();
+}
