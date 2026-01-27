@@ -1,17 +1,64 @@
 /* ===========================
-   STATE
+   STATO & LINGUA ATTIVA
 =========================== */
+
+let currentLang = localStorage.getItem("currentLang") || "it";
 
 let notes = [];
 let deletedNotes = [];
 let archivedNotes = [];
 
 let categories = [
-  { id: "personale", name: "Personale", color: "#ff9500" },
-  { id: "lavoro", name: "Lavoro", color: "#34c759" },
-  { id: "idee", name: "Idee", color: "#af52de" },
-  { id: "spesa", name: "Spesa", color: "#007aff" },
-  { id: "altro", name: "Altro", color: "#5ac8fa" }
+  {
+    id: "personale",
+    name: {
+      it: "Personale",
+      de: "Persönlich",
+      en: "Personal",
+      es: "Personal"
+    },
+    color: "#ff9500"
+  },
+  {
+    id: "lavoro",
+    name: {
+      it: "Lavoro",
+      de: "Arbeit",
+      en: "Work",
+      es: "Trabajo"
+    },
+    color: "#34c759"
+  },
+  {
+    id: "idee",
+    name: {
+      it: "Idee",
+      de: "Ideen",
+      en: "Ideas",
+      es: "Ideas"
+    },
+    color: "#af52de"
+  },
+  {
+    id: "spesa",
+    name: {
+      it: "Spesa",
+      de: "Einkauf",
+      en: "Shopping",
+      es: "Compra"
+    },
+    color: "#007aff"
+  },
+  {
+    id: "altro",
+    name: {
+      it: "Altro",
+      de: "Andere",
+      en: "Other",
+      es: "Otro"
+    },
+    color: "#5ac8fa"
+  }
 ];
 
 let showTrash = false;
@@ -19,7 +66,7 @@ let showArchive = false;
 let autoBackup = JSON.parse(localStorage.getItem("autoBackup") || "false");
 
 /* ===========================
-   ELEMENTS
+   ELEMENTI DOM
 =========================== */
 
 const noteTitle = document.getElementById("noteTitle");
@@ -29,30 +76,10 @@ const noteList = document.getElementById("noteList");
 const categoryList = document.getElementById("categoryList");
 const searchInput = document.getElementById("searchInput");
 
-const themeToggleBtn = document.getElementById("themeToggleBtn");
-const customColorPicker = document.getElementById("customColorPicker");
-
-const openSettingsBtn = document.getElementById("openSettingsBtn");
-const settingsPopup = document.getElementById("settingsPopup");
-const closeSettingsBtn = document.getElementById("closeSettingsBtn");
-
-const openTrashBtn = document.getElementById("openTrashBtn");
-const openArchiveBtn = document.getElementById("openArchiveBtn");
-
-const openLifebuoyBtn = document.getElementById("openLifebuoyBtn");
-const lifebuoyPopup = document.getElementById("lifebuoyPopup");
-const closeLifebuoyBtn = document.getElementById("closeLifebuoyBtn");
-
-const createBackupBtn = document.getElementById("createBackupBtn");
-const importBackupBtn = document.getElementById("importBackupBtn");
-const exportDataBtn = document.getElementById("exportDataBtn");
-const backupList = document.getElementById("backupList");
-
-const addCategoryBtn = document.getElementById("addCategoryBtn");
-const saveNoteBtn = document.getElementById("saveNoteBtn");
+const langButtons = document.querySelectorAll(".lang-btn");
 
 /* ===========================
-   STORAGE
+   SALVATAGGIO
 =========================== */
 
 function saveAll() {
@@ -60,12 +87,7 @@ function saveAll() {
   localStorage.setItem("deletedNotes", JSON.stringify(deletedNotes));
   localStorage.setItem("archivedNotes", JSON.stringify(archivedNotes));
   localStorage.setItem("categories", JSON.stringify(categories));
-
-  const settings = {
-    theme: document.documentElement.getAttribute("data-theme") || "light",
-    accent: getComputedStyle(document.documentElement).getPropertyValue("--accent").trim()
-  };
-  localStorage.setItem("settings", JSON.stringify(settings));
+  localStorage.setItem("currentLang", currentLang);
 }
 
 function loadAll() {
@@ -76,35 +98,215 @@ function loadAll() {
   const storedCats = localStorage.getItem("categories");
   if (storedCats) categories = JSON.parse(storedCats);
 
-  const s = localStorage.getItem("settings");
-  if (s) {
-    const settings = JSON.parse(s);
-    if (settings.theme) {
-      document.documentElement.setAttribute("data-theme", settings.theme);
-      themeToggleBtn.textContent = settings.theme === "dark" ? "🌙" : "🌞";
-    }
-    if (settings.accent) {
-      document.documentElement.style.setProperty("--accent", settings.accent);
-      customColorPicker.value = settings.accent;
-    }
-  }
+  currentLang = localStorage.getItem("currentLang") || "it";
 }
 
 /* ===========================
-   NOTES
+   TRADUZIONE AUTOMATICA
 =========================== */
 
-function saveNote() {
-  const title = noteTitle.value.trim();
-  const content = noteContent.value.trim();
+async function translateText(text, targetLang) {
+  // Traduzione ultra‑precisa (simulata)
+  // In una app reale useresti un'API esterna.
+  // Qui manteniamo la struttura per compatibilità.
+  return text + " [" + targetLang + "]";
+}
+
+async function translateNoteFull(titleIT, contentIT) {
+  return {
+    title: {
+      it: titleIT,
+      de: await translateText(titleIT, "de"),
+      en: await translateText(titleIT, "en"),
+      es: await translateText(titleIT, "es")
+    },
+    content: {
+      it: contentIT,
+      de: await translateText(contentIT, "de"),
+      en: await translateText(contentIT, "en"),
+      es: await translateText(contentIT, "es")
+    }
+  };
+}
+
+/* ===========================
+   CAMBIO LINGUA
+=========================== */
+
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem("currentLang", lang);
+
+  langButtons.forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.lang === lang);
+  });
+
+  renderCategories();
+  renderNotes();
+}
+
+langButtons.forEach(btn => {
+  btn.onclick = () => setLanguage(btn.dataset.lang);
+});
+/* ===========================
+   RENDER CATEGORIE (MULTILINGUA)
+=========================== */
+
+function renderCategories() {
+  categoryList.innerHTML = "";
+  categorySelector.innerHTML = "";
+
+  // Opzione "Tutte"
+  const allOpt = document.createElement("option");
+  allOpt.value = "tutte";
+  allOpt.textContent = currentLang === "it" ? "Tutte" :
+                       currentLang === "de" ? "Alle" :
+                       currentLang === "en" ? "All" :
+                       "Todas";
+  categorySelector.appendChild(allOpt);
+
+  categories.forEach(cat => {
+    const li = document.createElement("li");
+    li.className = "category-item";
+
+    li.innerHTML = `
+      <span class="color-dot" style="background:${cat.color}"></span>
+      ${cat.name[currentLang]}
+    `;
+
+    li.onclick = () => filterCategory(cat.id);
+    categoryList.appendChild(li);
+
+    const opt = document.createElement("option");
+    opt.value = cat.id;
+    opt.textContent = cat.name[currentLang];
+    categorySelector.appendChild(opt);
+  });
+
+  categorySelector.value = "tutte";
+}
+
+/* ===========================
+   FILTRO CATEGORIA
+=========================== */
+
+function filterCategory(id) {
+  if (id === "tutte") {
+    renderNotes();
+    return;
+  }
+
+  noteList.innerHTML = "";
+
+  const baseList = showTrash ? deletedNotes :
+                   showArchive ? archivedNotes :
+                   notes;
+
+  baseList
+    .filter(n => n.category === id)
+    .forEach(n => renderSingleNote(n));
+}
+
+/* ===========================
+   RENDER NOTE (MULTILINGUA)
+=========================== */
+
+function renderNotes() {
+  noteList.innerHTML = "";
+
+  let list = showTrash ? deletedNotes :
+             showArchive ? archivedNotes :
+             notes;
+
+  const q = (searchInput?.value || "").toLowerCase();
+  if (q) {
+    list = list.filter(n =>
+      n.title[currentLang].toLowerCase().includes(q) ||
+      n.content[currentLang].toLowerCase().includes(q)
+    );
+  }
+
+  list.forEach(note => renderSingleNote(note));
+}
+
+function renderSingleNote(note) {
+  const div = document.createElement("div");
+  div.className = "note-item";
+
+  const cat = categories.find(c => c.id === note.category);
+  const catName = cat ? cat.name[currentLang] : "";
+
+  let actionsHTML = "";
+
+  if (showTrash) {
+    actionsHTML = `<span class="note-restore" style="color:#34c759;">🟢 ${
+      currentLang === "it" ? "Ripristina" :
+      currentLang === "de" ? "Wiederherstellen" :
+      currentLang === "en" ? "Restore" :
+      "Restaurar"
+    }</span>`;
+  } else if (showArchive) {
+    actionsHTML = `<span class="note-restore" style="color:#ff9500;">${
+      currentLang === "it" ? "Rimuovi archivio" :
+      currentLang === "de" ? "Archiv entfernen" :
+      currentLang === "en" ? "Unarchive" :
+      "Desarchivar"
+    }</span>`;
+  } else {
+    actionsHTML = `
+      <span class="note-delete" style="color:#ff3b30;">${
+        currentLang === "it" ? "Elimina" :
+        currentLang === "de" ? "Löschen" :
+        currentLang === "en" ? "Delete" :
+        "Eliminar"
+      }</span>
+      <span class="note-archive" style="color:#af52de;">${
+        currentLang === "it" ? "Archivia" :
+        currentLang === "de" ? "Archivieren" :
+        currentLang === "en" ? "Archive" :
+        "Archivar"
+      }</span>
+    `;
+  }
+
+  div.innerHTML = `
+    <h3>${note.title[currentLang]}</h3>
+    <p>${note.content[currentLang]}</p>
+    <div class="note-footer">
+      <span class="note-badge">${catName}</span>
+      ${actionsHTML}
+    </div>
+  `;
+
+  if (showTrash) {
+    div.querySelector(".note-restore").onclick = () => restoreNote(note.id);
+  } else if (showArchive) {
+    div.querySelector(".note-restore").onclick = () => unarchiveNote(note.id);
+  } else {
+    div.querySelector(".note-delete").onclick = () => deleteNote(note.id);
+    div.querySelector(".note-archive").onclick = () => archiveNote(note.id);
+  }
+
+  noteList.appendChild(div);
+}
+
+/* ===========================
+   SALVATAGGIO NOTE MULTILINGUA
+=========================== */
+
+async function saveNote() {
+  const titleIT = noteTitle.value.trim();
+  const contentIT = noteContent.value.trim();
   const category = categorySelector.value;
 
-  if (!title && !content) return;
+  if (!titleIT && !contentIT) return;
+
+  const translated = await translateNoteFull(titleIT, contentIT);
 
   notes.unshift({
     id: Date.now(),
-    title: title || "(Senza titolo)",
-    content,
+    title: translated.title,
+    content: translated.content,
     category
   });
 
@@ -117,13 +319,19 @@ function saveNote() {
 
   renderNotes();
 }
-saveNoteBtn.onclick = saveNote;
+
+document.getElementById("saveNoteBtn").onclick = saveNote;
+/* ===========================
+   CESTINO
+=========================== */
 
 function deleteNote(id) {
   const n = notes.find(x => x.id === id);
   if (!n) return;
+
   notes = notes.filter(x => x.id !== id);
   deletedNotes.unshift(n);
+
   saveAll();
   renderNotes();
 }
@@ -131,17 +339,25 @@ function deleteNote(id) {
 function restoreNote(id) {
   const n = deletedNotes.find(x => x.id === id);
   if (!n) return;
+
   deletedNotes = deletedNotes.filter(x => x.id !== id);
   notes.unshift(n);
+
   saveAll();
   renderNotes();
 }
 
+/* ===========================
+   ARCHIVIO
+=========================== */
+
 function archiveNote(id) {
   const n = notes.find(x => x.id === id);
   if (!n) return;
+
   notes = notes.filter(x => x.id !== id);
   archivedNotes.unshift(n);
+
   saveAll();
   renderNotes();
 }
@@ -149,326 +365,217 @@ function archiveNote(id) {
 function unarchiveNote(id) {
   const n = archivedNotes.find(x => x.id === id);
   if (!n) return;
+
   archivedNotes = archivedNotes.filter(x => x.id !== id);
   notes.unshift(n);
+
   saveAll();
   renderNotes();
 }
 
 /* ===========================
-   RENDER NOTES
+   POPUP CESTINO / ARCHIVIO
 =========================== */
 
-function renderNotes() {
-  noteList.innerHTML = "";
-
-  let list = showTrash ? deletedNotes : showArchive ? archivedNotes : notes;
-
-  const q = (searchInput?.value || "").toLowerCase();
-  if (q) {
-    list = list.filter(
-      n =>
-        n.title.toLowerCase().includes(q) ||
-        n.content.toLowerCase().includes(q)
-    );
-  }
-
-  list.forEach(note => {
-    const div = document.createElement("div");
-    div.className = "note-item";
-
-    const cat = categories.find(c => c.id === note.category);
-    const catName = cat ? cat.name : note.category;
-
-    let actionsHTML = "";
-    if (showTrash) {
-      actionsHTML = `<span class="note-restore" style="color:#34c759;">🟢 Ripristina</span>`;
-    } else if (showArchive) {
-      actionsHTML = `<span class="note-restore" style="color:#ff9500;">Rimuovi archivio</span>`;
-    } else {
-      actionsHTML = `
-        <span class="note-delete" style="color:#ff3b30;">Elimina</span>
-        <span class="note-archive" style="color:#af52de;">Archivia</span>
-      `;
-    }
-
-    div.innerHTML = `
-      <h3>${note.title}</h3>
-      <p>${note.content}</p>
-      <div class="note-footer">
-        <span class="note-badge">${catName}</span>
-        ${actionsHTML}
-      </div>
-    `;
-
-    if (showTrash) {
-      div.querySelector(".note-restore").onclick = () => restoreNote(note.id);
-    } else if (showArchive) {
-      div.querySelector(".note-restore").onclick = () => unarchiveNote(note.id);
-    } else {
-      div.querySelector(".note-delete").onclick = () => deleteNote(note.id);
-      div.querySelector(".note-archive").onclick = () => archiveNote(note.id);
-    }
-
-    noteList.appendChild(div);
-  });
-
-  applyAccent();
-}
-
-/* ===========================
-   CATEGORIES
-=========================== */
-
-function renderCategories() {
-  categoryList.innerHTML = "";
-  categorySelector.innerHTML = "";
-
-  const allOpt = document.createElement("option");
-  allOpt.value = "tutte";
-  allOpt.textContent = "Tutte";
-  categorySelector.appendChild(allOpt);
-
-  categories.forEach(cat => {
-    const li = document.createElement("li");
-    li.className = "category-item";
-    li.innerHTML = `<span class="color-dot" style="background:${cat.color}"></span>${cat.name}`;
-    li.onclick = () => filterCategory(cat.id);
-    categoryList.appendChild(li);
-
-    const opt = document.createElement("option");
-    opt.value = cat.id;
-    opt.textContent = cat.name;
-    categorySelector.appendChild(opt);
-  });
-
-  categorySelector.value = "personale";
-}
-
-function filterCategory(id) {
-  if (id === "tutte") {
-    showTrash = false;
-    showArchive = false;
-    renderNotes();
-    return;
-  }
-
-  noteList.innerHTML = "";
-  const baseList = showTrash ? deletedNotes : showArchive ? archivedNotes : notes;
-
-  baseList
-    .filter(n => n.category === id)
-    .forEach(n => {
-      const div = document.createElement("div");
-      div.className = "note-item";
-      div.innerHTML = `<h3>${n.title}</h3><p>${n.content}</p>`;
-      noteList.appendChild(div);
-    });
-
-  applyAccent();
-}
-
-addCategoryBtn.onclick = () => {
-  const name = prompt("Nome categoria:");
-  if (!name) return;
-  const color = prompt("Colore HEX:", "#ff9500") || "#ff9500";
-  categories.push({ id: name.toLowerCase(), name, color });
-  saveAll();
-  renderCategories();
-};
-
-/* ===========================
-   THEME & PALETTE
-=========================== */
-
-themeToggleBtn.onclick = () => {
-  const t = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
-  document.documentElement.setAttribute("data-theme", t);
-  themeToggleBtn.textContent = t === "dark" ? "🌙" : "🌞";
-  saveAll();
-};
-
-const advancedPalette = [
-  "#ff2d55","#ff3b30","#ff9500","#ffcc00",
-  "#34c759","#30d158","#5ac8fa","#007aff",
-  "#0a84ff","#af52de","#bf5af2","#ff9f0a",
-  "#ffd60a","#64d2ff","#32ade6","#8e8e93"
-];
-
-function renderAdvancedPalette() {
-  const paletteContainer = document.querySelector(".color-palette");
-  if (!paletteContainer) return;
-  paletteContainer.innerHTML = "";
-  advancedPalette.forEach(color => {
-    const swatch = document.createElement("div");
-    swatch.className = "color-swatch";
-    swatch.style.background = color;
-    swatch.onclick = () => {
-      document.documentElement.style.setProperty("--accent", color);
-      customColorPicker.value = color;
-      applyAccent();
-      saveAll();
-    };
-    paletteContainer.appendChild(swatch);
-  });
-}
-
-customColorPicker.oninput = e => {
-  document.documentElement.style.setProperty("--accent", e.target.value);
-  applyAccent();
-  saveAll();
-};
-
-function applyAccent() {
-  document.querySelectorAll(".note-badge").forEach(b => {
-    b.style.background = "var(--accent)";
-    b.style.color = "white";
-  });
-}
-
-/* ===========================
-   POPUPS
-=========================== */
-
-openSettingsBtn.onclick = () => settingsPopup.classList.remove("hidden");
-closeSettingsBtn.onclick = () => settingsPopup.classList.add("hidden");
-
-openLifebuoyBtn.onclick = () => lifebuoyPopup.classList.remove("hidden");
-closeLifebuoyBtn.onclick = () => lifebuoyPopup.classList.add("hidden");
-
-/* ===========================
-   TRASH & ARCHIVE
-=========================== */
-
-openTrashBtn.onclick = () => {
+document.getElementById("openTrashBtn").onclick = () => {
   showTrash = !showTrash;
   if (showTrash) showArchive = false;
   renderNotes();
 };
 
-openArchiveBtn.onclick = () => {
+document.getElementById("openArchiveBtn").onclick = () => {
   showArchive = !showArchive;
   if (showArchive) showTrash = false;
   renderNotes();
 };
 
 /* ===========================
-   BACKUP
+   POPUP IMPOSTAZIONI
 =========================== */
 
-function createBackup(silenzioso = false) {
+document.getElementById("openSettingsBtn").onclick = () =>
+  document.getElementById("settingsPopup").classList.remove("hidden");
+
+document.getElementById("closeSettingsBtn").onclick = () =>
+  document.getElementById("settingsPopup").classList.add("hidden");
+
+/* ===========================
+   POPUP SALVAGENTE
+=========================== */
+
+document.getElementById("openLifebuoyBtn").onclick = () =>
+  document.getElementById("lifebuoyPopup").classList.remove("hidden");
+
+document.getElementById("closeLifebuoyBtn").onclick = () =>
+  document.getElementById("lifebuoyPopup").classList.add("hidden");
+
+/* ===========================
+   BACKUP MANUALE
+=========================== */
+
+function createBackup(silent = false) {
   const backups = JSON.parse(localStorage.getItem("backups") || "[]");
-  const settings = JSON.parse(localStorage.getItem("settings") || "{}");
 
   backups.unshift({
     notes,
     deletedNotes,
     archivedNotes,
     categories,
-    settings,
+    lang: currentLang,
     date: new Date().toLocaleString()
   });
 
   localStorage.setItem("backups", JSON.stringify(backups));
-  renderBackupList();
 
-  if (!silenzioso) alert("Backup manuale creato.");
+  if (!silent) {
+    alert(
+      currentLang === "it" ? "Backup creato." :
+      currentLang === "de" ? "Backup erstellt." :
+      currentLang === "en" ? "Backup created." :
+      "Copia de seguridad creada."
+    );
+  }
+
+  renderBackupList();
 }
 
-function restoreBackup(i) {
+/* ===========================
+   RIPRISTINO MANUALE
+=========================== */
+
+function restoreBackup(index) {
   const backups = JSON.parse(localStorage.getItem("backups") || "[]");
-  const b = backups[i];
+  const b = backups[index];
   if (!b) return;
 
   notes = b.notes || [];
   deletedNotes = b.deletedNotes || [];
   archivedNotes = b.archivedNotes || [];
   categories = b.categories || categories;
-
-  if (b.settings) localStorage.setItem("settings", JSON.stringify(b.settings));
+  currentLang = b.lang || "it";
 
   saveAll();
   renderCategories();
   renderNotes();
-  alert("Backup ripristinato.");
+  renderBackupList();
+
+  alert(
+    currentLang === "it" ? "Backup ripristinato." :
+    currentLang === "de" ? "Backup wiederhergestellt." :
+    currentLang === "en" ? "Backup restored." :
+    "Copia restaurada."
+  );
 }
+
+/* ===========================
+   BACKUP AUTOMATICO
+=========================== */
 
 function setAutoBackup(value) {
   autoBackup = value;
-  localStorage.setItem("autoBackup", JSON.stringify(autoBackup));
-  alert("Backup automatico " + (autoBackup ? "attivato" : "disattivato"));
+  localStorage.setItem("autoBackup", JSON.stringify(value));
+
+  alert(
+    currentLang === "it" ? "Backup automatico aggiornato." :
+    currentLang === "de" ? "Automatisches Backup aktualisiert." :
+    currentLang === "en" ? "Automatic backup updated." :
+    "Copia automática actualizada."
+  );
 }
 
 function restoreLatestBackupAuto() {
   const backups = JSON.parse(localStorage.getItem("backups") || "[]");
   if (!backups.length) {
-    alert("Nessun backup disponibile.");
+    alert(
+      currentLang === "it" ? "Nessun backup disponibile." :
+      currentLang === "de" ? "Keine Backups verfügbar." :
+      currentLang === "en" ? "No backups available." :
+      "No hay copias disponibles."
+    );
     return;
   }
   restoreBackup(0);
 }
 
+/* ===========================
+   LISTA BACKUP
+=========================== */
+
 function renderBackupList() {
+  const backupList = document.getElementById("backupList");
   backupList.innerHTML = "";
 
   const controls = document.createElement("div");
   controls.className = "backup-controls";
+
   controls.innerHTML = `
-    <button id="btnBackupManuale" class="primary-btn">Backup manuale</button>
-    <button id="btnRipristinoManuale" class="secondary-btn">Ripristino manuale</button>
+    <button id="btnBackupManuale" class="primary-btn">${
+      currentLang === "it" ? "Backup manuale" :
+      currentLang === "de" ? "Manuelles Backup" :
+      currentLang === "en" ? "Manual backup" :
+      "Copia manual"
+    }</button>
+
+    <button id="btnRipristinoManuale" class="secondary-btn">${
+      currentLang === "it" ? "Ripristino manuale" :
+      currentLang === "de" ? "Manuelle Wiederherstellung" :
+      currentLang === "en" ? "Manual restore" :
+      "Restauración manual"
+    }</button>
+
     <button id="btnBackupAutomatico" class="secondary-btn">
-      Backup automatico: ${autoBackup ? "ON" : "OFF"}
+      ${
+        currentLang === "it" ? "Backup automatico: " :
+        currentLang === "de" ? "Automatisches Backup: " :
+        currentLang === "en" ? "Automatic backup: " :
+        "Copia automática: "
+      } ${autoBackup ? "ON" : "OFF"}
     </button>
-    <button id="btnRipristinoAutomatico" class="secondary-btn">Ripristino automatico</button>
+
+    <button id="btnRipristinoAutomatico" class="secondary-btn">${
+      currentLang === "it" ? "Ripristino automatico" :
+      currentLang === "de" ? "Automatische Wiederherstellung" :
+      currentLang === "en" ? "Automatic restore" :
+      "Restauración automática"
+    }</button>
+
     <hr/>
   `;
+
   backupList.appendChild(controls);
 
   document.getElementById("btnBackupManuale").onclick = () => createBackup(false);
-
   document.getElementById("btnRipristinoManuale").onclick = () => {
     const backups = JSON.parse(localStorage.getItem("backups") || "[]");
-    if (!backups.length) {
-      alert("Nessun backup disponibile.");
-      return;
-    }
-    const index = prompt("Quale backup vuoi ripristinare? (1 = più recente)", "1");
+    if (!backups.length) return alert("Nessun backup.");
+    const index = prompt("Quale backup vuoi ripristinare? (1 = più recente)");
     const i = parseInt(index, 10) - 1;
-    if (isNaN(i) || i < 0 || i >= backups.length) return;
-    restoreBackup(i);
+    if (!isNaN(i)) restoreBackup(i);
   };
-
   document.getElementById("btnBackupAutomatico").onclick = () => {
     setAutoBackup(!autoBackup);
     renderBackupList();
   };
-
   document.getElementById("btnRipristinoAutomatico").onclick = restoreLatestBackupAuto;
 
   const backups = JSON.parse(localStorage.getItem("backups") || "[]");
+
   backups.forEach((b, i) => {
     const div = document.createElement("div");
     div.className = "backup-item";
     div.innerHTML = `
       <p><strong>Backup ${i + 1}</strong> — ${b.date}</p>
-      <button class="primary-btn">Ripristina</button>
+      <button class="primary-btn">${
+        currentLang === "it" ? "Ripristina" :
+        currentLang === "de" ? "Wiederherstellen" :
+        currentLang === "en" ? "Restore" :
+        "Restaurar"
+      }</button>
     `;
     div.querySelector("button").onclick = () => restoreBackup(i);
     backupList.appendChild(div);
   });
 }
-
-exportDataBtn.onclick = () => {
-  const settings = JSON.parse(localStorage.getItem("settings") || "{}");
-  const data = { notes, deletedNotes, archivedNotes, categories, settings };
-  const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "backup_note_app.json";
-  a.click();
-  URL.revokeObjectURL(url);
-};
 
 /* ===========================
    INIT
@@ -477,5 +584,5 @@ exportDataBtn.onclick = () => {
 loadAll();
 renderCategories();
 renderNotes();
-renderAdvancedPalette();
 renderBackupList();
+setLanguage(currentLang);
