@@ -169,3 +169,20 @@ header p {
   width: 100%;
   margin-top: 10px;
 }
+.note-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.note-actions span {
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: 0.2s;
+}
+
+.note-actions span:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
