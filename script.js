@@ -1,172 +1,91 @@
-// --- NAVIGAZIONE ---
-function showSection(id) {
-    document.querySelectorAll(".page-section").forEach(sec => sec.classList.add("hidden"));
-    document.getElementById(id).classList.remove("hidden");
-}
-
-// --- TEMA CHIARO/SCURO ---
-const themeToggle = document.getElementById("themeToggle");
-let darkMode = JSON.parse(localStorage.getItem("darkMode")) || false;
-
-function applyTheme() {
-    if (darkMode) {
-        document.body.classList.add("dark");
-        themeToggle.textContent = "🌚";
-    } else {
-        document.body.classList.remove("dark");
-        themeToggle.textContent = "🌞";
-    }
-}
-
-themeToggle.onclick = () => {
-    darkMode = !darkMode;
-    localStorage.setItem("darkMode", JSON.stringify(darkMode));
-    applyTheme();
-};
-
-applyTheme();
-
-// --- DATI BASE ---
-let notes = JSON.parse(localStorage.getItem("notes")) || [];
+// CATEGORIE DI BASE
 let categories = JSON.parse(localStorage.getItem("categories")) || [
-    { name: "Personale", color: "#4da3ff" },
-    { name: "Lavoro", color: "#555555" },
-    { name: "Spesa", color: "#3cb371" }
+    { name: "Lavoro", color: "#1e90ff" },
+    { name: "Spesa", color: "#ffa502" },
+    { name: "Idee", color: "#a55eea" },
+    { name: "Tutte", color: "#2ed573" }
 ];
 
+let selectedColor = null;
+
+// ELEMENTI
+const popup = document.getElementById("categoryPopup");
+const categoryList = document.getElementById("categoryList");
+const saveBtn = document.getElementById("saveCategoryBtn");
+const closeBtn = document.getElementById("closePopupBtn");
+const newCategoryName = document.getElementById("newCategoryName");
+
+// APRI POPUP
+document.getElementById("categoriesBtn").onclick = () => {
+    popup.classList.remove("hidden");
+    renderCategories();
+};
+
+// CHIUDI POPUP
+closeBtn.onclick = () => {
+    popup.classList.add("hidden");
+};
+
+// RENDER CATEGORIE
+function renderCategories() {
+    categoryList.innerHTML = "";
+    categories.forEach((cat, index) => {
+        const div = document.createElement("div");
+        div.className = "category-item";
+        div.innerHTML = `
+            <span>${cat.name}</span>
+            <div style="display:flex; gap:10px;">
+                <div class="category-color" style="background:${cat.color}"></div>
+                <button data-index="${index}" class="deleteCat">❌</button>
+            </div>
+        `;
+        categoryList.appendChild(div);
+    });
+
+    document.querySelectorAll(".deleteCat").forEach(btn => {
+        btn.onclick = () => {
+            const i = btn.getAttribute("data-index");
+            categories.splice(i, 1);
+            saveCategories();
+            renderCategories();
+        };
+    });
+}
+
+// SELEZIONE COLORE
+document.querySelectorAll(".color").forEach(c => {
+    c.onclick = () => {
+        document.querySelectorAll(".color").forEach(x => x.classList.remove("selected"));
+        c.classList.add("selected");
+        selectedColor = c.dataset.color;
+    };
+});
+
+// SALVA NUOVA CATEGORIA
+saveBtn.onclick = () => {
+    const name = newCategoryName.value.trim();
+    if (!name || !selectedColor) return;
+
+    categories.push({ name, color: selectedColor });
+    saveCategories();
+
+    newCategoryName.value = "";
+    selectedColor = null;
+    document.querySelectorAll(".color").forEach(x => x.classList.remove("selected"));
+
+    renderCategories();
+};
+
+// SALVA SU LOCALSTORAGE
 function saveCategories() {
     localStorage.setItem("categories", JSON.stringify(categories));
 }
 
-function saveNotes() {
-    localStorage.setItem("notes", JSON.stringify(notes));
-}
-
-// --- POPUP NOTA ---
-const notePopup = document.getElementById("notePopup");
-const categoryPopup = document.getElementById("categoryPopup");
-
-let selectedCategory = null;
-
-document.getElementById("addNoteBtn").onclick = () => {
-    document.getElementById("noteText").value = "";
-    selectedCategory = null;
-    renderCategoryList();
-    notePopup.classList.remove("hidden");
+// TEMA CHIARO/SCURO
+document.getElementById("sunBtn").onclick = () => {
+    document.body.classList.remove("dark");
 };
 
-function closeNotePopup() {
-    notePopup.classList.add("hidden");
-}
-
-// --- LISTA CATEGORIE ---
-function renderCategoryList() {
-    const list = document.getElementById("categoryList");
-    list.innerHTML = "";
-
-    categories.forEach((cat, index) => {
-        const row = document.createElement("div");
-
-        const radio = document.createElement("input");
-        radio.type = "radio";
-        radio.name = "cat";
-        radio.onclick = () => selectedCategory = cat.name;
-
-        const tag = document.createElement("span");
-        tag.className = "category-tag";
-        tag.style.background = cat.color;
-        tag.textContent = cat.name;
-
-        const del = document.createElement("span");
-        del.className = "delete-cat";
-        del.textContent = "❌";
-        del.onclick = () => deleteCategory(index);
-
-        row.appendChild(radio);
-        row.appendChild(tag);
-        row.appendChild(del);
-
-        list.appendChild(row);
-    });
-}
-
-// --- NUOVA CATEGORIA ---
-document.getElementById("addCategoryBtn").onclick = () => {
-    document.getElementById("newCategoryName").value = "";
-    document.getElementById("newCategoryColor").value = "#007aff";
-    categoryPopup.classList.remove("hidden");
+document.getElementById("moonBtn").onclick = () => {
+    document.body.classList.add("dark");
 };
-
-function closeCategoryPopup() {
-    categoryPopup.classList.add("hidden");
-}
-
-function createCategory() {
-    const name = document.getElementById("newCategoryName").value.trim();
-    const color = document.getElementById("newCategoryColor").value;
-
-    if (!name) {
-        alert("Inserisci un nome");
-        return;
-    }
-
-    categories.push({ name, color });
-    saveCategories();
-    renderCategoryList();
-
-    closeCategoryPopup();
-    notePopup.classList.remove("hidden");
-}
-
-// --- ELIMINA CATEGORIA ---
-function deleteCategory(i) {
-    categories.splice(i, 1);
-    saveCategories();
-    renderCategoryList();
-}
-
-// --- SALVA NOTA ---
-function saveNote() {
-    const text = document.getElementById("noteText").value.trim();
-    if (!text) {
-        alert("Scrivi qualcosa");
-        return;
-    }
-
-    notes.push({
-        text,
-        category: selectedCategory
-    });
-
-    saveNotes();
-    closeNotePopup();
-    renderNotes();
-}
-
-// --- MOSTRA NOTE ---
-function renderNotes() {
-    const container = document.getElementById("notesContainer");
-    container.innerHTML = "";
-
-    notes.forEach(n => {
-        const div = document.createElement("div");
-        div.className = "note";
-
-        let tagHTML = "";
-        if (n.category) {
-            const cat = categories.find(c => c.name === n.category);
-            if (cat) {
-                tagHTML = `<div class="category-tag" style="background:${cat.color}">${cat.name}</div>`;
-            }
-        }
-
-        div.innerHTML = `
-            ${tagHTML}
-            <p>${n.text}</p>
-        `;
-
-        container.appendChild(div);
-    });
-}
-
-renderNotes();
