@@ -157,3 +157,19 @@ textarea, input {
   transform: rotate(180deg) scale(1.2);
   opacity: 0.7;
 }
+/* NOTE — leggibilità perfetta */
+.note {
+  border-left: 8px solid;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  background: #ffffff;   /* sfondo chiaro */
+  color: #000000;        /* testo nero */
+}
+
+/* Testo interno sempre leggibile */
+.note h3,
+.note p,
+.note small {
+  color: #000000;
+}
