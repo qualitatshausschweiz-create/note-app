@@ -173,3 +173,50 @@ textarea, input {
 .note small {
   color: #000000;
 }
+/* --- IMPOSTAZIONI MODERNE --- */
+
+.modern-settings {
+  padding: 20px;
+}
+
+.settings-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.modern-btn {
+  width: 100%;
+  padding: 14px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 12px;
+  background: #f2f2f7;
+  font-size: 16px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: 0.2s;
+}
+
+.modern-btn:hover {
+  background: #e5e5ea;
+}
+
+.modern-close {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #ff3b30;
+  color: white;
+  font-weight: bold;
+  border: none;
+  transition: 0.2s;
+}
+
+.modern-close:hover {
+  background: #d32f2f;
+}
