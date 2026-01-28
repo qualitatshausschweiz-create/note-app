@@ -84,6 +84,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const settingsPanel = document.getElementById("settingsPanel");
   const closeSettingsPanel = document.getElementById("closeSettingsPanel");
 
+  const infoAppBtn = document.getElementById("infoAppBtn");
+  const themeSettingsBtn = document.getElementById("themeSettingsBtn");
+  const exportBackupBtn = document.getElementById("exportBackupBtn");
+  const resetDataBtn = document.getElementById("resetDataBtn");
+  const memoryStatusBtn = document.getElementById("memoryStatusBtn");
+
   let selectedCategory = null;
   let selectedNoteColor = "#1e90ff";
   let selectedCategoryColor = "#1e90ff";
@@ -334,7 +340,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---------- ⚙️ IMPOSTAZIONI (PRIMA PARTE) ----------
+  // ---------- ⚙️ IMPOSTAZIONI (VOCI FUNZIONANTI) ----------
 
   settingsBtn.onclick = () => {
     settingsPanel.classList.remove("hidden");
@@ -343,6 +349,82 @@ document.addEventListener("DOMContentLoaded", () => {
   closeSettingsPanel.onclick = () => {
     settingsPanel.classList.add("hidden");
   };
+
+  // Info App
+  if (infoAppBtn) {
+    infoAppBtn.onclick = () => {
+      alert("Note App – versione 1.0\nSviluppata da Sandro.");
+    };
+  }
+
+  // Tema chiaro/scuro
+  if (themeSettingsBtn) {
+    themeSettingsBtn.onclick = () => {
+      themeToggle.click();
+    };
+  }
+
+  // Esporta backup
+  if (exportBackupBtn) {
+    exportBackupBtn.onclick = () => {
+      const backup = {
+        categories,
+        notes,
+        trash,
+        timestamp: new Date().toISOString()
+      };
+
+      const dataStr = JSON.stringify(backup, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "note-app-backup.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+  }
+
+  // Reset totale dati
+  if (resetDataBtn) {
+    resetDataBtn.onclick = () => {
+      const conferma = confirm("Sei sicuro di voler cancellare tutti i dati?\nNote, categorie e cestino verranno eliminati.");
+      if (!conferma) return;
+
+      categories = [];
+      notes = [];
+      trash = [];
+      saveCategories();
+      saveNotes();
+      saveTrash();
+      renderNotes();
+      renderTrash();
+      alert("Dati cancellati con successo.");
+    };
+  }
+
+  // Stato memoria
+  if (memoryStatusBtn) {
+    memoryStatusBtn.onclick = () => {
+      const notesCount = notes.length;
+      const trashCount = trash.length;
+      const categoriesCount = categories.length;
+
+      const approxSize =
+        (JSON.stringify({ categories, notes, trash }).length / 1024).toFixed(1);
+
+      alert(
+        "Stato memoria:\n\n" +
+        "- Note: " + notesCount + "\n" +
+        "- Cestino: " + trashCount + "\n" +
+        "- Categorie: " + categoriesCount + "\n\n" +
+        "Dimensione approssimativa dati: " + approxSize + " KB"
+      );
+    };
+  }
 
   // ---------- AVVIO ----------
   renderNotes();
