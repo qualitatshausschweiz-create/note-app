@@ -64,10 +64,10 @@
       <button id="sortNotesBtn" class="settings-item">🔽 Ordina note</button>
 
       <div id="sortMenu" class="hidden sort-menu">
-        <button class="sortOption" data-sort="newest">Nuove → Vecchie</button>
-        <button class="sortOption" data-sort="oldest">Vecchie → Nuove</button>
-        <button class="sortOption" data-sort="color">Per colore</button>
-        <button class="sortOption" data-sort="category">Per categoria</button>
+        <button class="sortOption" onclick="sortNotes('newest')">Nuove → Vecchie</button>
+        <button class="sortOption" onclick="sortNotes('oldest')">Vecchie → Nuove</button>
+        <button class="sortOption" onclick="sortNotes('color')">Per colore</button>
+        <button class="sortOption" onclick="sortNotes('category')">Per categoria</button>
       </div>
 
       <button id="statsBtn" class="settings-item">📊 Statistiche</button>
