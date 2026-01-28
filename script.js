@@ -85,7 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeSettingsPanel = document.getElementById("closeSettingsPanel");
 
   const infoAppBtn = document.getElementById("infoAppBtn");
-  const themeSettingsBtn = document.getElementById("themeSettingsBtn");
   const exportBackupBtn = document.getElementById("exportBackupBtn");
   const resetDataBtn = document.getElementById("resetDataBtn");
   const memoryStatusBtn = document.getElementById("memoryStatusBtn");
@@ -340,7 +339,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---------- ⚙️ IMPOSTAZIONI (VOCI FUNZIONANTI) ----------
+  // ---------- ⚙️ IMPOSTAZIONI (senza tema chiaro/scuro) ----------
 
   settingsBtn.onclick = () => {
     settingsPanel.classList.remove("hidden");
@@ -357,7 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-// Esporta backup
+  // Esporta backup
   if (exportBackupBtn) {
     exportBackupBtn.onclick = () => {
       const backup = {
