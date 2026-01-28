@@ -30,7 +30,6 @@ body {
   cursor: pointer;
 }
 
-/* PANELLO + ANIMAZIONE PREMIUM */
 .panel {
   position: fixed;
   left: 0;
@@ -71,7 +70,6 @@ body {
   100% { transform: translateY(0); }
 }
 
-/* IMPOSTAZIONI */
 .settings-box {
   display: flex;
   flex-direction: column;
@@ -104,7 +102,6 @@ body {
   cursor: pointer;
 }
 
-/* NOTE */
 textarea, input {
   width: 100%;
   padding: 10px;
@@ -163,7 +160,6 @@ textarea, input {
   cursor: pointer;
 }
 
-/* ANIMAZIONE SOLE/LUNA */
 #themeToggle {
   transition: transform 0.25s ease, opacity 0.25s ease;
 }
