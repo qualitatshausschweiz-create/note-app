@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* TEMA SOLE/LUNA */
+  // THEME (una sola icona + animazione)
   const themeToggle = document.getElementById("themeToggle");
+
   const savedTheme = localStorage.getItem("theme");
 
   if (savedTheme === "dark") {
@@ -14,7 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   themeToggle.onclick = () => {
     themeToggle.classList.add("animate");
-    setTimeout(() => themeToggle.classList.remove("animate"), 250);
+
+    setTimeout(() => {
+      themeToggle.classList.remove("animate");
+    }, 250);
 
     if (document.body.classList.contains("dark")) {
       document.body.classList.remove("dark");
@@ -27,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  /* STORAGE */
+  // STORAGE
   let categories = JSON.parse(localStorage.getItem("categories")) || [
     { name: "Lavoro", color: "#1e90ff" },
     { name: "Spesa", color: "#ffa502" },
@@ -38,11 +42,17 @@ document.addEventListener("DOMContentLoaded", () => {
   let notes = JSON.parse(localStorage.getItem("notes")) || [];
   let trash = JSON.parse(localStorage.getItem("trash")) || [];
 
-  function saveCategories() { localStorage.setItem("categories", JSON.stringify(categories)); }
-  function saveNotes() { localStorage.setItem("notes", JSON.stringify(notes)); }
-  function saveTrash() { localStorage.setItem("trash", JSON.stringify(trash)); }
+  function saveCategories() {
+    localStorage.setItem("categories", JSON.stringify(categories));
+  }
+  function saveNotes() {
+    localStorage.setItem("notes", JSON.stringify(notes));
+  }
+  function saveTrash() {
+    localStorage.setItem("trash", JSON.stringify(trash));
+  }
 
-  /* ELEMENTI */
+  // ELEMENTI NOTE
   const addNoteBtn = document.getElementById("addNoteBtn");
   const notePanel = document.getElementById("notePanel");
   const closeNotePanel = document.getElementById("closeNotePanel");
@@ -53,11 +63,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const notePalette = document.getElementById("notePalette");
   const notesContainer = document.getElementById("notesContainer");
 
+  // ELEMENTI CESTINO
   const trashBtn = document.getElementById("trashBtn");
   const trashPanel = document.getElementById("trashPanel");
   const closeTrashPanel = document.getElementById("closeTrashPanel");
   const trashList = document.getElementById("trashList");
 
+  // ELEMENTI CATEGORIE
   const categoriesBtn = document.getElementById("categoriesBtn");
   const categoryPanel = document.getElementById("categoryPanel");
   const closeCategoryPanel = document.getElementById("closeCategoryPanel");
@@ -67,38 +79,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveCategoryBtn = document.getElementById("saveCategoryBtn");
   const categoryList = document.getElementById("categoryList");
 
-  const settingsBtn = document.getElementById("settingsBtn");
-  const settingsPanel = document.getElementById("settingsPanel");
-  const closeSettingsPanel = document.getElementById("closeSettingsPanel");
-
-  const infoAppBtn = document.getElementById("infoAppBtn");
-  const exportBackupBtn = document.getElementById("exportBackupBtn");
-  const resetDataBtn = document.getElementById("resetDataBtn");
-  const memoryStatusBtn = document.getElementById("memoryStatusBtn");
-
   let selectedCategory = null;
   let selectedNoteColor = "#1e90ff";
   let selectedCategoryColor = "#1e90ff";
 
-  /* ANIMAZIONE PANNELLI */
-  function openPanel(panel) {
-    panel.classList.remove("hidden");
-    setTimeout(() => panel.classList.add("show"), 10);
-  }
-
-  function closePanel(panel) {
-    panel.classList.remove("show");
-    setTimeout(() => panel.classList.add("hidden"), 250);
-  }
-
-  /* NOTE */
-  addNoteBtn.onclick = () => {
-    openPanel(notePanel);
+  // ---------- NOTE ----------
+   addNoteBtn.onclick = () => {
+    notePanel.classList.remove("hidden");
     renderCategoryButtons();
     renderNotePalette();
   };
 
-  closeNotePanel.onclick = () => closePanel(notePanel);
+  closeNotePanel.onclick = () => {
+    notePanel.classList.add("hidden");
+    resetNoteForm();
+  };
 
   function resetNoteForm() {
     noteTitle.value = "";
@@ -143,15 +138,20 @@ document.addEventListener("DOMContentLoaded", () => {
       notePalette.appendChild(div);
     });
 
-    notePalette.querySelector(".color").classList.add("selected");
+    const first = notePalette.querySelector(".color");
+    if (first) first.classList.add("selected");
   }
 
+  // SALVATAGGIO NOTA CORRETTO
   saveNoteBtn.onclick = () => {
     const titolo = noteTitle.value.trim();
     const testo = noteText.value.trim();
+
     if (!titolo && !testo) return;
 
-    const categoriaScelta = selectedCategory || categories[0].name;
+    const categoriaScelta =
+      selectedCategory ||
+      (categories.length > 0 ? categories[0].name : "Senza categoria");
 
     const newNote = {
       id: Date.now(),
@@ -166,11 +166,12 @@ document.addEventListener("DOMContentLoaded", () => {
     saveNotes();
     renderNotes();
     resetNoteForm();
-    closePanel(notePanel);
+    notePanel.classList.add("hidden");
   };
 
   function renderNotes() {
     notesContainer.innerHTML = "";
+
     notes.forEach(n => {
       const div = document.createElement("div");
       div.className = "note";
@@ -195,18 +196,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  renderNotes();
+  // ---------- CESTINO ----------
 
-  /* CESTINO */
   trashBtn.onclick = () => {
-    openPanel(trashPanel);
+    trashPanel.classList.remove("hidden");
     renderTrash();
   };
 
-  closeTrashPanel.onclick = () => closePanel(trashPanel);
+  closeTrashPanel.onclick = () => {
+    trashPanel.classList.add("hidden");
+  };
 
   function renderTrash() {
     trashList.innerHTML = "";
+
     if (trash.length === 0) {
       trashList.textContent = "Cestino vuoto";
       return;
@@ -244,14 +247,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* CATEGORIE */
+  // ---------- CATEGORIE ----------
+
   categoriesBtn.onclick = () => {
-    openPanel(categoryPanel);
+    categoryPanel.classList.remove("hidden");
     renderCategoryPalette();
     renderCategoryList();
   };
 
-  closeCategoryPanel.onclick = () => closePanel(categoryPanel);
+  closeCategoryPanel.onclick = () => {
+    categoryPanel.classList.add("hidden");
+    newCategoryName.value = "";
+  };
 
   function renderCategoryPalette() {
     const colors = ["#ff6b6b", "#ffa502", "#2ed573", "#1e90ff", "#a55eea", "#000000", "#ffffff"];
@@ -272,8 +279,12 @@ document.addEventListener("DOMContentLoaded", () => {
       categoryPalette.appendChild(div);
     });
 
-    categoryPalette.querySelector(".color").classList.add("selected");
-    categoryColorPicker.value = colors[0];
+    const first = categoryPalette.querySelector(".color");
+    if (first) {
+      first.classList.add("selected");
+      selectedCategoryColor = colors[0];
+      categoryColorPicker.value = colors[0];
+    }
 
     categoryColorPicker.oninput = (e) => {
       selectedCategoryColor = e.target.value;
@@ -301,9 +312,22 @@ document.addEventListener("DOMContentLoaded", () => {
       row.innerHTML = `
         <span>${cat.name}</span>
         <div style="display:flex;align-items:center;gap:8px;">
-          <div style="width:16px;height:16px;border-radius:50%;background:${cat.color}"></div>
+          <div style="width:16px;height:16px;border-radius:50%;background:${cat.color};"></div>
           <button data-index="${index}">❌</button>
         </div>
       `;
 
-      row.query
+      row.querySelector("button").onclick = () => {
+        categories.splice(index, 1);
+        saveCategories();
+        renderCategoryList();
+        renderCategoryButtons();
+      };
+
+      categoryList.appendChild(row);
+    });
+  }
+
+  // ---------- AVVIO ----------
+  renderNotes();
+});                  
