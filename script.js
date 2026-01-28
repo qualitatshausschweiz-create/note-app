@@ -1,5 +1,36 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+  // THEME (una sola icona + animazione)
+  const themeToggle = document.getElementById("themeToggle");
+
+  const savedTheme = localStorage.getItem("theme");
+
+  if (savedTheme === "dark") {
+    document.body.classList.add("dark");
+    themeToggle.textContent = "🌙";
+  } else {
+    document.body.classList.remove("dark");
+    themeToggle.textContent = "☀️";
+  }
+
+  themeToggle.onclick = () => {
+    themeToggle.classList.add("animate");
+
+    setTimeout(() => {
+      themeToggle.classList.remove("animate");
+    }, 250);
+
+    if (document.body.classList.contains("dark")) {
+      document.body.classList.remove("dark");
+      themeToggle.textContent = "☀️";
+      localStorage.setItem("theme", "light");
+    } else {
+      document.body.classList.add("dark");
+      themeToggle.textContent = "🌙";
+      localStorage.setItem("theme", "dark");
+    }
+  };
+
   // STORAGE
   let categories = JSON.parse(localStorage.getItem("categories")) || [
     { name: "Lavoro", color: "#1e90ff" },
@@ -54,6 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeSettingsPanel = document.getElementById("closeSettingsPanel");
 
   const infoAppBtn = document.getElementById("infoAppBtn");
+  const themeSettingsBtn = document.getElementById("themeSettingsBtn");
   const exportBackupBtn = document.getElementById("exportBackupBtn");
   const resetDataBtn = document.getElementById("resetDataBtn");
   const memoryStatusBtn = document.getElementById("memoryStatusBtn");
@@ -263,4 +295,130 @@ document.addEventListener("DOMContentLoaded", () => {
     if (first) {
       first.classList.add("selected");
       selectedCategoryColor = colors[0];
-      categoryColorPicker
+      categoryColorPicker.value = colors[0];
+    }
+
+    categoryColorPicker.oninput = (e) => {
+      selectedCategoryColor = e.target.value;
+      document.querySelectorAll("#categoryPalette .color").forEach(x => x.classList.remove("selected"));
+    };
+  }
+
+  saveCategoryBtn.onclick = () => {
+    const name = newCategoryName.value.trim();
+    if (!name) return;
+
+    categories.push({ name, color: selectedCategoryColor });
+    saveCategories();
+    newCategoryName.value = "";
+    renderCategoryList();
+    renderCategoryButtons();
+  };
+
+  function renderCategoryList() {
+    categoryList.innerHTML = "";
+
+    categories.forEach((cat, index) => {
+      const row = document.createElement("div");
+      row.className = "category-row";
+      row.innerHTML = `
+        <span>${cat.name}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:16px;height:16px;border-radius:50%;background:${cat.color};"></div>
+          <button data-index="${index}">❌</button>
+        </div>
+      `;
+
+      row.querySelector("button").onclick = () => {
+        categories.splice(index, 1);
+        saveCategories();
+        renderCategoryList();
+        renderCategoryButtons();
+      };
+
+      categoryList.appendChild(row);
+    });
+  }
+
+  // ---------- ⚙️ IMPOSTAZIONI (VOCI FUNZIONANTI) ----------
+
+  settingsBtn.onclick = () => {
+    settingsPanel.classList.remove("hidden");
+  };
+
+  closeSettingsPanel.onclick = () => {
+    settingsPanel.classList.add("hidden");
+  };
+
+  // Info App
+  if (infoAppBtn) {
+    infoAppBtn.onclick = () => {
+      alert("Note App – versione 1.0\nSviluppata da Sandro.");
+    };
+  }
+
+// Esporta backup
+  if (exportBackupBtn) {
+    exportBackupBtn.onclick = () => {
+      const backup = {
+        categories,
+        notes,
+        trash,
+        timestamp: new Date().toISOString()
+      };
+
+      const dataStr = JSON.stringify(backup, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "note-app-backup.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+  }
+
+  // Reset totale dati
+  if (resetDataBtn) {
+    resetDataBtn.onclick = () => {
+      const conferma = confirm("Sei sicuro di voler cancellare tutti i dati?\nNote, categorie e cestino verranno eliminati.");
+      if (!conferma) return;
+
+      categories = [];
+      notes = [];
+      trash = [];
+      saveCategories();
+      saveNotes();
+      saveTrash();
+      renderNotes();
+      renderTrash();
+      alert("Dati cancellati con successo.");
+    };
+  }
+
+  // Stato memoria
+  if (memoryStatusBtn) {
+    memoryStatusBtn.onclick = () => {
+      const notesCount = notes.length;
+      const trashCount = trash.length;
+      const categoriesCount = categories.length;
+
+      const approxSize =
+        (JSON.stringify({ categories, notes, trash }).length / 1024).toFixed(1);
+
+      alert(
+        "Stato memoria:\n\n" +
+        "- Note: " + notesCount + "\n" +
+        "- Cestino: " + trashCount + "\n" +
+        "- Categorie: " + categoriesCount + "\n\n" +
+        "Dimensione approssimativa dati: " + approxSize + " KB"
+      );
+    };
+  }
+
+  // ---------- AVVIO ----------
+  renderNotes();
+});
