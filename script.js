@@ -338,9 +338,17 @@ document.addEventListener("DOMContentLoaded", () => {
     alert("Funzione Importa backup in arrivo!");
   };
 
-  syncCloudBtn.onclick = () => {
-    alert("Sincronizzazione Google Drive / iCloud non ancora attiva.");
-  };
+ /* Pulsante Sync Cloud */
+syncCloudBtn.onclick = () => {
+  if (!accessToken) {
+    getDriveToken(() => {
+      uploadBackupToDrive();
+    });
+  } else {
+    uploadBackupToDrive();
+  }
+};
+
 
   autoThemeBtn.onclick = () => {
     const hour = new Date().getHours();
