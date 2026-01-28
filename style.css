@@ -30,7 +30,7 @@ body {
   cursor: pointer;
 }
 
-/* PANELLO BASE */
+/* PANELLO BASE + ANIMAZIONE PREMIUM */
 .panel {
   position: fixed;
   left: 0;
@@ -69,6 +69,22 @@ body {
   0% { transform: translateY(100%); }
   60% { transform: translateY(-6%); }
   100% { transform: translateY(0); }
+}
+
+/* DIVIDER STILE iOS */
+.settings-divider {
+  width: 100%;
+  text-align: left;
+  padding: 14px 12px;
+  font-size: 17px;
+  border: none;
+  background: var(--bg);
+  border-bottom: 1px solid rgba(0,0,0,0.12);
+  cursor: pointer;
+}
+
+.settings-divider:last-of-type {
+  border-bottom: none;
 }
 
 textarea, input {
@@ -120,10 +136,6 @@ textarea, input {
   border-radius: 10px;
 }
 
-.note h3 { margin: 0; }
-.note p { margin: 4px 0; }
-.note small { opacity: 0.6; }
-
 .save, .close {
   width: 100%;
   padding: 10px;
@@ -131,29 +143,6 @@ textarea, input {
   border-radius: 10px;
   border: none;
   cursor: pointer;
-}
-
-#categoryList {
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.category-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6px 10px;
-  border-radius: 10px;
-  background: rgba(0,0,0,0.04);
-}
-
-.category-row button {
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 16px;
 }
 
 /* ANIMAZIONE SOLE/LUNA */
