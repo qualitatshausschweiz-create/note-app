@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  // THEME
+  /* TEMA SOLE/LUNA */
   const themeToggle = document.getElementById("themeToggle");
   const savedTheme = localStorage.getItem("theme");
 
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // STORAGE
+  /* STORAGE */
   let categories = JSON.parse(localStorage.getItem("categories")) || [
     { name: "Lavoro", color: "#1e90ff" },
     { name: "Spesa", color: "#ffa502" },
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function saveNotes() { localStorage.setItem("notes", JSON.stringify(notes)); }
   function saveTrash() { localStorage.setItem("trash", JSON.stringify(trash)); }
 
-  // ELEMENTI
+  /* ELEMENTI */
   const addNoteBtn = document.getElementById("addNoteBtn");
   const notePanel = document.getElementById("notePanel");
   const closeNotePanel = document.getElementById("closeNotePanel");
@@ -80,18 +80,25 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedNoteColor = "#1e90ff";
   let selectedCategoryColor = "#1e90ff";
 
-  // NOTE
+  /* ANIMAZIONE PANNELLI */
+  function openPanel(panel) {
+    panel.classList.remove("hidden");
+    setTimeout(() => panel.classList.add("show"), 10);
+  }
+
+  function closePanel(panel) {
+    panel.classList.remove("show");
+    setTimeout(() => panel.classList.add("hidden"), 250);
+  }
+
+  /* NOTE */
   addNoteBtn.onclick = () => {
-    notePanel.classList.remove("hidden");
-    setTimeout(() => notePanel.classList.add("show"), 10);
+    openPanel(notePanel);
     renderCategoryButtons();
     renderNotePalette();
   };
 
-  closeNotePanel.onclick = () => {
-    notePanel.classList.remove("show");
-    setTimeout(() => notePanel.classList.add("hidden"), 250);
-  };
+  closeNotePanel.onclick = () => closePanel(notePanel);
 
   function resetNoteForm() {
     noteTitle.value = "";
@@ -136,8 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
       notePalette.appendChild(div);
     });
 
-    const first = notePalette.querySelector(".color");
-    if (first) first.classList.add("selected");
+    notePalette.querySelector(".color").classList.add("selected");
   }
 
   saveNoteBtn.onclick = () => {
@@ -145,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const testo = noteText.value.trim();
     if (!titolo && !testo) return;
 
-    const categoriaScelta = selectedCategory || (categories.length > 0 ? categories[0].name : "Senza categoria");
+    const categoriaScelta = selectedCategory || categories[0].name;
 
     const newNote = {
       id: Date.now(),
@@ -160,8 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
     saveNotes();
     renderNotes();
     resetNoteForm();
-    notePanel.classList.remove("show");
-    setTimeout(() => notePanel.classList.add("hidden"), 250);
+    closePanel(notePanel);
   };
 
   function renderNotes() {
@@ -190,17 +195,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // CESTINO
+  renderNotes();
+
+  /* CESTINO */
   trashBtn.onclick = () => {
-    trashPanel.classList.remove("hidden");
-    setTimeout(() => trashPanel.classList.add("show"), 10);
+    openPanel(trashPanel);
     renderTrash();
   };
 
-  closeTrashPanel.onclick = () => {
-    trashPanel.classList.remove("show");
-    setTimeout(() => trashPanel.classList.add("hidden"), 250);
-  };
+  closeTrashPanel.onclick = () => closePanel(trashPanel);
 
   function renderTrash() {
     trashList.innerHTML = "";
@@ -241,18 +244,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // CATEGORIE
+  /* CATEGORIE */
   categoriesBtn.onclick = () => {
-    categoryPanel.classList.remove("hidden");
-    setTimeout(() => categoryPanel.classList.add("show"), 10);
+    openPanel(categoryPanel);
     renderCategoryPalette();
     renderCategoryList();
   };
 
-  closeCategoryPanel.onclick = () => {
-    categoryPanel.classList.remove("show");
-    setTimeout(() => categoryPanel.classList.add("hidden"), 250);
-  };
+  closeCategoryPanel.onclick = () => closePanel(categoryPanel);
 
   function renderCategoryPalette() {
     const colors = ["#ff6b6b", "#ffa502", "#2ed573", "#1e90ff", "#a55eea", "#000000", "#ffffff"];
@@ -273,12 +272,8 @@ document.addEventListener("DOMContentLoaded", () => {
       categoryPalette.appendChild(div);
     });
 
-    const first = categoryPalette.querySelector(".color");
-    if (first) {
-      first.classList.add("selected");
-      selectedCategoryColor = colors[0];
-      categoryColorPicker.value = colors[0];
-    }
+    categoryPalette.querySelector(".color").classList.add("selected");
+    categoryColorPicker.value = colors[0];
 
     categoryColorPicker.oninput = (e) => {
       selectedCategoryColor = e.target.value;
@@ -297,4 +292,13 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCategoryButtons();
   };
 
-  function render
+  function renderCategoryList() {
+    categoryList.innerHTML = "";
+
+    categories.forEach((cat, index) => {
+      const row = document.createElement("div");
+      row.className = "category-row";
+      row.innerHTML = `
+        <span>${cat.name}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:16px;height:16px;border-radius:50%;background:${cat.color
