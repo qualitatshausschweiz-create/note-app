@@ -50,15 +50,34 @@
 
   <!-- Pannello Impostazioni -->
   <div id="settingsPanel" class="panel hidden">
-    <div class="panel-content">
+    <div class="panel-content settings-box">
+
       <h2>Impostazioni ⚙️</h2>
 
-      <button class="settings-divider">ℹ️ Info App</button>
-      <button class="settings-divider">📤 Esporta backup</button>
-      <button class="settings-divider">🗑️ Reset totale dati</button>
-      <button class="settings-divider">💾 Stato memoria</button>
+      <div class="settings-section">
+        <button id="infoAppBtn">ℹ️ Info App</button>
+      </div>
+
+      <div class="settings-divider"></div>
+
+      <div class="settings-section">
+        <button id="exportBackupBtn">📤 Esporta backup</button>
+      </div>
+
+      <div class="settings-divider"></div>
+
+      <div class="settings-section">
+        <button id="resetDataBtn">🗑️ Reset totale dati</button>
+      </div>
+
+      <div class="settings-divider"></div>
+
+      <div class="settings-section">
+        <button id="memoryStatusBtn">💾 Stato memoria</button>
+      </div>
 
       <button id="closeSettingsPanel" class="close">Chiudi</button>
+
     </div>
   </div>
 
