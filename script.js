@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const testo = noteText.value.trim();
     if (!titolo && !testo) return;
 
-    const categoriaScelta = selectedCategory || (categories[0] && categories[0].name) || "Senza categoria";
+    const categoriaScelta = selectedCategory || categories[0].name;
 
     const newNote = {
       id: Date.now(),
@@ -182,12 +182,12 @@ document.addEventListener("DOMContentLoaded", () => {
     notes.forEach(n => {
       const div = document.createElement("div");
       div.className = "note";
-      div.style.borderLeftColor = n.colore || "#1e90ff";
+      div.style.borderLeftColor = n.colore;
 
       div.innerHTML = `
         <h3>${n.titolo}</h3>
         <p>${n.testo}</p>
-        <small>${n.categoria || ""}</small><br>
+        <small>${n.categoria}</small><br>
         <button class="deleteNote">Elimina</button>
       `;
 
@@ -223,12 +223,12 @@ document.addEventListener("DOMContentLoaded", () => {
     trash.forEach(n => {
       const div = document.createElement("div");
       div.className = "note";
-      div.style.borderLeftColor = n.colore || "#1e90ff";
+      div.style.borderLeftColor = n.colore;
 
       div.innerHTML = `
         <h3>${n.titolo}</h3>
         <p>${n.testo}</p>
-        <small>${n.categoria || ""}</small><br>
+        <small>${n.categoria}</small><br>
         <button class="restoreNote">Ripristina</button>
         <button class="deleteForever">Elimina definitivamente</button>
       `;
@@ -376,32 +376,33 @@ document.addEventListener("DOMContentLoaded", () => {
     reader.readAsText(file);
   };
 
-  /* Ordina note */
+  /* Ordina note — FIX DEFINITIVO */
   sortNotesBtn.onclick = () => {
     sortMenu.classList.toggle("hidden");
   };
 
-  document.querySelectorAll(".sortOption").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const type = btn.dataset.sort;
+  sortMenu.addEventListener("click", (e) => {
+    const btn = e.target.closest(".sortOption");
+    if (!btn) return;
 
-      if (type === "newest") {
-        notes.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
-      }
-      if (type === "oldest") {
-        notes.sort((a, b) => new Date(a.data || 0) - new Date(b.data || 0));
-      }
-      if (type === "color") {
-        notes.sort((a, b) => (a.colore || "").localeCompare(b.colore || ""));
-      }
-      if (type === "category") {
-        notes.sort((a, b) => (a.categoria || "").localeCompare(b.categoria || ""));
-      }
+    const type = btn.dataset.sort;
 
-      saveNotes();
-      renderNotes();
-      sortMenu.classList.add("hidden");
-    });
+    if (type === "newest") {
+      notes.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
+    }
+    if (type === "oldest") {
+      notes.sort((a, b) => new Date(a.data || 0) - new Date(b.data || 0));
+    }
+    if (type === "color") {
+      notes.sort((a, b) => (a.colore || "").localeCompare(b.colore || ""));
+    }
+    if (type === "category") {
+      notes.sort((a, b) => (a.categoria || "").localeCompare(b.categoria || ""));
+    }
+
+    saveNotes();
+    renderNotes();
+    sortMenu.classList.add("hidden");
   });
 
   /* Statistiche */
@@ -412,8 +413,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const mostUsedCategory = notes.length
       ? notes.reduce((acc, n) => {
-          const key = n.categoria || "Senza categoria";
-          acc[key] = (acc[key] || 0) + 1;
+          acc[n.categoria] = (acc[n.categoria] || 0) + 1;
           return acc;
         }, {})
       : {};
@@ -422,8 +422,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const mostUsedColor = notes.length
       ? notes.reduce((acc, n) => {
-          const key = n.colore || "#1e90ff";
-          acc[key] = (acc[key] || 0) + 1;
+          acc[n.colore] = (acc[n.colore] || 0) + 1;
           return acc;
         }, {})
       : {};
@@ -431,7 +430,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const topColor = Object.entries(mostUsedColor).sort((a, b) => b[1] - a[1])[0]?.[0] || "Nessuno";
 
     const lastNote = notes.length
-      ? new Date(Math.max(...notes.map(n => new Date(n.data || 0)))).toLocaleString()
+      ? new Date(Math.max(...notes.map(n => new Date(n.data)))).toLocaleString()
       : "Nessuna";
 
     alert(
