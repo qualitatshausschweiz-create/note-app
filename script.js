@@ -153,12 +153,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     notePalette.querySelector(".color").classList.add("selected");
   }
+
   saveNoteBtn.onclick = () => {
     const titolo = noteTitle.value.trim();
     const testo = noteText.value.trim();
     if (!titolo && !testo) return;
 
-    const categoriaScelta = selectedCategory || categories[0].name;
+    const categoriaScelta = selectedCategory || (categories[0] && categories[0].name) || "Senza categoria";
 
     const newNote = {
       id: Date.now(),
@@ -181,12 +182,12 @@ document.addEventListener("DOMContentLoaded", () => {
     notes.forEach(n => {
       const div = document.createElement("div");
       div.className = "note";
-      div.style.borderLeftColor = n.colore;
+      div.style.borderLeftColor = n.colore || "#1e90ff";
 
       div.innerHTML = `
         <h3>${n.titolo}</h3>
         <p>${n.testo}</p>
-        <small>${n.categoria}</small><br>
+        <small>${n.categoria || ""}</small><br>
         <button class="deleteNote">Elimina</button>
       `;
 
@@ -222,12 +223,12 @@ document.addEventListener("DOMContentLoaded", () => {
     trash.forEach(n => {
       const div = document.createElement("div");
       div.className = "note";
-      div.style.borderLeftColor = n.colore;
+      div.style.borderLeftColor = n.colore || "#1e90ff";
 
       div.innerHTML = `
         <h3>${n.titolo}</h3>
         <p>${n.testo}</p>
-        <small>${n.categoria}</small><br>
+        <small>${n.categoria || ""}</small><br>
         <button class="restoreNote">Ripristina</button>
         <button class="deleteForever">Elimina definitivamente</button>
       `;
@@ -342,6 +343,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* Importa backup */
   importBackupBtn.onclick = () => {
+    importFileInput.value = "";
     importFileInput.click();
   };
 
@@ -380,26 +382,26 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   document.querySelectorAll(".sortOption").forEach(btn => {
-    btn.onclick = () => {
+    btn.addEventListener("click", () => {
       const type = btn.dataset.sort;
 
       if (type === "newest") {
-        notes.sort((a, b) => new Date(b.data) - new Date(a.data));
+        notes.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
       }
       if (type === "oldest") {
-        notes.sort((a, b) => new Date(a.data) - new Date(b.data));
+        notes.sort((a, b) => new Date(a.data || 0) - new Date(b.data || 0));
       }
       if (type === "color") {
-        notes.sort((a, b) => a.colore.localeCompare(b.colore));
+        notes.sort((a, b) => (a.colore || "").localeCompare(b.colore || ""));
       }
       if (type === "category") {
-        notes.sort((a, b) => a.categoria.localeCompare(b.categoria));
+        notes.sort((a, b) => (a.categoria || "").localeCompare(b.categoria || ""));
       }
 
       saveNotes();
       renderNotes();
       sortMenu.classList.add("hidden");
-    };
+    });
   });
 
   /* Statistiche */
@@ -410,7 +412,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const mostUsedCategory = notes.length
       ? notes.reduce((acc, n) => {
-          acc[n.categoria] = (acc[n.categoria] || 0) + 1;
+          const key = n.categoria || "Senza categoria";
+          acc[key] = (acc[key] || 0) + 1;
           return acc;
         }, {})
       : {};
@@ -419,7 +422,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const mostUsedColor = notes.length
       ? notes.reduce((acc, n) => {
-          acc[n.colore] = (acc[n.colore] || 0) + 1;
+          const key = n.colore || "#1e90ff";
+          acc[key] = (acc[key] || 0) + 1;
           return acc;
         }, {})
       : {};
@@ -427,7 +431,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const topColor = Object.entries(mostUsedColor).sort((a, b) => b[1] - a[1])[0]?.[0] || "Nessuno";
 
     const lastNote = notes.length
-      ? new Date(Math.max(...notes.map(n => new Date(n.data)))).toLocaleString()
+      ? new Date(Math.max(...notes.map(n => new Date(n.data || 0)))).toLocaleString()
       : "Nessuna";
 
     alert(
@@ -443,7 +447,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* Pannello impostazioni */
   settingsBtn.onclick = () => openPanel(settingsPanel);
-  closeSettingsPanel.onclick = () => closePanel(settingsPanel);
+  closeSettingsPanel.onclick = () => {
+    sortMenu.classList.add("hidden");
+    closePanel(settingsPanel);
+  };
 
   /* Backup completo */
   exportBackupBtn.onclick = () => {
