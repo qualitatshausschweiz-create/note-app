@@ -71,22 +71,29 @@ body {
   100% { transform: translateY(0); }
 }
 
-/* DIVIDER STILE iOS */
-.settings-divider {
+/* IMPOSTAZIONI — SECONDA PARTE */
+.settings-box {
+  padding-top: 10px;
+}
+
+.settings-section button {
   width: 100%;
-  text-align: left;
-  padding: 14px 12px;
+  padding: 14px;
   font-size: 17px;
+  text-align: left;
+  background: none;
   border: none;
-  background: var(--bg);
-  border-bottom: 1px solid rgba(0,0,0,0.12);
   cursor: pointer;
 }
 
-.settings-divider:last-of-type {
-  border-bottom: none;
+.settings-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(0,0,0,0.15);
+  margin: 4px 0;
 }
 
+/* NOTE */
 textarea, input {
   width: 100%;
   padding: 10px;
