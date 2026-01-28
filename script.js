@@ -79,6 +79,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveCategoryBtn = document.getElementById("saveCategoryBtn");
   const categoryList = document.getElementById("categoryList");
 
+  // ⚙️ ELEMENTI IMPOSTAZIONI
+  const settingsBtn = document.getElementById("settingsBtn");
+  const settingsPanel = document.getElementById("settingsPanel");
+  const closeSettingsPanel = document.getElementById("closeSettingsPanel");
+
   let selectedCategory = null;
   let selectedNoteColor = "#1e90ff";
   let selectedCategoryColor = "#1e90ff";
@@ -328,6 +333,16 @@ document.addEventListener("DOMContentLoaded", () => {
       categoryList.appendChild(row);
     });
   }
+
+  // ---------- ⚙️ IMPOSTAZIONI (PRIMA PARTE) ----------
+
+  settingsBtn.onclick = () => {
+    settingsPanel.classList.remove("hidden");
+  };
+
+  closeSettingsPanel.onclick = () => {
+    settingsPanel.classList.add("hidden");
+  };
 
   // ---------- AVVIO ----------
   renderNotes();
