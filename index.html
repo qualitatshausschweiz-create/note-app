@@ -57,11 +57,27 @@
       <h2>Impostazioni ⚙️</h2>
 
       <button id="infoAppBtn" class="settings-item">ℹ️ Info App</button>
-      <button id="exportBackupBtn" class="settings-item">📤 Esporta backup</button>
+      <button id="exportBackupBtn" class="settings-item">📤 Esporta backup completo</button>
+      <button id="exportNotesOnlyBtn" class="settings-item">📄 Esporta solo note</button>
+      <button id="importBackupBtn" class="settings-item">📥 Importa backup</button>
+
+      <button id="sortNotesBtn" class="settings-item">🔽 Ordina note</button>
+
+      <div id="sortMenu" class="hidden sort-menu">
+        <button class="sortOption" data-sort="newest">Nuove → Vecchie</button>
+        <button class="sortOption" data-sort="oldest">Vecchie → Nuove</button>
+        <button class="sortOption" data-sort="color">Per colore</button>
+        <button class="sortOption" data-sort="category">Per categoria</button>
+      </div>
+
+      <button id="statsBtn" class="settings-item">📊 Statistiche</button>
+
       <button id="resetDataBtn" class="settings-item">🗑️ Reset totale dati</button>
       <button id="memoryStatusBtn" class="settings-item">💾 Stato memoria</button>
 
       <button id="closeSettingsPanel" class="close">Chiudi</button>
+
+      <input type="file" id="importFileInput" class="hidden" accept="application/json">
 
     </div>
   </div>
