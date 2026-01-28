@@ -297,17 +297,4 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCategoryButtons();
   };
 
-  function renderCategoryList() {
-    categoryList.innerHTML = "";
-
-    categories.forEach((cat, index) => {
-      const row = document.createElement("div");
-      row.className = "category-row";
-      row.innerHTML = `
-        <span>${cat.name}</span>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div style="width:16px;height:16px;border-radius:50%;background:${cat.color};"></div>
-          <button data-index="${index}">❌</button>
-        </div>
-      `;
-
+  function render
