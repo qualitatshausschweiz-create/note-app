@@ -307,4 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <span>${cat.name}</span>
         <div style="display:flex;align-items:center;gap:8px;">
           <div style="width:16px;height:16px;border-radius:50%;background:${cat.color};"></div>
-          <button data
+          <button data-index="${index}">❌</button>
+        </div>
+      `;
+
