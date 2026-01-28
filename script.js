@@ -317,7 +317,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* IMPOSTAZIONI — ⚙️ FUNZIONANTE */
+  /* IMPOSTAZIONI — ⚙️ */
   settingsBtn.onclick = () => {
     openPanel(settingsPanel);
   };
@@ -331,11 +331,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   exportBackupBtn.onclick = () => {
-    const backup = {
-      notes,
-      categories,
-      trash
-    };
+    const backup = { notes, categories, trash };
     const data = JSON.stringify(backup, null, 2);
     const blob = new Blob([data], { type: "application/json" });
     const url = URL.createObjectURL(blob);
