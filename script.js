@@ -73,6 +73,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const infoAppBtn = document.getElementById("infoAppBtn");
   const exportBackupBtn = document.getElementById("exportBackupBtn");
+  const exportNotesOnlyBtn = document.getElementById("exportNotesOnlyBtn");
+  const importBackupBtn = document.getElementById("importBackupBtn");
+  const importFileInput = document.getElementById("importFileInput");
+
+  const sortNotesBtn = document.getElementById("sortNotesBtn");
+  const sortMenu = document.getElementById("sortMenu");
+  const statsBtn = document.getElementById("statsBtn");
+
   const resetDataBtn = document.getElementById("resetDataBtn");
   const memoryStatusBtn = document.getElementById("memoryStatusBtn");
 
@@ -145,7 +153,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     notePalette.querySelector(".color").classList.add("selected");
   }
-
   saveNoteBtn.onclick = () => {
     const titolo = noteTitle.value.trim();
     const testo = noteText.value.trim();
@@ -317,19 +324,128 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* IMPOSTAZIONI — ⚙️ */
-  settingsBtn.onclick = () => {
-    openPanel(settingsPanel);
+  /* ⚙️ IMPOSTAZIONI — NUOVE FUNZIONI */
+
+  /* Esporta solo note */
+  exportNotesOnlyBtn.onclick = () => {
+    const data = JSON.stringify(notes, null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "note_export.json";
+    a.click();
+
+    URL.revokeObjectURL(url);
   };
 
-  closeSettingsPanel.onclick = () => {
-    closePanel(settingsPanel);
+  /* Importa backup */
+  importBackupBtn.onclick = () => {
+    importFileInput.click();
   };
 
-  infoAppBtn.onclick = () => {
-    alert("Note App — Versione 1.0\nSviluppata da Sandro");
+  importFileInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+
+        notes = data.notes || [];
+        categories = data.categories || [];
+        trash = data.trash || [];
+
+        saveNotes();
+        saveCategories();
+        saveTrash();
+
+        renderNotes();
+        renderCategoryList();
+
+        alert("Backup importato con successo!");
+      } catch {
+        alert("Errore: file non valido.");
+      }
+    };
+
+    reader.readAsText(file);
   };
 
+  /* Ordina note */
+  sortNotesBtn.onclick = () => {
+    sortMenu.classList.toggle("hidden");
+  };
+
+  document.querySelectorAll(".sortOption").forEach(btn => {
+    btn.onclick = () => {
+      const type = btn.dataset.sort;
+
+      if (type === "newest") {
+        notes.sort((a, b) => new Date(b.data) - new Date(a.data));
+      }
+      if (type === "oldest") {
+        notes.sort((a, b) => new Date(a.data) - new Date(b.data));
+      }
+      if (type === "color") {
+        notes.sort((a, b) => a.colore.localeCompare(b.colore));
+      }
+      if (type === "category") {
+        notes.sort((a, b) => a.categoria.localeCompare(b.categoria));
+      }
+
+      saveNotes();
+      renderNotes();
+      sortMenu.classList.add("hidden");
+    };
+  });
+
+  /* Statistiche */
+  statsBtn.onclick = () => {
+    const totalNotes = notes.length;
+    const totalCategories = categories.length;
+    const totalTrash = trash.length;
+
+    const mostUsedCategory = notes.length
+      ? notes.reduce((acc, n) => {
+          acc[n.categoria] = (acc[n.categoria] || 0) + 1;
+          return acc;
+        }, {})
+      : {};
+
+    const topCategory = Object.entries(mostUsedCategory).sort((a, b) => b[1] - a[1])[0]?.[0] || "Nessuna";
+
+    const mostUsedColor = notes.length
+      ? notes.reduce((acc, n) => {
+          acc[n.colore] = (acc[n.colore] || 0) + 1;
+          return acc;
+        }, {})
+      : {};
+
+    const topColor = Object.entries(mostUsedColor).sort((a, b) => b[1] - a[1])[0]?.[0] || "Nessuno";
+
+    const lastNote = notes.length
+      ? new Date(Math.max(...notes.map(n => new Date(n.data)))).toLocaleString()
+      : "Nessuna";
+
+    alert(
+      `📊 STATISTICHE\n\n` +
+      `Note totali: ${totalNotes}\n` +
+      `Categorie: ${totalCategories}\n` +
+      `Cestino: ${totalTrash}\n\n` +
+      `Categoria più usata: ${topCategory}\n` +
+      `Colore più usato: ${topColor}\n` +
+      `Ultima nota: ${lastNote}`
+    );
+  };
+
+  /* Pannello impostazioni */
+  settingsBtn.onclick = () => openPanel(settingsPanel);
+  closeSettingsPanel.onclick = () => closePanel(settingsPanel);
+
+  /* Backup completo */
   exportBackupBtn.onclick = () => {
     const backup = { notes, categories, trash };
     const data = JSON.stringify(backup, null, 2);
@@ -344,6 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
     URL.revokeObjectURL(url);
   };
 
+  /* Reset totale */
   resetDataBtn.onclick = () => {
     if (confirm("Vuoi davvero cancellare tutti i dati?")) {
       notes = [];
@@ -358,6 +475,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  /* Stato memoria */
   memoryStatusBtn.onclick = () => {
     const size = new Blob([JSON.stringify({ notes, categories, trash })]).size;
     alert("Memoria usata: " + size + " bytes");
