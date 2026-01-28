@@ -1,6 +1,25 @@
+function sortNotes(type) {
+  let notesData = JSON.parse(localStorage.getItem("notes")) || [];
+
+  if (type === "newest") {
+    notesData.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
+  }
+  if (type === "oldest") {
+    notesData.sort((a, b) => new Date(a.data || 0) - new Date(b.data || 0));
+  }
+  if (type === "color") {
+    notesData.sort((a, b) => (a.colore || "").localeCompare(b.colore || ""));
+  }
+  if (type === "category") {
+    notesData.sort((a, b) => (a.categoria || "").localeCompare(b.categoria || ""));
+  }
+
+  localStorage.setItem("notes", JSON.stringify(notesData));
+  location.reload();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* TEMA SOLE/LUNA */
   const themeToggle = document.getElementById("themeToggle");
   const savedTheme = localStorage.getItem("theme");
 
@@ -27,7 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  /* STORAGE */
   let categories = JSON.parse(localStorage.getItem("categories")) || [
     { name: "Lavoro", color: "#1e90ff" },
     { name: "Spesa", color: "#ffa502" },
@@ -42,7 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function saveNotes() { localStorage.setItem("notes", JSON.stringify(notes)); }
   function saveTrash() { localStorage.setItem("trash", JSON.stringify(trash)); }
 
-  /* ELEMENTI */
   const addNoteBtn = document.getElementById("addNoteBtn");
   const notePanel = document.getElementById("notePanel");
   const closeNotePanel = document.getElementById("closeNotePanel");
@@ -88,7 +105,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedNoteColor = "#1e90ff";
   let selectedCategoryColor = "#1e90ff";
 
-  /* ANIMAZIONE PANNELLI */
   function openPanel(panel) {
     panel.classList.remove("hidden");
     setTimeout(() => panel.classList.add("show"), 10);
@@ -99,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => panel.classList.add("hidden"), 250);
   }
 
-  /* NOTE */
   addNoteBtn.onclick = () => {
     openPanel(notePanel);
     renderCategoryButtons();
@@ -205,7 +220,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderNotes();
 
-  /* CESTINO */
   trashBtn.onclick = () => {
     openPanel(trashPanel);
     renderTrash();
@@ -252,7 +266,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* CATEGORIE */
   categoriesBtn.onclick = () => {
     openPanel(categoryPanel);
     renderCategoryPalette();
@@ -325,9 +338,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* ⚙️ IMPOSTAZIONI — NUOVE FUNZIONI */
-
-  /* Esporta solo note */
   exportNotesOnlyBtn.onclick = () => {
     const data = JSON.stringify(notes, null, 2);
     const blob = new Blob([data], { type: "application/json" });
@@ -341,7 +351,6 @@ document.addEventListener("DOMContentLoaded", () => {
     URL.revokeObjectURL(url);
   };
 
-  /* Importa backup */
   importBackupBtn.onclick = () => {
     importFileInput.value = "";
     importFileInput.click();
@@ -376,36 +385,10 @@ document.addEventListener("DOMContentLoaded", () => {
     reader.readAsText(file);
   };
 
-  /* Ordina note — FIX DEFINITIVO */
   sortNotesBtn.onclick = () => {
     sortMenu.classList.toggle("hidden");
   };
 
-  sortMenu.addEventListener("click", (e) => {
-    const btn = e.target.closest(".sortOption");
-    if (!btn) return;
-
-    const type = btn.dataset.sort;
-
-    if (type === "newest") {
-      notes.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
-    }
-    if (type === "oldest") {
-      notes.sort((a, b) => new Date(a.data || 0) - new Date(b.data || 0));
-    }
-    if (type === "color") {
-      notes.sort((a, b) => (a.colore || "").localeCompare(b.colore || ""));
-    }
-    if (type === "category") {
-      notes.sort((a, b) => (a.categoria || "").localeCompare(b.categoria || ""));
-    }
-
-    saveNotes();
-    renderNotes();
-    sortMenu.classList.add("hidden");
-  });
-
-  /* Statistiche */
   statsBtn.onclick = () => {
     const totalNotes = notes.length;
     const totalCategories = categories.length;
@@ -444,14 +427,12 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   };
 
-  /* Pannello impostazioni */
   settingsBtn.onclick = () => openPanel(settingsPanel);
   closeSettingsPanel.onclick = () => {
     sortMenu.classList.add("hidden");
     closePanel(settingsPanel);
   };
 
-  /* Backup completo */
   exportBackupBtn.onclick = () => {
     const backup = { notes, categories, trash };
     const data = JSON.stringify(backup, null, 2);
@@ -466,7 +447,6 @@ document.addEventListener("DOMContentLoaded", () => {
     URL.revokeObjectURL(url);
   };
 
-  /* Reset totale */
   resetDataBtn.onclick = () => {
     if (confirm("Vuoi davvero cancellare tutti i dati?")) {
       notes = [];
@@ -481,7 +461,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  /* Stato memoria */
   memoryStatusBtn.onclick = () => {
     const size = new Blob([JSON.stringify({ notes, categories, trash })]).size;
     alert("Memoria usata: " + size + " bytes");
