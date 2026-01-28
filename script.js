@@ -1,4 +1,25 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const CLIENT_ID = "792122447047-u30lrb5oo1jjbnkibfh420ah0o95e3d8.apps.googleusercontent.com";
+  const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
+  let accessToken = null;
+
+  function getDriveToken(callback) {
+    const tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: DRIVE_SCOPE,
+      callback: (response) => {
+        if (response.access_token) {
+          accessToken = response.access_token;
+          callback();
+        } else {
+          alert("Errore nel recupero del token Google Drive.");
+        }
+      }
+    });
+
+    tokenClient.requestAccessToken();
+  }
+
 
   /* TEMA SOLE/LUNA */
   const themeToggle = document.getElementById("themeToggle");
@@ -352,6 +373,14 @@ document.addEventListener("DOMContentLoaded", () => {
       saveNotes();
       saveCategories();
       saveTrash();
+      function createBackupObject() {
+  return {
+    notes,
+    categories,
+    trash
+  };
+}
+
       renderNotes();
       renderCategoryList();
       alert("Dati cancellati.");
@@ -362,5 +391,58 @@ document.addEventListener("DOMContentLoaded", () => {
     const size = new Blob([JSON.stringify({ notes, categories, trash })]).size;
     alert("Memoria usata: " + size + " bytes");
   };
+async function uploadBackupToDrive() {
+  if (!accessToken) {
+    alert("Token Google non presente.");
+    return;
+  }
+
+  const backup = createBackupObject();
+
+  const metadata = {
+    name: "note_app_backup.json",
+    mimeType: "application/json"
+  };
+
+  const boundary = "-------314159265358979323846";
+  const delimiter = "\r\n--" + boundary + "\r\n";
+  const closeDelimiter = "\r\n--" + boundary + "--";
+
+  const body =
+    delimiter +
+    "Content-Type: application/json; charset=UTF-8\r\n\r\n" +
+    JSON.stringify(metadata) +
+    delimiter +
+    "Content-Type: application/json\r\n\r\n" +
+    JSON.stringify(backup) +
+    closeDelimiter;
+
+  const res = await fetch(
+    "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+    {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + accessToken,
+        "Content-Type": "multipart/related; boundary=" + boundary
+      },
+      body
+    }
+  );
+
+  if (!res.ok) {
+    alert("Errore nel backup su Google Drive.");
+    return;
+  }
+
+  alert("✅ Backup caricato su Google Drive!");
+}
+
+syncCloudBtn.onclick = () => {
+  if (!accessToken) {
+    getDriveToken(() => uploadBackupToDrive());
+  } else {
+    uploadBackupToDrive();
+  }
+};
 
 });
