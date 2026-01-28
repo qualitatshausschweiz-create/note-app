@@ -220,3 +220,63 @@ textarea, input {
 .modern-close:hover {
   background: #d32f2f;
 }
+/* --- IMPOSTAZIONI iOS 17 --- */
+
+.modern-settings {
+  padding: 20px;
+}
+
+.settings-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+  color: var(--text-color);
+}
+
+.settings-group {
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.modern-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  color: var(--text-color);
+  transition: 0.2s;
+}
+
+.modern-btn:last-child {
+  border-bottom: none;
+}
+
+.modern-btn:active {
+  background: rgba(0,0,0,0.08);
+}
+
+.modern-close {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: #ff3b30;
+  color: white;
+  font-weight: bold;
+  border: none;
+  margin-top: 10px;
+  transition: 0.2s;
+}
+
+.modern-close:active {
+  background: #d32f2f;
+}
