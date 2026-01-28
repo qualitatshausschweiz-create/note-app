@@ -1,21 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* TEMA SOLE/LUNA */
+  /* ---------------------- TEMA SOLE/LUNA ---------------------- */
   const themeToggle = document.getElementById("themeToggle");
   const savedTheme = localStorage.getItem("theme");
 
   if (savedTheme === "dark") {
     document.body.classList.add("dark");
     themeToggle.textContent = "🌙";
-  } else {
-    document.body.classList.remove("dark");
-    themeToggle.textContent = "☀️";
   }
 
   themeToggle.onclick = () => {
-    themeToggle.classList.add("animate");
-    setTimeout(() => themeToggle.classList.remove("animate"), 250);
-
     if (document.body.classList.contains("dark")) {
       document.body.classList.remove("dark");
       themeToggle.textContent = "☀️";
@@ -27,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  /* STORAGE */
+  /* ---------------------- STORAGE ---------------------- */
   let categories = JSON.parse(localStorage.getItem("categories")) || [
     { name: "Lavoro", color: "#1e90ff" },
     { name: "Spesa", color: "#ffa502" },
@@ -42,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function saveNotes() { localStorage.setItem("notes", JSON.stringify(notes)); }
   function saveTrash() { localStorage.setItem("trash", JSON.stringify(trash)); }
 
-  /* ELEMENTI */
+  /* ---------------------- ELEMENTI ---------------------- */
   const addNoteBtn = document.getElementById("addNoteBtn");
   const notePanel = document.getElementById("notePanel");
   const closeNotePanel = document.getElementById("closeNotePanel");
@@ -76,11 +70,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const resetDataBtn = document.getElementById("resetDataBtn");
   const memoryStatusBtn = document.getElementById("memoryStatusBtn");
 
+  const importBackupBtn = document.getElementById("importBackupBtn");
+  const syncCloudBtn = document.getElementById("syncCloudBtn");
+  const autoThemeBtn = document.getElementById("autoThemeBtn");
+
   let selectedCategory = null;
   let selectedNoteColor = "#1e90ff";
   let selectedCategoryColor = "#1e90ff";
 
-  /* ANIMAZIONE PANNELLI */
+  /* ---------------------- ANIMAZIONE PANNELLI ---------------------- */
   function openPanel(panel) {
     panel.classList.remove("hidden");
     setTimeout(() => panel.classList.add("show"), 10);
@@ -91,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => panel.classList.add("hidden"), 250);
   }
 
-  /* NOTE */
+  /* ---------------------- NOTE ---------------------- */
   addNoteBtn.onclick = () => {
     openPanel(notePanel);
     renderCategoryButtons();
@@ -131,59 +129,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
     colors.forEach(c => {
       const div = document.createElement("div");
-      div.className = "color";
+      div.className = "color-dot";
       div.style.background = c;
 
       div.onclick = () => {
         selectedNoteColor = c;
-        document.querySelectorAll("#notePalette .color").forEach(x => x.classList.remove("selected"));
-        div.classList.add("selected");
+        document.querySelectorAll(".color-dot").forEach(d => d.style.border = "none");
+        div.style.border = "2px solid #000";
       };
 
       notePalette.appendChild(div);
     });
-
-    notePalette.querySelector(".color").classList.add("selected");
   }
 
+  /* ---------------------- SALVATAGGIO NOTA ---------------------- */
   saveNoteBtn.onclick = () => {
-    const titolo = noteTitle.value.trim();
-    const testo = noteText.value.trim();
-    if (!titolo && !testo) return;
+    const title = noteTitle.value.trim();
+    const text = noteText.value.trim();
 
-    const categoriaScelta = selectedCategory || categories[0].name;
+    if (!title && !text) return;
 
-    const newNote = {
+    notes.push({
       id: Date.now(),
-      titolo,
-      testo,
-      colore: selectedNoteColor,
-      categoria: categoriaScelta,
-      data: new Date().toISOString()
-    };
+      title,
+      text,
+      category: selectedCategory || "Tutte",
+      color: selectedNoteColor,
+      date: new Date().toISOString()
+    });
 
-    notes.push(newNote);
     saveNotes();
     renderNotes();
     resetNoteForm();
     closePanel(notePanel);
   };
 
+  /* ---------------------- RENDER NOTE ---------------------- */
   function renderNotes() {
     notesContainer.innerHTML = "";
+
     notes.forEach(n => {
       const div = document.createElement("div");
-      div.className = "note";
-      div.style.borderLeftColor = n.colore;
+      div.className = "note-item";
+      div.style.background = n.color;
 
       div.innerHTML = `
-        <h3>${n.titolo}</h3>
-        <p>${n.testo}</p>
-        <small>${n.categoria}</small><br>
-        <button class="deleteNote">Elimina</button>
+        <h3>${n.title}</h3>
+        <p>${n.text}</p>
+        <small>${n.category}</small>
+        <button class="delete-note">🗑️</button>
       `;
 
-      div.querySelector(".deleteNote").onclick = () => {
+      div.querySelector(".delete-note").onclick = () => {
         trash.push(n);
         notes = notes.filter(x => x.id !== n.id);
         saveNotes();
@@ -197,7 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderNotes();
 
-  /* CESTINO */
+  /* ---------------------- CESTINO ---------------------- */
   trashBtn.onclick = () => {
     openPanel(trashPanel);
     renderTrash();
@@ -207,35 +204,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderTrash() {
     trashList.innerHTML = "";
-    if (trash.length === 0) {
-      trashList.textContent = "Cestino vuoto";
-      return;
-    }
 
-    trash.forEach(n => {
+    trash.forEach(t => {
       const div = document.createElement("div");
-      div.className = "note";
-      div.style.borderLeftColor = n.colore;
-
+      div.className = "trash-item";
       div.innerHTML = `
-        <h3>${n.titolo}</h3>
-        <p>${n.testo}</p>
-        <small>${n.categoria}</small><br>
-        <button class="restoreNote">Ripristina</button>
-        <button class="deleteForever">Elimina definitivamente</button>
+        <h3>${t.title}</h3>
+        <p>${t.text}</p>
+        <button class="restore">♻️</button>
+        <button class="remove">❌</button>
       `;
 
-      div.querySelector(".restoreNote").onclick = () => {
-        notes.push(n);
-        trash = trash.filter(x => x.id !== n.id);
+      div.querySelector(".restore").onclick = () => {
+        notes.push(t);
+        trash = trash.filter(x => x.id !== t.id);
         saveNotes();
         saveTrash();
         renderTrash();
         renderNotes();
       };
 
-      div.querySelector(".deleteForever").onclick = () => {
-        trash = trash.filter(x => x.id !== n.id);
+      div.querySelector(".remove").onclick = () => {
+        trash = trash.filter(x => x.id !== t.id);
         saveTrash();
         renderTrash();
       };
@@ -244,11 +234,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* CATEGORIE */
+  /* ---------------------- CATEGORIE ---------------------- */
   categoriesBtn.onclick = () => {
     openPanel(categoryPanel);
-    renderCategoryPalette();
     renderCategoryList();
+    renderCategoryPalette();
   };
 
   closeCategoryPanel.onclick = () => closePanel(categoryPanel);
@@ -259,26 +249,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     colors.forEach(c => {
       const div = document.createElement("div");
-      div.className = "color";
+      div.className = "color-dot";
       div.style.background = c;
 
       div.onclick = () => {
         selectedCategoryColor = c;
-        document.querySelectorAll("#categoryPalette .color").forEach(x => x.classList.remove("selected"));
-        div.classList.add("selected");
-        categoryColorPicker.value = c;
+        document.querySelectorAll("#categoryPalette .color-dot").forEach(d => d.style.border = "none");
+        div.style.border = "2px solid #000";
       };
 
       categoryPalette.appendChild(div);
     });
-
-    categoryPalette.querySelector(".color").classList.add("selected");
-    categoryColorPicker.value = colors[0];
-
-    categoryColorPicker.oninput = (e) => {
-      selectedCategoryColor = e.target.value;
-      document.querySelectorAll("#categoryPalette .color").forEach(x => x.classList.remove("selected"));
-    };
   }
 
   saveCategoryBtn.onclick = () => {
@@ -287,61 +268,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
     categories.push({ name, color: selectedCategoryColor });
     saveCategories();
-    newCategoryName.value = "";
     renderCategoryList();
-    renderCategoryButtons();
+    newCategoryName.value = "";
   };
 
   function renderCategoryList() {
     categoryList.innerHTML = "";
 
-    categories.forEach((cat, index) => {
-      const row = document.createElement("div");
-      row.className = "category-row";
-      row.innerHTML = `
-        <span>${cat.name}</span>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div style="width:16px;height:16px;border-radius:50%;background:${cat.color}"></div>
-          <button data-index="${index}">❌</button>
-        </div>
-      `;
+    categories.forEach(cat => {
+      const div = document.createElement("div");
+      div.className = "category-item";
+      div.style.background = cat.color;
+      div.textContent = cat.name;
 
-      row.querySelector("button").onclick = () => {
-        categories.splice(index, 1);
-        saveCategories();
-        renderCategoryList();
-        renderCategoryButtons();
+      div.onclick = () => {
+        selectedCategory = cat.name;
+        renderNotes();
+        closePanel(categoryPanel);
       };
 
-      categoryList.appendChild(row);
+      categoryList.appendChild(div);
     });
   }
 
-  /* IMPOSTAZIONI — ⚙️ */
-  settingsBtn.onclick = () => {
-    openPanel(settingsPanel);
-  };
-
-  closeSettingsPanel.onclick = () => {
-    closePanel(settingsPanel);
-  };
+  /* ---------------------- IMPOSTAZIONI ---------------------- */
+  settingsBtn.onclick = () => openPanel(settingsPanel);
+  closeSettingsPanel.onclick = () => closePanel(settingsPanel);
 
   infoAppBtn.onclick = () => {
-    alert("Note App — Versione 1.0\nSviluppata da Sandro");
+    alert("Note App — Versione 1.0\nCreata da Sandro");
   };
 
   exportBackupBtn.onclick = () => {
-    const backup = { notes, categories, trash };
-    const data = JSON.stringify(backup, null, 2);
-    const blob = new Blob([data], { type: "application/json" });
+    const backup = {
+      notes,
+      categories,
+      trash
+    };
+    const blob = new Blob([JSON.stringify(backup)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
     a.href = url;
     a.download = "backup_note_app.json";
     a.click();
-
-    URL.revokeObjectURL(url);
   };
 
   resetDataBtn.onclick = () => {
@@ -353,14 +323,38 @@ document.addEventListener("DOMContentLoaded", () => {
       saveCategories();
       saveTrash();
       renderNotes();
-      renderCategoryList();
-      alert("Dati cancellati.");
+      alert("Dati cancellati");
     }
   };
 
   memoryStatusBtn.onclick = () => {
-    const size = new Blob([JSON.stringify({ notes, categories, trash })]).size;
-    alert("Memoria usata: " + size + " bytes");
+    const used = JSON.stringify(localStorage).length;
+    alert(`Memoria usata: ${used} bytes`);
+  };
+
+  /* ---------------------- NUOVE FUNZIONI ---------------------- */
+
+  importBackupBtn.onclick = () => {
+    alert("Funzione Importa backup in arrivo!");
+  };
+
+  syncCloudBtn.onclick = () => {
+    alert("Sincronizzazione Google Drive / iCloud non ancora attiva.");
+  };
+
+  autoThemeBtn.onclick = () => {
+    const hour = new Date().getHours();
+    const isDay = hour >= 7 && hour <= 19;
+
+    if (isDay) {
+      document.body.classList.remove("dark");
+      themeToggle.textContent = "☀️";
+    } else {
+      document.body.classList.add("dark");
+      themeToggle.textContent = "🌙";
+    }
+
+    alert("Tema automatico attivato in base all'orario.");
   };
 
 });
