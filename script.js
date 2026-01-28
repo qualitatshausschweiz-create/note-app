@@ -1,8 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  // THEME (una sola icona + animazione)
+  // THEME
   const themeToggle = document.getElementById("themeToggle");
-
   const savedTheme = localStorage.getItem("theme");
 
   if (savedTheme === "dark") {
@@ -15,10 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   themeToggle.onclick = () => {
     themeToggle.classList.add("animate");
-
-    setTimeout(() => {
-      themeToggle.classList.remove("animate");
-    }, 250);
+    setTimeout(() => themeToggle.classList.remove("animate"), 250);
 
     if (document.body.classList.contains("dark")) {
       document.body.classList.remove("dark");
@@ -42,17 +38,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let notes = JSON.parse(localStorage.getItem("notes")) || [];
   let trash = JSON.parse(localStorage.getItem("trash")) || [];
 
-  function saveCategories() {
-    localStorage.setItem("categories", JSON.stringify(categories));
-  }
-  function saveNotes() {
-    localStorage.setItem("notes", JSON.stringify(notes));
-  }
-  function saveTrash() {
-    localStorage.setItem("trash", JSON.stringify(trash));
-  }
+  function saveCategories() { localStorage.setItem("categories", JSON.stringify(categories)); }
+  function saveNotes() { localStorage.setItem("notes", JSON.stringify(notes)); }
+  function saveTrash() { localStorage.setItem("trash", JSON.stringify(trash)); }
 
-  // ELEMENTI NOTE
+  // ELEMENTI
   const addNoteBtn = document.getElementById("addNoteBtn");
   const notePanel = document.getElementById("notePanel");
   const closeNotePanel = document.getElementById("closeNotePanel");
@@ -63,13 +53,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const notePalette = document.getElementById("notePalette");
   const notesContainer = document.getElementById("notesContainer");
 
-  // ELEMENTI CESTINO
   const trashBtn = document.getElementById("trashBtn");
   const trashPanel = document.getElementById("trashPanel");
   const closeTrashPanel = document.getElementById("closeTrashPanel");
   const trashList = document.getElementById("trashList");
 
-  // ELEMENTI CATEGORIE
   const categoriesBtn = document.getElementById("categoriesBtn");
   const categoryPanel = document.getElementById("categoryPanel");
   const closeCategoryPanel = document.getElementById("closeCategoryPanel");
@@ -79,7 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveCategoryBtn = document.getElementById("saveCategoryBtn");
   const categoryList = document.getElementById("categoryList");
 
-  // ⚙️ ELEMENTI IMPOSTAZIONI
   const settingsBtn = document.getElementById("settingsBtn");
   const settingsPanel = document.getElementById("settingsPanel");
   const closeSettingsPanel = document.getElementById("closeSettingsPanel");
@@ -93,17 +80,17 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedNoteColor = "#1e90ff";
   let selectedCategoryColor = "#1e90ff";
 
-  // ---------- NOTE ----------
-
+  // NOTE
   addNoteBtn.onclick = () => {
     notePanel.classList.remove("hidden");
+    setTimeout(() => notePanel.classList.add("show"), 10);
     renderCategoryButtons();
     renderNotePalette();
   };
 
   closeNotePanel.onclick = () => {
-    notePanel.classList.add("hidden");
-    resetNoteForm();
+    notePanel.classList.remove("show");
+    setTimeout(() => notePanel.classList.add("hidden"), 250);
   };
 
   function resetNoteForm() {
@@ -153,16 +140,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (first) first.classList.add("selected");
   }
 
-  // SALVATAGGIO NOTA CORRETTO
   saveNoteBtn.onclick = () => {
     const titolo = noteTitle.value.trim();
     const testo = noteText.value.trim();
-
     if (!titolo && !testo) return;
 
-    const categoriaScelta =
-      selectedCategory ||
-      (categories.length > 0 ? categories[0].name : "Senza categoria");
+    const categoriaScelta = selectedCategory || (categories.length > 0 ? categories[0].name : "Senza categoria");
 
     const newNote = {
       id: Date.now(),
@@ -177,12 +160,12 @@ document.addEventListener("DOMContentLoaded", () => {
     saveNotes();
     renderNotes();
     resetNoteForm();
-    notePanel.classList.add("hidden");
+    notePanel.classList.remove("show");
+    setTimeout(() => notePanel.classList.add("hidden"), 250);
   };
 
   function renderNotes() {
     notesContainer.innerHTML = "";
-
     notes.forEach(n => {
       const div = document.createElement("div");
       div.className = "note";
@@ -207,20 +190,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---------- CESTINO ----------
-
+  // CESTINO
   trashBtn.onclick = () => {
     trashPanel.classList.remove("hidden");
+    setTimeout(() => trashPanel.classList.add("show"), 10);
     renderTrash();
   };
 
   closeTrashPanel.onclick = () => {
-    trashPanel.classList.add("hidden");
+    trashPanel.classList.remove("show");
+    setTimeout(() => trashPanel.classList.add("hidden"), 250);
   };
 
   function renderTrash() {
     trashList.innerHTML = "";
-
     if (trash.length === 0) {
       trashList.textContent = "Cestino vuoto";
       return;
@@ -258,17 +241,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---------- CATEGORIE ----------
-
+  // CATEGORIE
   categoriesBtn.onclick = () => {
     categoryPanel.classList.remove("hidden");
+    setTimeout(() => categoryPanel.classList.add("show"), 10);
     renderCategoryPalette();
     renderCategoryList();
   };
 
   closeCategoryPanel.onclick = () => {
-    categoryPanel.classList.add("hidden");
-    newCategoryName.value = "";
+    categoryPanel.classList.remove("show");
+    setTimeout(() => categoryPanel.classList.add("hidden"), 250);
   };
 
   function renderCategoryPalette() {
@@ -324,100 +307,4 @@ document.addEventListener("DOMContentLoaded", () => {
         <span>${cat.name}</span>
         <div style="display:flex;align-items:center;gap:8px;">
           <div style="width:16px;height:16px;border-radius:50%;background:${cat.color};"></div>
-          <button data-index="${index}">❌</button>
-        </div>
-      `;
-
-      row.querySelector("button").onclick = () => {
-        categories.splice(index, 1);
-        saveCategories();
-        renderCategoryList();
-        renderCategoryButtons();
-      };
-
-      categoryList.appendChild(row);
-    });
-  }
-
-  // ---------- ⚙️ IMPOSTAZIONI (senza tema chiaro/scuro) ----------
-
-  settingsBtn.onclick = () => {
-    settingsPanel.classList.remove("hidden");
-  };
-
-  closeSettingsPanel.onclick = () => {
-    settingsPanel.classList.add("hidden");
-  };
-
-  // Info App
-  if (infoAppBtn) {
-    infoAppBtn.onclick = () => {
-      alert("Note App – versione 1.0\nSviluppata da Sandro.");
-    };
-  }
-
-  // Esporta backup
-  if (exportBackupBtn) {
-    exportBackupBtn.onclick = () => {
-      const backup = {
-        categories,
-        notes,
-        trash,
-        timestamp: new Date().toISOString()
-      };
-
-      const dataStr = JSON.stringify(backup, null, 2);
-      const blob = new Blob([dataStr], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "note-app-backup.json";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    };
-  }
-
-  // Reset totale dati
-  if (resetDataBtn) {
-    resetDataBtn.onclick = () => {
-      const conferma = confirm("Sei sicuro di voler cancellare tutti i dati?\nNote, categorie e cestino verranno eliminati.");
-      if (!conferma) return;
-
-      categories = [];
-      notes = [];
-      trash = [];
-      saveCategories();
-      saveNotes();
-      saveTrash();
-      renderNotes();
-      renderTrash();
-      alert("Dati cancellati con successo.");
-    };
-  }
-
-  // Stato memoria
-  if (memoryStatusBtn) {
-    memoryStatusBtn.onclick = () => {
-      const notesCount = notes.length;
-      const trashCount = trash.length;
-      const categoriesCount = categories.length;
-
-      const approxSize =
-        (JSON.stringify({ categories, notes, trash }).length / 1024).toFixed(1);
-
-      alert(
-        "Stato memoria:\n\n" +
-        "- Note: " + notesCount + "\n" +
-        "- Cestino: " + trashCount + "\n" +
-        "- Categorie: " + categoriesCount + "\n\n" +
-        "Dimensione approssimativa dati: " + approxSize + " KB"
-      );
-    };
-  }
-
-  // ---------- AVVIO ----------
-  renderNotes();
-});
+          <button data
