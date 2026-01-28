@@ -1,88 +1,68 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Note App</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Note App</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header>
-    <div class="icon-bar">
-        <button id="themeToggle">☀️</button>
-        <button id="addNoteBtn">➕</button>
-        <button id="categoriesBtn">📁</button>
-        <button id="trashBtn">🗑️</button>
-        <button id="settingsBtn">⚙️</button>
+  <div class="icon-bar">
+    <button id="themeToggle">☀️</button>
+    <button id="addNoteBtn">➕</button>
+    <button id="categoriesBtn">📁</button>
+    <button id="trashBtn">🗑️</button>
+    <button id="settingsBtn">⚙️</button>
+  </div>
+
+  <!-- Pannello Note -->
+  <div id="notePanel" class="panel hidden">
+    <div class="panel-content">
+      <input id="noteTitle" placeholder="Titolo">
+      <textarea id="noteText" placeholder="Testo"></textarea>
+      <div id="categoryButtons" class="category-buttons"></div>
+      <div id="notePalette" class="palette"></div>
+      <button id="saveNoteBtn" class="save">Salva</button>
+      <button id="closeNotePanel" class="close">Chiudi</button>
     </div>
-</header>
-
-<main id="notesContainer"></main>
-
-<!-- PANNELLO NUOVA NOTA -->
-<div id="notePanel" class="panel hidden">
-  <div class="panel-content">
-    <h2>Nuova Nota</h2>
-
-    <input type="text" id="noteTitle" placeholder="Titolo">
-    <textarea id="noteText" placeholder="Scrivi la tua nota..."></textarea>
-
-    <h3>Categoria</h3>
-    <div id="categoryButtons" class="category-buttons"></div>
-
-    <h3>Colore nota</h3>
-    <div class="palette" id="notePalette"></div>
-
-    <button id="saveNoteBtn" class="save">Salva nota</button>
-    <button id="closeNotePanel" class="close">Chiudi</button>
   </div>
-</div>
 
-<!-- PANNELLO CATEGORIE -->
-<div id="categoryPanel" class="panel hidden">
-  <div class="panel-content">
-    <h2>Categorie</h2>
-
-    <input type="text" id="newCategoryName" placeholder="Nome categoria">
-
-    <h3>Colore categoria</h3>
-    <div class="palette" id="categoryPalette"></div>
-    <input type="color" id="categoryColorPicker" value="#1e90ff" style="margin-top:8px;">
-
-    <button id="saveCategoryBtn" class="save">Salva categoria</button>
-
-    <h3>Categorie esistenti</h3>
-    <div id="categoryList"></div>
-
-    <button id="closeCategoryPanel" class="close">Chiudi</button>
+  <!-- Pannello Categorie -->
+  <div id="categoryPanel" class="panel hidden">
+    <div class="panel-content">
+      <input id="newCategoryName" placeholder="Nome categoria">
+      <div id="categoryPalette" class="palette"></div>
+      <input type="color" id="categoryColorPicker">
+      <button id="saveCategoryBtn" class="save">Salva categoria</button>
+      <div id="categoryList"></div>
+      <button id="closeCategoryPanel" class="close">Chiudi</button>
+    </div>
   </div>
-</div>
 
-<!-- PANNELLO CESTINO -->
-<div id="trashPanel" class="panel hidden">
-  <div class="panel-content">
-    <h2>Cestino</h2>
-    <div id="trashList"></div>
-    <button id="closeTrashPanel" class="close">Chiudi</button>
+  <!-- Pannello Cestino -->
+  <div id="trashPanel" class="panel hidden">
+    <div class="panel-content">
+      <div id="trashList"></div>
+      <button id="closeTrashPanel" class="close">Chiudi</button>
+    </div>
   </div>
-</div>
 
-<!-- ⚙️ PANNELLO IMPOSTAZIONI -->
-<div id="settingsPanel" class="panel hidden">
-  <div class="panel-content">
-    <h2>Impostazioni ⚙️</h2>
+  <!-- Pannello Impostazioni -->
+  <div id="settingsPanel" class="panel hidden">
+    <div class="panel-content">
+      <h2>Impostazioni ⚙️</h2>
 
-    <button class="setting-btn" id="infoAppBtn">ℹ️ Info App</button>
-    <button class="setting-btn" id="toggleThemeBtn">🌓 Tema chiaro/scuro</button>
-    <button class="setting-btn" id="exportBackupBtn">📤 Esporta backup</button>
-    <button class="setting-btn" id="resetDataBtn">🗑️ Reset totale dati</button>
-    <button class="setting-btn" id="memoryStatusBtn">💾 Stato memoria</button>
+      <button id="infoAppBtn">ℹ️ Info App</button>
+      <!-- Tema chiaro/scuro RIMOSSO -->
+      <button id="exportBackupBtn">📤 Esporta backup</button>
+      <button id="resetDataBtn">🗑️ Reset totale dati</button>
+      <button id="memoryStatusBtn">💾 Stato memoria</button>
 
-    <button id="closeSettingsPanel" class="close">Chiudi</button>
+      <button id="closeSettingsPanel" class="close">Chiudi</button>
+    </div>
   </div>
-</div>
 
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
