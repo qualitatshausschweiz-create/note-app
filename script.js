@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const CLIENT_ID = "792122447047-u30lrb5oo1jjbnkibfh420ah0o95e3d8.apps.googleusercontent.com";
+
+  /* GOOGLE DRIVE CONFIG */
+  const CLIENT_ID = "792122447047-u30lrb5oo1jjbnkibfh420ah0o95e3d8.apps.googleusercontent.com";
   const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
   let accessToken = null;
 
@@ -19,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     tokenClient.requestAccessToken();
   }
-
 
   /* TEMA SOLE/LUNA */
   const themeToggle = document.getElementById("themeToggle");
@@ -63,6 +64,15 @@ document.addEventListener("DOMContentLoaded", () => {
   function saveNotes() { localStorage.setItem("notes", JSON.stringify(notes)); }
   function saveTrash() { localStorage.setItem("trash", JSON.stringify(trash)); }
 
+  /* BACKUP OBJECT */
+  function createBackupObject() {
+    return {
+      notes,
+      categories,
+      trash
+    };
+  }
+
   /* ELEMENTI */
   const addNoteBtn = document.getElementById("addNoteBtn");
   const notePanel = document.getElementById("notePanel");
@@ -96,6 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const exportBackupBtn = document.getElementById("exportBackupBtn");
   const resetDataBtn = document.getElementById("resetDataBtn");
   const memoryStatusBtn = document.getElementById("memoryStatusBtn");
+  const syncCloudBtn = document.getElementById("syncCloudBtn");
 
   let selectedCategory = null;
   let selectedNoteColor = "#1e90ff";
@@ -373,13 +384,6 @@ document.addEventListener("DOMContentLoaded", () => {
       saveNotes();
       saveCategories();
       saveTrash();
-      function createBackupObject() {
-  return {
-    notes,
-    categories,
-    trash
-  };
-}
 
       renderNotes();
       renderCategoryList();
@@ -391,58 +395,60 @@ document.addEventListener("DOMContentLoaded", () => {
     const size = new Blob([JSON.stringify({ notes, categories, trash })]).size;
     alert("Memoria usata: " + size + " bytes");
   };
-async function uploadBackupToDrive() {
-  if (!accessToken) {
-    alert("Token Google non presente.");
-    return;
-  }
 
-  const backup = createBackupObject();
-
-  const metadata = {
-    name: "note_app_backup.json",
-    mimeType: "application/json"
-  };
-
-  const boundary = "-------314159265358979323846";
-  const delimiter = "\r\n--" + boundary + "\r\n";
-  const closeDelimiter = "\r\n--" + boundary + "--";
-
-  const body =
-    delimiter +
-    "Content-Type: application/json; charset=UTF-8\r\n\r\n" +
-    JSON.stringify(metadata) +
-    delimiter +
-    "Content-Type: application/json\r\n\r\n" +
-    JSON.stringify(backup) +
-    closeDelimiter;
-
-  const res = await fetch(
-    "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
-    {
-      method: "POST",
-      headers: {
-        "Authorization": "Bearer " + accessToken,
-        "Content-Type": "multipart/related; boundary=" + boundary
-      },
-      body
+  /* GOOGLE DRIVE UPLOAD */
+  async function uploadBackupToDrive() {
+    if (!accessToken) {
+      alert("Token Google non presente.");
+      return;
     }
-  );
 
-  if (!res.ok) {
-    alert("Errore nel backup su Google Drive.");
-    return;
+    const backup = createBackupObject();
+
+    const metadata = {
+      name: "note_app_backup.json",
+      mimeType: "application/json"
+    };
+
+    const boundary = "-------314159265358979323846";
+    const delimiter = "\r\n--" + boundary + "\r\n";
+    const closeDelimiter = "\r\n--" + boundary + "--";
+
+    const body =
+      delimiter +
+      "Content-Type: application/json; charset=UTF-8\r\n\r\n" +
+      JSON.stringify(metadata) +
+      delimiter +
+      "Content-Type: application/json\r\n\r\n" +
+      JSON.stringify(backup) +
+      closeDelimiter;
+
+    const res = await fetch(
+      "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+      {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + accessToken,
+          "Content-Type": "multipart/related; boundary=" + boundary
+        },
+        body
+      }
+    );
+
+    if (!res.ok) {
+      alert("Errore nel backup su Google Drive.");
+      return;
+    }
+
+    alert("✅ Backup caricato su Google Drive!");
   }
 
-  alert("✅ Backup caricato su Google Drive!");
-}
-
-syncCloudBtn.onclick = () => {
-  if (!accessToken) {
-    getDriveToken(() => uploadBackupToDrive());
-  } else {
-    uploadBackupToDrive();
-  }
-};
+  syncCloudBtn.onclick = () => {
+    if (!accessToken) {
+      getDriveToken(() => uploadBackupToDrive());
+    } else {
+      uploadBackupToDrive();
+    }
+  };
 
 });
