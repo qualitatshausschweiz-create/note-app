@@ -357,14 +357,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  // Tema chiaro/scuro
-  if (themeSettingsBtn) {
-    themeSettingsBtn.onclick = () => {
-      themeToggle.click();
-    };
-  }
-
-  // Esporta backup
+// Esporta backup
   if (exportBackupBtn) {
     exportBackupBtn.onclick = () => {
       const backup = {
