@@ -30,7 +30,7 @@ body {
   cursor: pointer;
 }
 
-/* PANELLO BASE + ANIMAZIONE PREMIUM */
+/* PANELLO + ANIMAZIONE PREMIUM */
 .panel {
   position: fixed;
   left: 0;
@@ -71,7 +71,7 @@ body {
   100% { transform: translateY(0); }
 }
 
-/* IMPOSTAZIONI — SECONDA PARTE */
+/* IMPOSTAZIONI — DIVIDER iOS */
 .settings-box {
   padding-top: 10px;
 }
