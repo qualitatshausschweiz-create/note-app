@@ -317,4 +317,54 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  /* IMPOSTAZIONI — ⚙️ FUNZIONANTE */
+  settingsBtn.onclick = () => {
+    openPanel(settingsPanel);
+  };
+
+  closeSettingsPanel.onclick = () => {
+    closePanel(settingsPanel);
+  };
+
+  infoAppBtn.onclick = () => {
+    alert("Note App — Versione 1.0\nSviluppata da Sandro");
+  };
+
+  exportBackupBtn.onclick = () => {
+    const backup = {
+      notes,
+      categories,
+      trash
+    };
+    const data = JSON.stringify(backup, null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "backup_note_app.json";
+    a.click();
+
+    URL.revokeObjectURL(url);
+  };
+
+  resetDataBtn.onclick = () => {
+    if (confirm("Vuoi davvero cancellare tutti i dati?")) {
+      notes = [];
+      categories = [];
+      trash = [];
+      saveNotes();
+      saveCategories();
+      saveTrash();
+      renderNotes();
+      renderCategoryList();
+      alert("Dati cancellati.");
+    }
+  };
+
+  memoryStatusBtn.onclick = () => {
+    const size = new Blob([JSON.stringify({ notes, categories, trash })]).size;
+    alert("Memoria usata: " + size + " bytes");
+  };
+
 });
