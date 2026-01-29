@@ -321,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCategoryButtons();
   };
 
-  /* LISTA CATEGORIE — CERCHI GRANDI */
+  /* ⭐ LISTA CATEGORIE CON CERCHI GRANDI + SELEZIONE + ANIMAZIONE */
   function renderCategoryList() {
     categoryList.innerHTML = "";
 
@@ -333,21 +333,25 @@ document.addEventListener("DOMContentLoaded", () => {
       row.style.justifyContent = "space-between";
       row.style.marginBottom = "14px";
 
+      // Cerchio grande
       const circle = document.createElement("div");
       circle.className = "category-list-color";
       circle.style.backgroundColor = cat.color;
 
+      // Nome categoria
       const name = document.createElement("span");
       name.textContent = cat.name;
       name.style.fontSize = "17px";
       name.style.marginLeft = "12px";
 
+      // Contenitore cerchio + nome
       const left = document.createElement("div");
       left.style.display = "flex";
       left.style.alignItems = "center";
       left.appendChild(circle);
       left.appendChild(name);
 
+      // Bottone elimina
       const del = document.createElement("button");
       del.textContent = "❌";
       del.style.border = "none";
@@ -360,6 +364,16 @@ document.addEventListener("DOMContentLoaded", () => {
         saveCategories();
         renderCategoryList();
         renderCategoryButtons();
+      };
+
+      // ⭐ CLICK SULLA CATEGORIA → SELEZIONE VISIVA + ANIMAZIONE
+      left.onclick = () => {
+        document.querySelectorAll(".category-row").forEach(r => {
+          r.classList.remove("category-selected");
+        });
+
+        row.classList.add("category-selected");
+        selectedCategory = cat.name;
       };
 
       row.appendChild(left);
