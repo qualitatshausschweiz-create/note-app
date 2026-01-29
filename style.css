@@ -119,10 +119,9 @@ textarea, input {
   margin: 10px 0;
 }
 
-/* 🎯 CERCHI COLORATI GRANDI (categorie + note) */
 .color {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   cursor: pointer;
   border: 2px solid transparent;
@@ -280,4 +279,39 @@ textarea, input {
 
 .modern-close:active {
   background: #d32f2f;
+}
+
+/* --- CERCHI CATEGORIE PREMIUM --- */
+.category-color {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 6px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+.category-color:hover {
+  transform: scale(1.12);
+  box-shadow: 0 0 12px rgba(0,0,0,0.18);
+}
+
+.category-color.selected {
+  border-color: #000;
+  transform: scale(1.22);
+  box-shadow:
+    0 0 10px rgba(0,0,0,0.25),
+    0 0 18px rgba(0,0,0,0.15);
+}
+
+.category-color:active {
+  transform: scale(0.88);
 }
