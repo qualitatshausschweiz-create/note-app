@@ -248,7 +248,61 @@ textarea, input {
   background: #d32f2f;
 }
 
-/* ⭐ CORREZIONE: CERCHI GRANDI NELLA LISTA CATEGORIE */
+/* ⭐ NUOVE VOCI IMPOSTAZIONI (toggle + select) */
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 6px;
+  font-size: 17px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.toggle {
+  appearance: none;
+  width: 48px;
+  height: 28px;
+  background: #ccc;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.toggle:checked {
+  background: #34c759;
+}
+
+.toggle::before {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  background: white;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.25s ease;
+}
+
+.toggle:checked::before {
+  transform: translateX(20px);
+}
+
+.select-ios {
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.2);
+  background: rgba(255,255,255,0.7);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* ⭐ CERCHI GRANDI NELLA LISTA CATEGORIE */
 .category-list-color {
   width: 32px;
   height: 32px;
@@ -264,7 +318,8 @@ textarea, input {
   transform: scale(1.12);
   box-shadow: 0 0 10px rgba(0,0,0,0.15);
 }
-/* ⭐ CERCHI GRANDI NELLA LISTA CATEGORIE + GLOW + BOUNCE + SELEZIONE */
+
+/* ⭐ CERCHI GRANDI + GLOW + BOUNCE + SELEZIONE */
 .category-list-color {
   width: 32px;
   height: 32px;
@@ -279,32 +334,27 @@ textarea, input {
     border-color 0.25s ease;
 }
 
-/* Glow al passaggio */
 .category-list-color:hover {
   transform: scale(1.12);
   box-shadow: 0 0 12px rgba(0,0,0,0.18);
 }
 
-/* Bounce iOS 17 alla pressione */
 .category-list-color:active {
   transform: scale(0.85);
   box-shadow: 0 0 6px rgba(0,0,0,0.15);
 }
 
-/* ⭐ Categoria selezionata: bordo nero + pulse */
 .category-selected .category-list-color {
   border-color: #000;
   animation: pulseCategory 0.55s ease-out;
 }
 
-/* Effetto pulsazione morbida */
 @keyframes pulseCategory {
   0%   { transform: scale(1); }
   40%  { transform: scale(1.22); }
   100% { transform: scale(1); }
 }
 
-/* ⭐ Nome categoria allineato perfettamente al cerchio */
 .category-row span {
   font-size: 17px;
   margin-left: 12px;
@@ -312,7 +362,6 @@ textarea, input {
   vertical-align: middle;
 }
 
-/* ⭐ Contenitore riga categoria */
 .category-row {
   display: flex;
   align-items: center;
