@@ -119,9 +119,10 @@ textarea, input {
   margin: 10px 0;
 }
 
+/* 🎯 CERCHI COLORATI GRANDI (categorie + note) */
 .color {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   cursor: pointer;
   border: 2px solid transparent;
@@ -157,24 +158,24 @@ textarea, input {
   transform: rotate(180deg) scale(1.2);
   opacity: 0.7;
 }
+
 /* NOTE — leggibilità perfetta */
 .note {
   border-left: 8px solid;
   padding: 12px;
   margin-bottom: 10px;
   border-radius: 6px;
-  background: #ffffff;   /* sfondo chiaro */
-  color: #000000;        /* testo nero */
+  background: #ffffff;
+  color: #000000;
 }
 
-/* Testo interno sempre leggibile */
 .note h3,
 .note p,
 .note small {
   color: #000000;
 }
-/* --- IMPOSTAZIONI MODERNE --- */
 
+/* --- IMPOSTAZIONI MODERNE --- */
 .modern-settings {
   padding: 20px;
 }
@@ -220,8 +221,8 @@ textarea, input {
 .modern-close:hover {
   background: #d32f2f;
 }
-/* --- IMPOSTAZIONI iOS 17 --- */
 
+/* --- IMPOSTAZIONI iOS 17 --- */
 .modern-settings {
   padding: 20px;
 }
