@@ -543,3 +543,68 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 10);
   }
 
+  /* ============================================================
+     ⭐ NUOVE IMPOSTAZIONI iOS 17 — PARTE 2
+     ============================================================ */
+
+  /* Override di renderNotes per ordinamento + animazioni */
+  const originalRenderNotes = renderNotes;
+  renderNotes = function () {
+    notesContainer.innerHTML = "";
+
+    sortNotes();
+
+    notes.forEach(n => {
+      const div = document.createElement("div");
+      div.className = "note";
+      div.style.borderLeftColor = n.colore;
+
+      div.innerHTML = `
+        <h3>${n.titolo}</h3>
+        <p>${n.testo}</p>
+        <small>${n.categoria}</small><br>
+        <button class="deleteNote">Elimina</button>
+      `;
+
+      div.querySelector(".deleteNote").onclick = () => {
+        vibrate();
+        trash.push(n);
+        notes = notes.filter(x => x.id !== n.id);
+        saveNotes();
+        saveTrash();
+        renderNotes();
+      };
+
+      applyNoteAnimations(div);
+      notesContainer.appendChild(div);
+    });
+  };
+
+  /* LISTENER IMPOSTAZIONI */
+  settingThemeAuto.onchange = () => {
+    appSettings.themeAuto = settingThemeAuto.checked;
+    localStorage.setItem("appSettings", JSON.stringify(appSettings));
+    applyDynamicTheme();
+    vibrate();
+  };
+
+  settingVibration.onchange = () => {
+    appSettings.vibration = settingVibration.checked;
+    localStorage.setItem("appSettings", JSON.stringify(appSettings));
+    vibrate();
+  };
+
+  settingSort.onchange = () => {
+    appSettings.sort = settingSort.value;
+    localStorage.setItem("appSettings", JSON.stringify(appSettings));
+    renderNotes();
+    vibrate();
+  };
+
+  settingAnimations.onchange = () => {
+    appSettings.animations = settingAnimations.checked;
+    localStorage.setItem("appSettings", JSON.stringify(appSettings));
+    vibrate();
+  };
+
+}); // 🔥 CHIUSURA FINALE DEL DOMContentLoaded
