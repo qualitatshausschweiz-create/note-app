@@ -333,25 +333,21 @@ document.addEventListener("DOMContentLoaded", () => {
       row.style.justifyContent = "space-between";
       row.style.marginBottom = "14px";
 
-      // Cerchio grande
       const circle = document.createElement("div");
       circle.className = "category-list-color";
       circle.style.backgroundColor = cat.color;
 
-      // Nome categoria
       const name = document.createElement("span");
       name.textContent = cat.name;
       name.style.fontSize = "17px";
       name.style.marginLeft = "12px";
 
-      // Contenitore cerchio + nome
       const left = document.createElement("div");
       left.style.display = "flex";
       left.style.alignItems = "center";
       left.appendChild(circle);
       left.appendChild(name);
 
-      // Bottone elimina
       const del = document.createElement("button");
       del.textContent = "❌";
       del.style.border = "none";
@@ -366,7 +362,6 @@ document.addEventListener("DOMContentLoaded", () => {
         renderCategoryButtons();
       };
 
-      // ⭐ CLICK SULLA CATEGORIA → SELEZIONE VISIVA + ANIMAZIONE
       left.onclick = () => {
         document.querySelectorAll(".category-row").forEach(r => {
           r.classList.remove("category-selected");
@@ -481,4 +476,70 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-});
+  /* ============================================================
+     ⭐ NUOVE IMPOSTAZIONI iOS 17 — PARTE 1
+     ============================================================ */
+
+  const settingThemeAuto = document.getElementById("settingThemeAuto");
+  const settingVibration = document.getElementById("settingVibration");
+  const settingSort = document.getElementById("settingSort");
+  const settingAnimations = document.getElementById("settingAnimations");
+
+  let appSettings = JSON.parse(localStorage.getItem("appSettings")) || {
+    themeAuto: false,
+    vibration: false,
+    sort: "recenti",
+    animations: true
+  };
+
+  settingThemeAuto.checked = appSettings.themeAuto;
+  settingVibration.checked = appSettings.vibration;
+  settingSort.value = appSettings.sort;
+  settingAnimations.checked = appSettings.animations;
+
+  function applyDynamicTheme() {
+    if (!appSettings.themeAuto) return;
+
+    const hour = new Date().getHours();
+    if (hour >= 19 || hour <= 6) {
+      document.body.classList.add("dark");
+      themeToggle.textContent = "🌙";
+    } else {
+      document.body.classList.remove("dark");
+      themeToggle.textContent = "☀️";
+    }
+  }
+  applyDynamicTheme();
+
+  function vibrate(ms = 40) {
+    if (appSettings.vibration && navigator.vibrate) {
+      navigator.vibrate(ms);
+    }
+  }
+
+  function sortNotes() {
+    if (appSettings.sort === "recenti") {
+      notes.sort((a, b) => new Date(b.data) - new Date(a.data));
+    }
+    if (appSettings.sort === "vecchie") {
+      notes.sort((a, b) => new Date(a.data) - new Date(b.data));
+    }
+    if (appSettings.sort === "colore") {
+      notes.sort((a, b) => a.colore.localeCompare(b.colore));
+    }
+    if (appSettings.sort === "titolo") {
+      notes.sort((a, b) => a.titolo.localeCompare(b.titolo));
+    }
+  }
+
+  function applyNoteAnimations(div) {
+    if (!appSettings.animations) return;
+    div.style.transition = "transform 0.25s ease, opacity 0.25s ease";
+    div.style.opacity = "0";
+    div.style.transform = "translateY(10px)";
+    setTimeout(() => {
+      div.style.opacity = "1";
+      div.style.transform = "translateY(0)";
+    }, 10);
+  }
+
