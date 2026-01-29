@@ -66,11 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* BACKUP OBJECT */
   function createBackupObject() {
-    return {
-      notes,
-      categories,
-      trash
-    };
+    return { notes, categories, trash };
   }
 
   /* ELEMENTI */
@@ -201,6 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
     closePanel(notePanel);
   };
 
+  /* NOTE LIST */
   function renderNotes() {
     notesContainer.innerHTML = "";
     notes.forEach(n => {
@@ -324,39 +321,58 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCategoryButtons();
   };
 
+  /* LISTA CATEGORIE — CERCHI GRANDI */
   function renderCategoryList() {
     categoryList.innerHTML = "";
 
     categories.forEach((cat, index) => {
       const row = document.createElement("div");
       row.className = "category-row";
-      row.innerHTML = `
-        <span>${cat.name}</span>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div style="width:16px;height:16px;border-radius:50%;background:${cat.color}"></div>
-          <button data-index="${index}">❌</button>
-        </div>
-      `;
+      row.style.display = "flex";
+      row.style.alignItems = "center";
+      row.style.justifyContent = "space-between";
+      row.style.marginBottom = "14px";
 
-      row.querySelector("button").onclick = () => {
+      const circle = document.createElement("div");
+      circle.className = "category-list-color";
+      circle.style.backgroundColor = cat.color;
+
+      const name = document.createElement("span");
+      name.textContent = cat.name;
+      name.style.fontSize = "17px";
+      name.style.marginLeft = "12px";
+
+      const left = document.createElement("div");
+      left.style.display = "flex";
+      left.style.alignItems = "center";
+      left.appendChild(circle);
+      left.appendChild(name);
+
+      const del = document.createElement("button");
+      del.textContent = "❌";
+      del.style.border = "none";
+      del.style.background = "transparent";
+      del.style.fontSize = "20px";
+      del.style.cursor = "pointer";
+
+      del.onclick = () => {
         categories.splice(index, 1);
         saveCategories();
         renderCategoryList();
         renderCategoryButtons();
       };
 
+      row.appendChild(left);
+      row.appendChild(del);
       categoryList.appendChild(row);
     });
   }
 
-  /* IMPOSTAZIONI — ⚙️ */
-  settingsBtn.onclick = () => {
-    openPanel(settingsPanel);
-  };
+  renderCategoryList();
 
-  closeSettingsPanel.onclick = () => {
-    closePanel(settingsPanel);
-  };
+  /* IMPOSTAZIONI */
+  settingsBtn.onclick = () => openPanel(settingsPanel);
+  closeSettingsPanel.onclick = () => closePanel(settingsPanel);
 
   infoAppBtn.onclick = () => {
     alert("Note App — Versione 1.0\nSviluppata da Sandro");
