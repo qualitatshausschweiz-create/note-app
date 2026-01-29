@@ -61,6 +61,37 @@
 
       <h2>Impostazioni ⚙️</h2>
 
+      <!-- Sezione moderna stile iOS 17 -->
+      <div class="settings-group">
+
+        <label class="settings-row">
+          <span>Tema dinamico</span>
+          <input type="checkbox" id="settingThemeAuto" class="toggle">
+        </label>
+
+        <label class="settings-row">
+          <span>Vibrazione feedback</span>
+          <input type="checkbox" id="settingVibration" class="toggle">
+        </label>
+
+        <label class="settings-row">
+          <span>Ordinamento note</span>
+          <select id="settingSort" class="select-ios">
+            <option value="recenti">Più recenti</option>
+            <option value="vecchie">Più vecchie</option>
+            <option value="colore">Per colore categoria</option>
+            <option value="titolo">Titolo A‑Z</option>
+          </select>
+        </label>
+
+        <label class="settings-row">
+          <span>Animazioni avanzate</span>
+          <input type="checkbox" id="settingAnimations" class="toggle">
+        </label>
+
+      </div>
+
+      <!-- Pulsanti già esistenti -->
       <button id="infoAppBtn" class="settings-item">ℹ️ Info App</button>
       <button id="exportBackupBtn" class="settings-item">📤 Esporta backup</button>
       <button id="syncCloudBtn" class="settings-item">☁️ Sincronizza con Google Drive</button>
